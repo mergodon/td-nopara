@@ -38,6 +38,7 @@ Copy the templates from the framework repo at `~/.claude/td-templates/` (or `/Us
 - `.td/TESTING.md` → fill placeholders
 - `.td/ENV.md` → fill placeholders
 - `.td/STATE.md` → fill placeholders, set `Last action` to today's date
+- `.td/INBOX.md` → copy as-is (empty inbox)
 - `.td/frameworks/.gitkeep` → empty file
 - `.gitignore` → merge with existing (do not clobber)
 - `.env.example` → only if no `.env.example` exists; otherwise leave alone
@@ -56,6 +57,8 @@ Stage and commit:
 git add CLAUDE.md .td/ .gitignore .env.example
 git commit -m "chore: td-flow init"
 ```
+
+If a `.td/INBOX.md` template was created, it's part of `.td/` and gets included in this commit.
 
 If the user already had a remote configured, ask: "Push to `origin/main` now?" If yes, push.
 

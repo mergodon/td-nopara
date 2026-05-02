@@ -11,7 +11,11 @@ You are starting a BIG flow for a new feature. The argument is the feature name 
 
 # Step 1 — Discuss
 
-Read `.td/PROJECT.md` first. Then ask the user 3–5 bullet questions to scope the feature. Examples:
+Read `.td/PROJECT.md` and `.td/INBOX.md` first. If any inbox items match the feature being scoped (same surface, same component), surface them in this step:
+
+> "Inbox has these related items: [list]. Should we fold any in?"
+
+Then ask the user 3–5 bullet questions to scope the feature. Examples:
 
 - What's the user-visible outcome of this feature in one sentence?
 - What's the simplest version that ships value?
@@ -104,3 +108,4 @@ One-line summary: "Plan locked: {{N}} pieces. Run `/td-ship` to do piece 01."
 - Do not start coding in this command. This command only plans.
 - Do not commit anything yet. The plan files in `.td/flow/` get committed as part of the first piece's `/td-ship`.
 - If the user's answers reveal the feature is actually a SMALL fix, suggest `/td-fix` instead and abort cleanly.
+- If inbox items get folded in, mark them clearly in `00-brief.md` so they get deleted from `INBOX.md` when the feature ships.

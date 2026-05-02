@@ -21,13 +21,14 @@ Invoke (or remind the user about) td-flow when:
 - The user asks how to handle a feature, fix, or session reset and they have a `.td/` directory in their project.
 - The user mentions Laravel Boost, framework pollution in CLAUDE.md, or wanting to clean up auto-generated agent files.
 
-## The seven commands
+## The eight commands
 
 | Command | Job |
 |---|---|
 | `/td-init` | Bootstrap td-flow in the current directory. Brownfield-aware. |
 | `/td-feature <name>` | Start a BIG flow: discuss → plan → reality check. |
 | `/td-fix <description>` | Start a SMALL flow. |
+| `/td-note <text>` | Append a bug or idea to `.td/INBOX.md` mid-flow without breaking what you're doing. |
 | `/td-ship` | Do the next piece (BIG) or the fix (SMALL): work + test + commit + push + advance. |
 | `/td-status` | Print the project's current state. |
 | `/td-reset` | Squash local-only commits, write a handoff into `.td/STATE.md`, push. Run before `/clear`. |
@@ -42,6 +43,7 @@ CLAUDE.md                    ← stable contract, identical across projects
   TESTING.md                 ← test command + pre-ship checklist
   ENV.md                     ← live env (URLs, deploy, dashboards)
   STATE.md                   ← where we are now (≤50 lines, rewritten)
+  INBOX.md                   ← bugs and ideas captured via /td-note
   frameworks/                ← redirect target for framework injections
   flow/                      ← active work; deleted on completion
 .claude/                     ← optional per-project Claude config

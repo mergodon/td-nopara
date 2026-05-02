@@ -11,7 +11,7 @@ You are starting a SMALL flow for a fix or tweak. The argument is a short descri
 
 # Step 1 — Write fix.md
 
-Read `.td/PROJECT.md` and `.td/TESTING.md` for context. Write `.td/flow/fix.md`:
+Read `.td/PROJECT.md`, `.td/TESTING.md`, and `.td/INBOX.md` for context. If the fix description matches an inbox `[bug]` line, plan to delete that line as part of the fix's commit. Write `.td/flow/fix.md`:
 
 ```
 # Fix: {{description}}

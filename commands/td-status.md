@@ -8,6 +8,7 @@ You are showing the user where they stand. This command is read-only — never m
 
 - `.td/STATE.md`
 - `.td/flow/` listing (filenames only)
+- `.td/INBOX.md` (count `[bug]` and `[idea]` lines)
 - `git status --short` (uncommitted changes)
 - `git log --oneline -5` (last 5 commits)
 - `git rev-list --count origin/main..HEAD` (local commits ahead of remote, if any)
@@ -28,6 +29,7 @@ Next: <STATE.md "Next" line>
 Blocker: <STATE.md "Blocker" line>
 
 Flow files: <count> (<list of NN-names if BIG, or "fix.md" if SMALL, or "—" if none>)
+Inbox: <total> items (<bugs> bugs, <ideas> ideas)
 Uncommitted: <count> files
 Local commits ahead: <count>
 

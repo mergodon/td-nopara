@@ -56,6 +56,7 @@ If the push is rejected (someone else pushed, network failure), surface the erro
 # Step 7 — Advance
 
 **SMALL flow:**
+- If `fix.md` referenced an inbox item, remove that line from `.td/INBOX.md` (stage it together with the fix changes).
 - Delete `.td/flow/`.
 - Update `.td/PROJECT.md`: if this fix corresponds to a "Shipped" line, add it; otherwise leave PROJECT.md alone.
 - Rewrite `.td/STATE.md` to idle:
@@ -71,6 +72,7 @@ If the push is rejected (someone else pushed, network failure), surface the erro
 - Mark the piece done in `.td/flow/plan.md` (prefix the piece line with `[x]`).
 - If more pieces remain: rewrite `.td/STATE.md` to point at the next piece.
 - If this was the last piece:
+  - If `00-brief.md` referenced inbox items, remove those lines from `.td/INBOX.md` (stage with the final piece's commit).
   - Update `.td/PROJECT.md`: move the feature from "Active scope" to "Shipped".
   - Delete `.td/flow/`.
   - Rewrite `.td/STATE.md` to idle.

@@ -2,14 +2,15 @@
 
 This file is the contract. It does not change project-to-project. Project-specific things live in `.td/`. Frameworks must not write here — see "Framework guidelines" below.
 
-## The four living files
+## The five living files
 
-Always read these first. Never append, always rewrite to current truth.
+Always read these first. Never append (except INBOX.md), always rewrite to current truth.
 
 - `.td/PROJECT.md` — what this is, who for, stack, current scope, shipped, out of scope. Edited freely; reflects the present.
 - `.td/TESTING.md` — how to test this project. The single source for test commands and the pre-ship checklist.
 - `.td/ENV.md` — live environment: URLs, deploy command, dashboards, where logs are, where secrets live (names only — actual values stay in `.env`, gitignored).
 - `.td/STATE.md` — where we are right now. ≤50 lines. Rewritten after every meaningful action. Past sessions are not kept here — git is the log.
+- `.td/INBOX.md` — bugs and ideas captured mid-flow via `/td-note`. Append-only. Items get deleted when they ship.
 
 ## The two flows
 
@@ -68,15 +69,16 @@ Run `/td-reset`:
 
 Never force-push commits that are already on `origin/main`.
 
-## The seven commands
+## The eight commands
 
 | Command | Job |
 |---|---|
 | `/td-init` | Bootstrap a project. Brownfield-aware: maps existing files, asks for gaps, fills `.td/`. |
 | `/td-feature <name>` | Start a BIG flow: discuss → plan → reality check. |
 | `/td-fix <description>` | Start a SMALL flow. |
+| `/td-note <text>` | Append a bug or idea to `.td/INBOX.md` mid-flow. Does not interrupt current work. |
 | `/td-ship` | Do the next piece (BIG) or the fix (SMALL): work + test + commit + push + advance. |
-| `/td-status` | Print `STATE.md` summary: position, last action, next piece, blocker. |
+| `/td-status` | Print `STATE.md` summary: position, last action, next piece, blocker, inbox count. |
 | `/td-reset` | Squash local-only commits, write handoff into `STATE.md`, push. Run before `/clear`. |
 | `/td-cleanup` | Detect framework pollution in this file; relocate to `.td/frameworks/`. Manual only. |
 

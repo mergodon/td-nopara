@@ -30,13 +30,14 @@ claude
 
 `/td-init` is brownfield-aware — it maps existing files (package.json, framework configs, README) and asks for the gaps before writing `.td/`.
 
-## The seven commands
+## The eight commands
 
 | Command | Job |
 |---|---|
 | `/td-init` | Bootstrap td-flow in this directory. |
 | `/td-feature <name>` | Start a BIG flow: discuss → plan → reality check. |
 | `/td-fix <description>` | Start a SMALL flow. |
+| `/td-note <text>` | Append a bug or idea to `.td/INBOX.md` mid-flow. Doesn't break the current work. |
 | `/td-ship` | Do the next piece (BIG) or the fix (SMALL): work + test + commit + push. |
 | `/td-status` | Print current state. |
 | `/td-reset` | Squash local-only commits, write a handoff into STATE.md, push. Run before `/clear`. |
@@ -51,6 +52,7 @@ CLAUDE.md                    ← stable contract, identical across projects
   TESTING.md                 ← test command + pre-ship checklist
   ENV.md                     ← live env (URLs, deploy, dashboards)
   STATE.md                   ← where we are now (≤50 lines, rewritten)
+  INBOX.md                   ← bugs and ideas captured via /td-note
   frameworks/                ← redirect target for framework injections
   flow/                      ← active work; deleted on completion
 .env.example                 ← committed; lists secret names
