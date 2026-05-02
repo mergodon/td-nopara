@@ -1,86 +1,62 @@
 ---
-description: Send a bug report or feature idea about the td-flow framework itself to the framework repo. Does not touch the current project.
+description: Append a bug or feature idea about the td-flow framework itself to its FEEDBACK.md doc. Does not touch the current project.
 ---
 
-You are filing feedback **about td-flow itself** — something quirky, missing, or annoying about the framework. This is different from `/td-note`, which captures items about the *current project*. `/td-feedback` reaches across into the td-flow framework repo so the user can later pull and review.
+You are filing feedback **about td-flow itself** — something quirky, missing, or annoying about the framework. This is different from `/td-note`, which captures items about the *current project*. Feedback goes to a single doc in the framework repo.
 
 The argument is the feedback text. Optional `bug:` or `idea:` prefix to classify; otherwise classify automatically.
 
 # Step 1 — Locate the framework repo
 
-The framework lives where `~/.claude/td-templates` symlink points. Resolve it:
-
 ```
 FRAMEWORK_DIR=$(dirname "$(readlink -f ~/.claude/td-templates)")
 ```
 
-If the symlink is missing, abort and tell the user: "td-flow framework not installed. Run `~/projects/td/install.sh`."
+If the symlink is missing, abort: "td-flow framework not installed. Run `~/projects/td/install.sh`."
 
 # Step 2 — Classify
-
-Same rule as `/td-note`:
 
 - Prefix `bug:` or `bug ` → `bug` (strip prefix).
 - Prefix `idea:` or `idea ` → `idea` (strip prefix).
 - Keywords `broken`, `fails`, `error`, `crash`, `wrong`, `regression`, `doesn't work`, `not working` → `bug`.
 - Otherwise → `idea`.
 
-# Step 3 — Send the feedback
+# Step 3 — Append to FEEDBACK.md
 
-Check if `gh` is on PATH **and** the framework repo has a GitHub remote:
+If `$FRAMEWORK_DIR/FEEDBACK.md` doesn't exist, create it from the template at `$FRAMEWORK_DIR/templates/FEEDBACK.md`.
 
-```
-cd "$FRAMEWORK_DIR" && git remote get-url origin 2>/dev/null
-```
+Read the current project's name from `.td/PROJECT.md` (the first `# heading`), or fall back to the cwd basename if not in a td-flow project.
 
-**If yes (GitHub issue path):**
+Append one line under the appropriate section (`## Open` or `## Bugs`):
 
 ```
-cd "$FRAMEWORK_DIR"
-gh issue create \
-  --title "<bug|idea>: <first 60 chars of text>" \
-  --body "<full text>
-
----
-Reported via /td-feedback from project: <current project name from .td/PROJECT.md or cwd basename>
-" \
-  --label "<bug|idea>"
+- [<bug|idea>] <YYYY-MM-DD> — <text> (from: <project_name>)
 ```
 
-If the labels `bug` or `idea` don't exist on the repo, create them on the fly with `gh label create <name> --force`. (Skip `--force` if the gh version doesn't support it; just retry without `--force`.)
+If the section ends with the placeholder `(empty)`, replace that line with the new entry.
 
-Capture the issue URL from the gh output.
-
-**If no (offline/local fallback):**
-
-Append to `$FRAMEWORK_DIR/FEEDBACK.md` (create it if missing):
-
-```
-- [<bug|idea>] <YYYY-MM-DD> — <text> (from project: <project name>)
-```
-
-Then commit inside the framework repo:
+# Step 4 — Commit and push
 
 ```
 cd "$FRAMEWORK_DIR"
 git add FEEDBACK.md
-git -c user.email=<from git config> -c user.name=<from git config> commit -m "feedback: <bug|idea>: <first 50 chars>"
+git commit -m "feedback: <bug|idea>: <first 50 chars>"
+git push origin main 2>/dev/null || true
 ```
 
-Do not push. The user pulls and reviews when they're ready.
+If push fails because no remote is configured or auth is missing, that's fine — leave the commit local. Do not surface the push failure as an error; just note it.
 
-# Step 4 — Tell the user
+# Step 5 — Tell the user
 
-One line, with the destination so the user can find it later:
+One line, with location:
 
-- GitHub path: `Filed [bug|idea] on td-flow: <issue URL>`
-- Local path: `Filed [bug|idea] in ~/projects/td/FEEDBACK.md (no remote configured).`
+- If pushed: `Filed [bug|idea] in mergodon/td-nopara FEEDBACK.md and pushed.`
+- If local-only: `Filed [bug|idea] locally in ~/projects/td/FEEDBACK.md (not pushed).`
 
 Then **return to whatever flow was in progress**. Do not act on the feedback. Do not start fixing the framework.
 
 # Rules
 
-- This command does NOT touch the current project's `.td/`, `.git`, or `INBOX.md`. It writes to the framework repo only.
-- Never start fixing the framework here. The whole point is fire-and-forget.
-- If the GitHub issue creation fails (auth, network), fall back to the local file and tell the user both that the issue failed and that it was logged locally.
-- Do not push the framework repo from this command — the user reviews and decides what to push.
+- Never touch the current project's `.td/` or git.
+- Never start fixing the framework here.
+- One line per entry. Detail can be added by editing FEEDBACK.md directly later.
