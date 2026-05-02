@@ -1,64 +1,68 @@
 ---
 name: td-flow
-description: Solo-developer project framework — bootstrap, plan, ship, reset. Use when the user mentions td-flow, td-init, td-feature, td-fix, td-ship, td-reset, td-cleanup, or asks how the td-flow framework works. The actual workflow lives in slash commands `/td-*`; this skill points the user at the right command.
+description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-init, the cycle (plan / execute / test / ship / validate / document), or asks how this framework works. After /td-init, the user just talks — no other slash commands.
 ---
 
 # td-flow
 
-A minimal, file-based, repo-portable framework for solo software work. Designed to:
+A minimal, file-based, repo-portable framework for solo development. Every project gets the same shape so the user never has to re-explain.
 
-- Make every project feel the same (CLAUDE.md + 4 living files)
-- Scale from "fix a typo" to "build a feature" with two distinct flows
-- Use git as the only history log
-- Keep `CLAUDE.md` clean from framework injections
+## When to use
 
-## When to use this skill
+- The user runs `/td-init` and asks how to proceed.
+- The user mentions td-flow, the cycle, or any of the structured docs.
+- The user asks "where are we" or "how do I test this" and a `.td/` directory exists.
+- The user mentions framework pollution in `CLAUDE.md` (Laravel Boost etc.) — relocate to `.td/frameworks/`.
 
-Invoke (or remind the user about) td-flow when:
+## The cycle
 
-- The user runs any `/td-*` slash command and asks how it works.
-- The user asks to "set up a new project the standard way" or "init the framework here."
-- The user asks how to handle a feature, fix, or session reset and they have a `.td/` directory in their project.
-- The user mentions Laravel Boost, framework pollution in CLAUDE.md, or wanting to clean up auto-generated agent files.
+```
+1. PLAN      — what are we building, in pieces, and how will it be tested?
+2. EXECUTE   — do the pieces. One commit per piece.
+3. TEST      — run TESTING.md § Local testing pre-ship checklist.
+4. SHIP      — push to origin/main.
+5. VALIDATE  — run TESTING.md § Live testing post-ship checklist (skip if "none").
+6. DOCUMENT  — update PROJECT.md, clear .td/work/<topic>.md, STATE.md → idle.
+```
 
-## The ten commands
+A session can cover any subset. STATE.md captures which phase we're in; next session resumes.
 
-| Command | Job |
-|---|---|
-| `/td-init` | Bootstrap td-flow in the current directory. Brownfield-aware. |
-| `/td-feature <name>` | Start a BIG flow: discuss → plan → reality check. |
-| `/td-fix <description>` | Start a SMALL flow. |
-| `/td-note <text>` | Capture a bug or idea about THIS project (writes to `.td/INBOX.md`). |
-| `/td-feedback <text>` | Capture a bug or idea about td-flow ITSELF (sends to the framework repo). |
-| `/td-ship` | Do the next piece (BIG) or the fix (SMALL): work + test + commit + push + advance. |
-| `/td-status` | Print the project's current state. |
-| `/td-reset` | Squash local-only commits, write a handoff into `.td/STATE.md`, push. Run before `/clear`. |
-| `/td-cleanup` | Detect framework pollution in `CLAUDE.md`, relocate to `.td/frameworks/`. |
-| `/td-help` | One-screen cheat sheet. |
-
-## Files in every td-flow project
+## Files in every project
 
 ```
 CLAUDE.md                    ← stable contract, identical across projects
 .td/
   PROJECT.md                 ← what / who / stack / scope
-  TESTING.md                 ← test command + pre-ship checklist
-  ENV.md                     ← live env (URLs, deploy, dashboards)
-  STATE.md                   ← where we are now (≤50 lines, rewritten)
-  INBOX.md                   ← bugs and ideas captured via /td-note
-  frameworks/                ← redirect target for framework injections
-  flow/                      ← active work; deleted on completion
-.claude/                     ← optional per-project Claude config
-.env.example                 ← committed; lists secret names
-.env                         ← gitignored; real values
+  TESTING.md                 ← Local testing + Live testing (locked sections)
+  ENV.md                     ← live URL, deploy, dashboards
+  STATE.md                   ← current phase, current topic, resume note
+  INBOX.md                   ← bugs/ideas captured mid-flow
+  frameworks/                ← framework guidelines (kept out of CLAUDE.md)
+  work/<topic>.md            ← active work (one file, deleted at phase 6)
+.env.example                 ← committed, lists secret names
+.env                         ← gitignored, real values
+.git/hooks/pre-commit        ← runs Test command from TESTING.md § Local testing
 ```
 
-## How to invoke
+## Natural-language → doc map
 
-If the user asks how to start, point them at:
+The user just talks. CLAUDE.md tells Claude where each kind of statement lands:
+
+- "test command is X" → TESTING.md § Local testing
+- "deploy is X" / "smoke check is X" → TESTING.md § Live testing
+- "live URL is X" / "logs are at X" → ENV.md
+- "stack is X" / "scope changes to X" → PROJECT.md
+- "remember to X" → INBOX.md
+- "feedback on td-flow" → ~/projects/td/FEEDBACK.md
+- "let's add X" / "fix the bug X" → start cycle, write .td/work/<topic>.md
+- "ship it" / "we're done" → run phases 3 → 6
+- "where are we" → read STATE.md
+- "let's wrap" / before /clear → rewrite STATE.md as handoff
+
+## The one slash command
 
 ```
 /td-init
 ```
 
-For everything else, look up the command from the table above.
+Bootstraps a new (or existing) project's `.td/` directory. Brownfield-aware. Everything after is conversational.

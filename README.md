@@ -2,20 +2,20 @@
 
 A minimal, file-based, repo-portable framework for solo development.
 
-Every project gets the same shape: one `CLAUDE.md` contract, four small living files in `.td/`, two flows (BIG and SMALL), seven slash commands. Git is the only history log. No CLI, no daemon, no global state.
+Every project gets the same structured docs and the same 6-phase cycle (plan / execute / test / ship / validate / document). The conversation is the interface. There's one slash command, `/td-init`, and after that you just talk.
 
 ## Install
 
 ```
-git clone https://github.com/mergodon/td ~/projects/td
+git clone https://github.com/mergodon/td-nopara ~/projects/td
 cd ~/projects/td
 ./install.sh
 ```
 
-This symlinks:
-- `commands/td-*.md` → `~/.claude/commands/`
-- `skill/` → `~/.claude/skills/td-flow`
-- `templates/` → `~/.claude/td-templates`
+Symlinks created:
+- `~/.claude/commands/td-init.md`
+- `~/.claude/skills/td-flow`
+- `~/.claude/td-templates`
 
 To update on any machine: `git pull && ./install.sh`.
 
@@ -28,22 +28,30 @@ claude
 /td-init
 ```
 
-`/td-init` is brownfield-aware — it maps existing files (package.json, framework configs, README) and asks for the gaps before writing `.td/`.
+`/td-init` is brownfield-aware — it maps existing files (`package.json`, framework configs, `README.md`) and asks for the gaps before writing `.td/`.
 
-## The ten commands
+After init, just talk:
 
-| Command | Job |
-|---|---|
-| `/td-init` | Bootstrap td-flow in this directory. |
-| `/td-feature <name>` | Start a BIG flow: discuss → plan → reality check. |
-| `/td-fix <description>` | Start a SMALL flow. |
-| `/td-note <text>` | Capture a bug or idea about THIS project (`.td/INBOX.md`). |
-| `/td-feedback <text>` | Capture a bug or idea about td-flow itself (filed to the framework repo). |
-| `/td-ship` | Do the next piece (BIG) or the fix (SMALL): work + test + commit + push. |
-| `/td-status` | Print current state. |
-| `/td-reset` | Squash local-only commits, write a handoff into STATE.md, push. Run before `/clear`. |
-| `/td-cleanup` | Detect framework pollution in `CLAUDE.md`, relocate to `.td/frameworks/`. |
-| `/td-help` | One-screen cheat sheet. |
+- "let's add a search bar" — starts the cycle at phase 1
+- "test command is `npm test`" — updates `.td/TESTING.md` § Local testing
+- "live URL is myapp.pages.dev" — updates `.td/ENV.md`
+- "remember to debounce search" — appends `.td/INBOX.md`
+- "ship it" — runs phases 3–6
+- "where are we" — reads `.td/STATE.md`
+- "let's wrap" — rewrites `.td/STATE.md` as a handoff before `/clear`
+
+## The cycle
+
+```
+1. PLAN      — what are we building, in pieces, and how will it be tested?
+2. EXECUTE   — do the pieces. One commit per piece.
+3. TEST      — run TESTING.md § Local testing pre-ship checklist.
+4. SHIP      — push to origin/main. Deploy follows automatically per ENV.md.
+5. VALIDATE  — run TESTING.md § Live testing post-ship checklist (skip if "none").
+6. DOCUMENT  — update PROJECT.md, clear .td/work/<topic>.md, STATE.md → idle.
+```
+
+A session can cover any subset of phases — single stage or multi-stage. STATE.md tracks where you are; the next session picks up cold.
 
 ## Files in every td-flow project
 
@@ -51,38 +59,49 @@ claude
 CLAUDE.md                    ← stable contract, identical across projects
 .td/
   PROJECT.md                 ← what / who / stack / scope
-  TESTING.md                 ← test command + pre-ship checklist
-  ENV.md                     ← live env (URLs, deploy, dashboards)
-  STATE.md                   ← where we are now (≤50 lines, rewritten)
-  INBOX.md                   ← bugs and ideas captured via /td-note
-  frameworks/                ← redirect target for framework injections
-  flow/                      ← active work; deleted on completion
-.env.example                 ← committed; lists secret names
-.env                         ← gitignored; real values
-.git/hooks/pre-commit        ← runs the test command from .td/TESTING.md
+  TESTING.md                 ← Local testing + Live testing (locked sections)
+  ENV.md                     ← live URL, deploy, dashboards
+  STATE.md                   ← current phase, current topic, resume note
+  INBOX.md                   ← bugs/ideas captured mid-flow
+  frameworks/                ← framework guidelines (Laravel Boost etc.)
+  work/<topic>.md            ← active work (one file per topic, deleted at phase 6)
+.env.example                 ← committed, lists secret names
+.env                         ← gitignored, real values
+.git/hooks/pre-commit        ← runs Test command from TESTING.md § Local testing
 ```
 
 ## Repo layout (this repo)
 
 ```
-commands/        → slash command source (symlinked into ~/.claude/commands/)
-templates/       → files copied into target projects on /td-init
-skill/SKILL.md   → skill definition (symlinked into ~/.claude/skills/td-flow)
-hooks/pre-commit → test-on-commit hook installed by /td-init
-install.sh       → symlinks commands, skill, templates into ~/.claude/
+commands/td-init.md   the only slash command
+templates/            files copied into target projects on /td-init
+  CLAUDE.md           the universal contract
+  td/PROJECT.md
+  td/TESTING.md       the locked-shape testing doc
+  td/ENV.md
+  td/STATE.md
+  td/INBOX.md
+  td/frameworks/.gitkeep
+  .gitignore
+  .env.example
+  FEEDBACK.md         template for the framework-level feedback file
+skill/SKILL.md        skill definition (symlinked into ~/.claude/skills/td-flow)
+hooks/pre-commit      test-on-commit hook installed by /td-init
+install.sh            symlinks commands, skill, templates into ~/.claude/
+FEEDBACK.md           feedback about td-flow itself, captured from any project
 ```
 
 ## Principles
 
-Lifted from gsd-2's VISION.md and kept verbatim:
+Lifted from gsd-2 VISION and kept verbatim:
 
-- Three similar lines is better than a premature abstraction.
+- Three similar lines beats a premature abstraction.
 - Tests are the contract.
 - Ship fast, fix fast.
 - Complexity without user-visible value doesn't belong.
 
 ## Not in scope (yet)
 
-- Research / web context / context7 — useful, deferred.
-- Subagents / parallel pieces — useful, deferred.
+- Research / context7 step before phase 1 — useful, deferred.
+- Subagents for parallel pieces — useful, deferred.
 - Anything that turns this into a CLI or npm package.

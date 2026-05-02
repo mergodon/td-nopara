@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# td-flow pre-commit hook — runs the project's test command from .td/TESTING.md.
-# Installed by /td-init. Bypass it only via /td-reset (which checkpoints first), never with --no-verify.
+# td-flow pre-commit hook — runs the project's Test command from .td/TESTING.md § Local testing.
+# Installed by /td-init. Do not bypass with --no-verify.
 
 set -e
 
@@ -9,20 +9,18 @@ if [ ! -f .td/TESTING.md ]; then
   exit 0
 fi
 
-# Extract the first fenced code block under "## Test command"
 CMD=$(awk '
-  /^## Test command/ { in_section = 1; next }
-  in_section && /^```/ { if (capturing) exit; capturing = 1; next }
-  capturing { print; exit }
-' .td/TESTING.md | head -1 | xargs)
+  /^## Local testing/ { in_section = 1; next }
+  in_section && /^## / { exit }
+  in_section && /^- Test command:/ {
+    sub(/^- Test command:[[:space:]]*/, "")
+    print
+    exit
+  }
+' .td/TESTING.md | xargs)
 
-if [ -z "$CMD" ]; then
-  echo "td-flow: no Test command in .td/TESTING.md — skipping"
-  exit 0
-fi
-
-if [[ "$CMD" == *"no tests"* ]] || [[ "$CMD" == "{{test_command}}" ]]; then
-  echo "td-flow: Test command is a placeholder — skipping. Update .td/TESTING.md."
+if [ -z "$CMD" ] || [ "$CMD" = "none" ] || [ "$CMD" = "{{test_command}}" ]; then
+  echo "td-flow: no runnable Test command in .td/TESTING.md § Local testing — skipping"
   exit 0
 fi
 

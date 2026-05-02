@@ -1,36 +1,28 @@
-# How to test this project
+# Testing
 
-This file is the single source for the pre-ship checklist. `/td-ship` runs it. The pre-commit hook runs the **Test command** below.
+The two sections below are locked. Add values, don't add or rename sections. CLAUDE.md routes "this is how local testing works" → § Local testing, and "this is how live testing works" → § Live testing.
 
-## Test command
+The pre-commit hook runs `Test command` from § Local testing. Phase 3 (TEST) runs the Pre-ship checklist. Phase 5 (VALIDATE) runs the Post-ship validation; if every value here is "none", phase 5 is auto-skipped.
 
-```
-{{test_command}}
-```
+## Local testing
 
-## Dev server
+- Test command:    {{test_command}}
+- Dev server:      {{dev_command}}
+- Local URL:       {{local_url}}
+- Pre-ship checklist:
+  - [ ] {{test_command}} passes
+  - [ ] dev server starts without errors
+  - [ ] {{manual_local_check_or_none}}
 
-```
-{{dev_command}}
-```
+## Live testing
 
-Local URL: {{local_url}}
-
-## Pre-ship checklist
-
-<!-- /td-ship walks this list before commit. Failure = no commit, no push. -->
-
-- [ ] `{{test_command}}` passes
-- [ ] Dev server starts without errors
-- [ ] Manual check: {{manual_check_or_none}}
-
-## How to verify in browser
-
-{{browser_steps_or_none}}
-
-## How to verify via curl / API
-
-{{curl_steps_or_none}}
+- Live URL:        {{live_url_or_none}}
+- Deploy:          {{deploy_command_or_auto}}
+- Smoke command:   {{smoke_command_or_none}}
+- Logs:            {{logs_command_or_url_or_none}}
+- Post-ship validation:
+  - [ ] {{post_ship_check_1_or_none}}
+  - [ ] {{post_ship_check_2_or_none}}
 
 ## Notes
 

@@ -1,17 +1,20 @@
 # State
 
-<!-- Where we are right now. ≤50 lines. Rewritten after every meaningful action. Past sessions are not kept here — git is the log. -->
+<!-- Where we are right now. ≤50 lines. Rewritten by Claude. Past sessions are not kept here — git is the log. -->
 
-Project: {{project_name}}
-Currently: idle (no active flow)
+Project:  {{project_name}}
+Topic:    idle
+Phase:    idle
 Position: —
-Status: ready
-Last action: {{init_date}} — td-flow initialized
-Next: start a flow with `/td-feature <name>` or `/td-fix <description>`
-Blocker: none
+Status:   ready
+Blocker:  none
+Last:     {{init_date}} — td-flow initialized
+Next:     start a topic by saying what you want to build, fix, or change
+
+## Resume note
+
+Fresh project. No active work. Read PROJECT.md for the scope and TESTING.md for how we test.
 
 ## Open threads
-
-<!-- Tiny notes about things to look at next. Cleared when addressed. Keep to 3 max. -->
 
 (none)

@@ -1,87 +1,81 @@
 # How to work in this repo (td-flow)
 
-This file is the contract. It does not change project-to-project. Project-specific things live in `.td/`. Frameworks must not write here — see "Framework guidelines" below.
+This is the contract. Identical across every td-flow project. The conversation is the interface; the docs in `.td/` are the structure. Don't add things here — see "Framework guidelines" below.
 
-## The five living files
+## The cycle (6 phases as checkpoints)
 
-Always read these first. Never append (except INBOX.md), always rewrite to current truth.
+Every piece of work moves through these phases. A session can cover any subset — single phase or all six. STATE.md tracks where we are.
 
-- `.td/PROJECT.md` — what this is, who for, stack, current scope, shipped, out of scope. Edited freely; reflects the present.
-- `.td/TESTING.md` — how to test this project. The single source for test commands and the pre-ship checklist.
-- `.td/ENV.md` — live environment: URLs, deploy command, dashboards, where logs are, where secrets live (names only — actual values stay in `.env`, gitignored).
-- `.td/STATE.md` — where we are right now. ≤50 lines. Rewritten after every meaningful action. Past sessions are not kept here — git is the log.
-- `.td/INBOX.md` — bugs and ideas captured mid-flow via `/td-note`. Append-only. Items get deleted when they ship.
+1. **PLAN**     — what are we building, in pieces, and how will it be tested?
+2. **EXECUTE**  — do the pieces. One commit per piece.
+3. **TEST**     — run the Local testing pre-ship checklist from `.td/TESTING.md`.
+4. **SHIP**     — push to `origin/main`. Deploy follows automatically per `.td/ENV.md`.
+5. **VALIDATE** — run the Live testing post-ship checklist from `.td/TESTING.md`. Skip silently if "none".
+6. **DOCUMENT** — update `.td/PROJECT.md` (Active → Shipped). Clear `.td/work/<topic>.md`. Set `STATE.md` to idle.
 
-## The two flows
+If a session ends mid-cycle, STATE.md captures the phase. Next session resumes there.
 
-Pick one based on size. Never run both at once.
+## The docs (`.td/`)
 
-### BIG — for features, anything non-trivial
-1. **Discuss** — ask 3–5 bullet questions, write `.td/flow/00-brief.md`.
-2. **Plan** — break into pieces. Each piece must be ≤30 minutes of work, describable in one sentence, with one obvious test. Stub each piece as `.td/flow/01-name.md`, `.td/flow/02-name.md`, etc. Write the index in `.td/flow/plan.md`.
-3. **Reality check** — re-read the plan and ask the user: (a) "Are we overcomplicating?" (b) "Are pieces too big? What can split?" Plan locks only after user confirms.
-4. **Execute pieces in order** with `/td-ship`. One piece per ship.
-5. **Wrap** — when all pieces done, update `.td/PROJECT.md` (move from "active scope" to "shipped"), delete `.td/flow/`.
+Six files. Same shape every project. Only values differ.
 
-### SMALL — for fixes, tweaks, small things
-1. Write a one-page `.td/flow/fix.md`: goal, plan, how to test.
-2. Do it. Test. `/td-ship`.
-3. Delete `.td/flow/`.
+- `PROJECT.md` — what / who / stack / active scope / shipped
+- `TESTING.md` — Local testing + Live testing (locked sections)
+- `ENV.md` — live URL, deploy, dashboards, logs
+- `STATE.md` — current phase, current topic, blocker, resume note (≤50 lines, rewritten by me)
+- `INBOX.md` — bugs/ideas captured mid-flow (append-only)
+- `frameworks/<name>.md` — framework guidelines (Laravel Boost, etc.) so they don't pollute CLAUDE.md
 
-No discussion phase, no plan, no numbered pieces, no reality check.
+`.td/work/<topic>.md` — the active work file. One per topic. Sections for plan / execute notes / test results / validate notes. Deleted at phase 6.
 
-## Commit & push policy
+## Rails (the few things I always do)
 
-- **One piece = one commit. One fix = one commit.** No "wip", no "fix typo". Mid-piece work stays unstaged. If you need a checkpoint, use `/td-reset`.
-- **Auto-push to `origin/main` on every successful `/td-ship`.** Tests pass = commit = push. No PRs, no branches, no force-pushes.
-- **Commit message format** (so `git log --oneline` is the audit trail):
-  - BIG piece: `feat(<feature>): 02 wire-api`
-  - SMALL fix: `fix: search overflowing on mobile`
-  - Framework cleanup: `chore: relocate <name> guidelines out of CLAUDE.md`
-  - Init: `chore: td-flow init`
+- On every fresh context, read `CLAUDE.md`, `.td/STATE.md`, `.td/PROJECT.md`. Orient before responding.
+- Run `TESTING.md` § Local testing pre-ship checklist before phase 4. Failing check = no commit, no push.
+- One commit per piece. Push to `origin/main` directly. No PRs. Never bypass the pre-commit hook.
+- Run `TESTING.md` § Live testing post-ship validation as phase 5 (skip if section is "none").
+- At phase 6, update `PROJECT.md` and clear `.td/work/<topic>.md`. Reset `STATE.md` to idle.
+- When the user signals wrap-up ("let's wrap", "save it", mentions of `/clear`), rewrite `STATE.md` as a handoff with current phase and a 2–4 line resume note.
+- When a framework writes guidelines into CLAUDE.md, relocate them to `.td/frameworks/<name>.md`.
 
-## Test policy
+## Where things go (natural-language → doc map)
 
-`.td/TESTING.md` defines the pre-ship checklist. `/td-ship` runs it. **Failing checklist = no commit, no push.** Update `TESTING.md` if the checklist changes — never skip it silently.
+When the user says any of these (at the start of a message, action-shaped), this is the destination:
 
-A pre-commit hook installed by `/td-init` runs the test command from `TESTING.md`. Don't bypass it (no `--no-verify`).
+- "test command is X" / "this is how local testing works" → `.td/TESTING.md` § Local testing
+- "deploy is X" / "this is how live testing works" / "smoke check is X" → `.td/TESTING.md` § Live testing
+- "live URL is X" / "logs are at X" / "dashboard is at X" → `.td/ENV.md`
+- "stack changed to X" / "we use X for Y" / "scope is X" → `.td/PROJECT.md`
+- "remember to X" / "park this idea" / "don't forget X" → append `.td/INBOX.md`
+- "feedback on td-flow" / "td-flow should X" → append `~/projects/td/FEEDBACK.md`
+- "let's add X" / "fix the bug X" / "build X" → start cycle at phase 1, write `.td/work/<topic>.md`
+- "ship it" / "we're done" / "looks good" → run phases 3 → 6
+- "where are we" / "status" → read STATE.md, summarize
+- "let's wrap" / "save it" / about to /clear → rewrite STATE.md as handoff
+
+Mid-conversation mentions of testing or deployment do not trigger updates — only explicit, action-shaped statements at the start of a message do.
+
+## Commit message format
+
+So `git log --oneline` is the audit trail:
+
+- Piece in a cycle: `feat(<topic>): <short summary>` or `fix(<topic>): <short summary>`
+- Doc-only update: `docs: <what changed>`
+- Inbox entry: `chore: inbox — <bug|idea>: <first 50 chars>`
+- Framework cleanup: `chore: relocate <name> guidelines out of CLAUDE.md`
 
 ## Framework guidelines
 
-Framework-specific instructions (Laravel Boost, Next.js, Tailwind, shadcn, etc.) live in `.td/frameworks/<name>.md`, never here. If a framework tool writes to this file, run `/td-cleanup` to relocate it.
+Framework-specific instructions (Laravel Boost, Next.js, Tailwind, shadcn) live in `.td/frameworks/<name>.md`, never here. If a framework tool writes to this file, relocate the content the next time you notice. CLAUDE.md is a stable contract.
 
-When working with a framework, read `.td/frameworks/<name>.md` first.
+## Principles (anti-bloat)
 
-## Principles (lifted from gsd-2 VISION, kept because they're right)
+- Three similar lines beats a premature abstraction.
+- Tests are the contract.
+- Ship fast, fix fast.
+- Complexity without user-visible value doesn't belong.
+- Don't add error handling, fallbacks, or validation for cases that can't happen.
 
-- **Three similar lines is better than a premature abstraction.**
-- **Tests are the contract.** If behavior changes, tests tell you what broke.
-- **Ship fast, fix fast.** Every commit works. Iterate over the live thing.
-- **Complexity without user-visible value doesn't belong.**
-- **Don't add error handling, fallbacks, or validation for cases that can't happen.**
+## The one slash command
 
-## Reset policy (before /clear)
-
-Run `/td-reset`:
-- Squashes any local checkpoint commits ahead of `origin/main` into a clean message
-- Rewrites `.td/STATE.md` so a fresh conversation picks up cold
-- Pushes the squashed commit
-
-Never force-push commits that are already on `origin/main`.
-
-## The ten commands
-
-| Command | Job |
-|---|---|
-| `/td-init` | Bootstrap a project. Brownfield-aware: maps existing files, asks for gaps, fills `.td/`. |
-| `/td-feature <name>` | Start a BIG flow: discuss → plan → reality check. |
-| `/td-fix <description>` | Start a SMALL flow. |
-| `/td-note <text>` | Append a bug or idea to `.td/INBOX.md` (THIS project) mid-flow. |
-| `/td-feedback <text>` | File a bug or idea about td-flow ITSELF, sent to the framework repo. |
-| `/td-ship` | Do the next piece (BIG) or the fix (SMALL): work + test + commit + push + advance. |
-| `/td-status` | Print `STATE.md` summary: position, last action, next piece, blocker, inbox count. |
-| `/td-reset` | Squash local-only commits, write handoff into `STATE.md`, push. Run before `/clear`. |
-| `/td-cleanup` | Detect framework pollution in this file; relocate to `.td/frameworks/`. Manual only. |
-| `/td-help` | One-screen cheat sheet. `/td-help <name>` shows one command's description. |
-
-That's the whole framework. Anything not covered here is implementation freedom — choose the library, choose the structure, follow `.td/PROJECT.md` for scope.
+Just `/td-init` — bootstraps a new project's `.td/` from a known template. Everything else is conversational.
