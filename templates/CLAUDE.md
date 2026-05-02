@@ -57,6 +57,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "ship it" / "we're done" → run steps 4–6
 - "where are we" → read STATE.md, summarize
 - "save this as a template" / "make this a `<name>` starter" → copy current `.td/` shape (anonymized) to `~/projects/td/templates/<name>/`
+- "let's wrap" / "save it" / about to /clear → suggest `/td-clear` (or run the equivalent close ritual if user already typed `/td-clear`)
 
 Mid-conversation mentions of testing or deploy do not trigger updates — only explicit, action-shaped statements at the start of a message do.
 
@@ -74,6 +75,9 @@ Mid-conversation mentions of testing or deploy do not trigger updates — only e
 - Ship fast, fix fast.
 - Complexity without user-visible value doesn't belong.
 
-## The one slash command
+## The two slash commands
 
-Just `/td-init`. Everything else is conversational.
+- `/td-init` — bootstrap or migrate a project (one-time per project).
+- `/td-clear` — review, validate, cleanup, push. Run before `/clear` so the next session picks up cold.
+
+Everything else is conversational.

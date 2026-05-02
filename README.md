@@ -25,9 +25,12 @@ In any project directory:
 
 ```
 claude
-/td-init                       # generic bootstrap, brownfield-aware
+/td-init                       # bootstrap or migrate (brownfield-aware)
 /td-init --template laravel    # bootstrap from a saved template
+/td-clear                      # before /clear: review, validate, cleanup, push
 ```
+
+`/td-init` detects existing td-flow v1/v2 or rgb-buddy-2-style conventions (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`) and migrates them in place — no re-explaining.
 
 After init, just talk:
 
@@ -38,7 +41,7 @@ After init, just talk:
 - "save this as a `userscript` template" — extracts the current `.td/` shape into `~/projects/td/templates/userscript/`
 - "ship it" — runs Test → Ship → Close
 - "where are we" — summarizes `.td/STATE.md`
-- "let's wrap" — runs the close ritual before you `/clear`
+- "let's wrap" — I suggest `/td-clear` (which runs the close ritual)
 
 ## The rhythm
 

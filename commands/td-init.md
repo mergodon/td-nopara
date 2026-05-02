@@ -2,9 +2,38 @@
 description: Bootstrap td-flow in the current directory. Brownfield-aware. Detects stack and pre-fills WORKWAY.md framework awareness. Optional --template <name> to start from a saved starter.
 ---
 
-You are initializing td-flow. After this runs, the user just talks; this is the only slash command.
+You are initializing td-flow. After this runs, the user just talks; the only other slash command is `/td-clear` for context resets.
 
 The argument may be `--template <name>` to start from a saved template at `~/projects/td/templates/<name>/` instead of the default `~/.claude/td-templates/`. If `<name>` doesn't exist, abort and list available templates.
+
+# Step 0 — Detect existing td-flow or td-flow-like conventions
+
+If any of these are present, we're migrating, not bootstrapping. Don't re-ask the user for things existing files already answer.
+
+**td-flow v2 detected** — `.td/TESTING.md` and/or `.td/ENV.md` exist:
+- Read `.td/TESTING.md` and `.td/ENV.md`. Map their values into the v3 `WORKWAY.md` template:
+  - `## Local testing` block in TESTING → `## Local testing` in WORKWAY (Test command, Dev server, Local URL, Pre-ship checklist)
+  - `## Live testing` block in TESTING → `## Production / Ship` in WORKWAY (Live URL, Deploy, Smoke command, Logs) and `## Local UAT` if any manual checks were captured
+  - `.td/ENV.md` content → spread across `## Production / Ship` and `## Notes` as appropriate
+  - `.td/frameworks/*.md` content → `## Framework specifics` (one subsection per framework)
+- Rename `.td/INBOX.md` → `.td/BACKLOG.md` (preserve content, drop `[bug]`/`[idea]` tags).
+- If `.td/flow/<NN>-<name>.md` files exist (v1 piece files): consolidate into `.td/work/<topic>.md` if a flow is in progress; otherwise delete.
+- Tell the user what got migrated where.
+- Skip Step 2 (ask for gaps); jump to Step 5 (commit).
+
+**rgb-buddy-2-style convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`, `.planning/` exist:
+- Read `.claude/agreements/*.md`. Most agreements are universal td-flow rails (cadence, push-after-commit, run-commands) — they're already in CLAUDE.md and don't need preservation. Project-specific ones (branding, uat-style) → append as items in `WORKWAY.md` § Notes.
+- Read `ARCHITECTURE.md`. Keep it at root as-is (it's a stable doc the user already maintains); link to it from `.td/PROJECT.md`.
+- Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, archive it (rename to `BLOCKS-archive.md` or leave as-is — ask the user).
+- Read existing root `CLAUDE.md`. Extract: project description (`## What this is` / similar) → `.td/PROJECT.md`; stack section → `.td/PROJECT.md`; common commands → `WORKWAY.md` § Local testing or § Production / Ship as appropriate; everything else → `.td/PROJECT.md` (it's content, not contract).
+- Overwrite root `CLAUDE.md` with the canonical td-flow contract.
+- Read existing `.gitignore`, `package.json` etc. for stack signals (still run Step 1 detection for things not in existing docs).
+- Tell the user what got migrated where, then jump to Step 4 (framework specifics — fill any gaps not covered by existing docs).
+
+**Already td-flow v3** — `.td/PROJECT.md` AND `.td/WORKWAY.md` exist:
+- Abort: "Project already initialized as td-flow v3. Remove `.td/` to re-init."
+
+If none of the above match: proceed with normal Step 1.
 
 # Step 1 — Map what's already here
 
@@ -22,8 +51,8 @@ Detect:
    - `components/ui/` directory → shadcn
 4. **Test commands.** Read scripts from `package.json` or equivalent. Note `test`, `dev`, `build`, `deploy`.
 5. **Existing docs.** `README.md`, root `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`, `BLOCKS.md`, `.cursor/`, `.windsurfrules`.
-6. **Existing td-flow state.** If `.td/PROJECT.md` already exists, abort: "Project already initialized. Remove `.td/` first to re-init."
-7. **Existing root `CLAUDE.md`.** If present and not the td-flow contract, save the current content under a heading `## Preserved (pre-td-flow)` inside `.td/WORKWAY.md` § Framework specifics, then overwrite root `CLAUDE.md` with the canonical contract. Tell the user where the preserved content went.
+6. **Existing td-flow state.** Already handled in Step 0.
+7. **Existing root `CLAUDE.md`** (only relevant if Step 0 didn't already migrate it): if present and not the td-flow contract, save the current content under a heading `## Preserved (pre-td-flow)` inside `.td/WORKWAY.md` § Framework specifics, then overwrite root `CLAUDE.md` with the canonical contract. Tell the user where the preserved content went.
 
 Print a 5–10 line map of findings.
 
