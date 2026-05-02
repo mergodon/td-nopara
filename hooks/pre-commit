@@ -11,7 +11,7 @@ fi
 
 CMD=$(awk '
   /^## Local testing/ { in_section = 1; next }
-  in_section && /^## / { exit }
+  /^## / && in_section { exit }
   in_section && /^- Test command:/ {
     sub(/^- Test command:[[:space:]]*/, "")
     print

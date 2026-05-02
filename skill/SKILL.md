@@ -62,12 +62,13 @@ CLAUDE.md                ← contract at root, user controls it
 - When drifting: "We're scattered — want to wrap and start fresh?"
 - Before context close: cleanup ritual without being asked.
 
-## The two slash commands
+## The three slash commands
 
 ```
-/td-init                    # bootstrap or migrate a project (brownfield-aware)
+/td-init                    # bootstrap or migrate (brownfield-aware)
 /td-init --template <name>  # bootstrap from a saved template (e.g. laravel)
-/td-clear                   # review + validate + cleanup + push before /clear
+/td-ship                    # local checks pass → one commit → push to origin/main
+/td-close                   # cleanup docs, update STATE, push. Run before /clear.
 ```
 
-Migration: `/td-init` detects existing td-flow v1/v2 or rgb-buddy-2-style conventions (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`) and maps them to v3 without re-asking.
+Migration: `/td-init` detects existing td-flow v1/v2, GSD legacy (`.planning/`, HTML markers), or rgb-buddy-2-style conventions and maps them to v3 without re-asking.

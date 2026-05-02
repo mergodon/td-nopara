@@ -21,7 +21,18 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
 - Tell the user what got migrated where.
 - Skip Step 2 (ask for gaps); jump to Step 5 (commit).
 
-**rgb-buddy-2-style convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`, `.planning/` exist:
+**GSD-1 / GSD legacy detected** — `.planning/` exists, OR root `CLAUDE.md` contains HTML markers like `<!-- GSD:project-start -->` or `<!-- GSD:stack-start -->`:
+- Read `.planning/` content (PROJECT.md, STATE.md, roadmap.md, etc. — GSD's old structure). Map values into the v3 docs:
+  - `.planning/PROJECT.md` "What this is" + "Core Value" + "Requirements" → `.td/PROJECT.md`.
+  - `.planning/STATE.md` content → `.td/STATE.md` § Resume note (prose).
+  - Test commands found in CLAUDE.md fenced blocks → `.td/WORKWAY.md` § Local testing.
+  - Stack info from CLAUDE.md GSD markers → `.td/PROJECT.md` Stack section.
+  - `.planning/research/*` (e.g. STACK.md tables) → `.td/WORKWAY.md` § Framework specifics.
+- Strip GSD HTML markers from CLAUDE.md before overwriting with the canonical contract.
+- After migration, ask: "Delete `.planning/`? (its content is now in `.td/`)." If yes, `git rm -r .planning/`.
+- Tell the user what got migrated.
+
+**rgb-buddy-2-style convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` exist (and not GSD):
 - Read `.claude/agreements/*.md`. Most agreements are universal td-flow rails (cadence, push-after-commit, run-commands) — they're already in CLAUDE.md and don't need preservation. Project-specific ones (branding, uat-style) → append as items in `WORKWAY.md` § Notes.
 - Read `ARCHITECTURE.md`. Keep it at root as-is (it's a stable doc the user already maintains); link to it from `.td/PROJECT.md`.
 - Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, archive it (rename to `BLOCKS-archive.md` or leave as-is — ask the user).

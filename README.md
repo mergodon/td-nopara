@@ -27,10 +27,11 @@ In any project directory:
 claude
 /td-init                       # bootstrap or migrate (brownfield-aware)
 /td-init --template laravel    # bootstrap from a saved template
-/td-clear                      # before /clear: review, validate, cleanup, push
+/td-ship                       # local checks pass → one commit → push to origin/main
+/td-close                      # before /clear: cleanup docs, update STATE, push
 ```
 
-`/td-init` detects existing td-flow v1/v2 or rgb-buddy-2-style conventions (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`) and migrates them in place — no re-explaining.
+`/td-init` detects existing td-flow v1/v2, GSD legacy (`.planning/`, HTML markers), or rgb-buddy-2-style conventions (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`) and migrates them in place — no re-explaining.
 
 After init, just talk:
 
@@ -41,7 +42,8 @@ After init, just talk:
 - "save this as a `userscript` template" — extracts the current `.td/` shape into `~/projects/td/templates/userscript/`
 - "ship it" — runs Test → Ship → Close
 - "where are we" — summarizes `.td/STATE.md`
-- "let's wrap" — I suggest `/td-clear` (which runs the close ritual)
+- "ship it" — runs `/td-ship`
+- "let's wrap" — runs `/td-close`
 
 ## The rhythm
 
@@ -112,6 +114,8 @@ Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `
 - Ship fast, fix fast.
 - Complexity without user-visible value doesn't belong.
 - GitHub is the memory. Don't duplicate.
+- Cleanup is part of the work — fix incidental drift in the same commit.
+- Present results — assumptions, fixes, decisions visible. No opaque "done."
 
 ## Not in scope (yet)
 

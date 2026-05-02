@@ -1,8 +1,8 @@
 ---
-description: Review, validate, cleanup, and push before context reset. Run this before /clear so the next session picks up cold.
+description: Cleanup the documentation, update state with current findings, push. Run before context reset so the next session picks up cold.
 ---
 
-You are wrapping the current session for context reset. The goal: leave the repo and `.td/STATE.md` so a fresh conversation reading them picks up without questions. Anything git already remembers gets removed from the docs.
+You are wrapping the current session. Documentation is the focus: clean it up, capture what's true now, push. Optimization, code review, refactoring — all out of scope. If something invites that, surface it as a backlog item or a future topic and move on.
 
 # Step 1 — Audit current state
 
@@ -10,15 +10,14 @@ You are wrapping the current session for context reset. The goal: leave the repo
 - `git status --short` — uncommitted changes? If yes: stop, ask the user "Commit them as a checkpoint, stash, or discard?" and wait. Do not proceed until working tree is clean.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
 
-# Step 2 — Review the code
+# Step 2 — Quick code sanity check (not a review)
 
-Skim recent changes (`git diff origin/main..HEAD` or, if all pushed, `git log -p -1`). Confirm:
+Skim recent changes (`git log -p -1` or `git diff origin/main..HEAD` if local commits exist). Look for ONLY these:
 
-- Tests still green (run `WORKWAY.md § Local testing → Test command`).
-- No half-done branches in code (TODO without context, dead `if false`, commented-out blocks).
-- No accidentally committed secrets (.env values, tokens, keys).
+- Accidentally committed secrets (`.env` values, tokens, keys).
+- Obvious leftovers (commented-out blocks, dead `if false`, debug prints).
 
-If anything looks wrong, surface it as one line and ask the user how to handle it. Do not auto-fix.
+If found, surface as one line and ask the user. **Don't refactor, don't optimize, don't restructure** — that's a separate topic, not part of close.
 
 # Step 3 — Squash local-only commits (if any)
 
@@ -51,21 +50,24 @@ The principle: if `git log` or the current code holds the answer, the doc doesn'
 
 # Step 5 — Update STATE.md as a handoff
 
-Rewrite `.td/STATE.md` so a fresh conversation can pick up cold:
+Rewrite `.td/STATE.md` so a fresh conversation picks up cold. Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 
 ```
 Project:  <name>
 Topic:    <current topic, or "idle">
-Phase:    <Plan | Work | Test | Ship | idle>
+Phase:    <whatever describes where we are — pick a word that fits>
 Blocker:  <one-line if any, else "none">
-Last:     <YYYY-MM-DD HH:MM> — <one-line summary of where we left off>
+Last:     <YYYY-MM-DD HH:MM> — <one-line summary>
 
 ## Resume note
 
-<2–4 lines of plain prose: what we were doing, what's done, what's pending, any gotchas the next session needs>
+<Plain prose. Can be 2 lines or 30. Whatever the next session needs to pick up cold:
+what we were doing, what's done, what's pending, gotchas, key file paths, the
+test command and where it lives, any context7 findings worth keeping. If we're
+in the middle of planning a multi-step thing, this is where the plan lives.>
 ```
 
-Resume note is the load-bearing part. Write it as if briefing yourself in two weeks.
+Resume note is the load-bearing part. During execution I'll skim it; for fresh-context orientation I'll read it fully. Don't artificially cap it.
 
 # Step 6 — Push
 
@@ -77,7 +79,7 @@ If push is rejected (network, auth, divergence), surface the error and stop.
 
 # Step 7 — Tell the user
 
-One sentence: `Cleared. <N> commits pushed. STATE handoff written. Safe to /clear.`
+One sentence: `Closed. <N> commits pushed. STATE handoff written. Safe to /clear.`
 
 # Rules
 
