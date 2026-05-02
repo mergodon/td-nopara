@@ -69,17 +69,19 @@ Run `/td-reset`:
 
 Never force-push commits that are already on `origin/main`.
 
-## The eight commands
+## The ten commands
 
 | Command | Job |
 |---|---|
 | `/td-init` | Bootstrap a project. Brownfield-aware: maps existing files, asks for gaps, fills `.td/`. |
 | `/td-feature <name>` | Start a BIG flow: discuss → plan → reality check. |
 | `/td-fix <description>` | Start a SMALL flow. |
-| `/td-note <text>` | Append a bug or idea to `.td/INBOX.md` mid-flow. Does not interrupt current work. |
+| `/td-note <text>` | Append a bug or idea to `.td/INBOX.md` (THIS project) mid-flow. |
+| `/td-feedback <text>` | File a bug or idea about td-flow ITSELF, sent to the framework repo. |
 | `/td-ship` | Do the next piece (BIG) or the fix (SMALL): work + test + commit + push + advance. |
 | `/td-status` | Print `STATE.md` summary: position, last action, next piece, blocker, inbox count. |
 | `/td-reset` | Squash local-only commits, write handoff into `STATE.md`, push. Run before `/clear`. |
 | `/td-cleanup` | Detect framework pollution in this file; relocate to `.td/frameworks/`. Manual only. |
+| `/td-help` | One-screen cheat sheet. `/td-help <name>` shows one command's description. |
 
 That's the whole framework. Anything not covered here is implementation freedom — choose the library, choose the structure, follow `.td/PROJECT.md` for scope.
