@@ -1,65 +1,98 @@
 ---
-description: Bootstrap td-flow in the current directory. Brownfield-aware — maps existing files, asks for gaps, writes the structured docs.
+description: Bootstrap td-flow in the current directory. Brownfield-aware. Detects stack and pre-fills WORKWAY.md framework awareness. Optional --template <name> to start from a saved starter.
 ---
 
-You are initializing td-flow in the current directory. This is the only slash command in td-flow; everything else is conversational. After this runs, the user just talks and you follow the contract in `CLAUDE.md`.
+You are initializing td-flow. After this runs, the user just talks; this is the only slash command.
+
+The argument may be `--template <name>` to start from a saved template at `~/projects/td/templates/<name>/` instead of the default `~/.claude/td-templates/`. If `<name>` doesn't exist, abort and list available templates.
 
 # Step 1 — Map what's already here
 
-Look around the current directory and detect:
+Detect:
 
-1. **Git state.** Is `.git` present? Remote URL? Default branch?
-2. **Stack signals.** `package.json`, `Cargo.toml`, `pyproject.toml`, `composer.json`, `Gemfile`, `go.mod`, `next.config.*`, `vite.config.*`, `astro.config.*`, `wrangler.toml`, `Dockerfile`. Note language and framework.
-3. **Test commands.** Read `scripts` from `package.json` / equivalent. Note `test`, `dev`, `build`, `deploy`.
-4. **Existing docs.** `README.md`, `CLAUDE.md`, `AGENTS.md`, `.cursor/`, `.windsurfrules`.
-5. **Existing td-flow state.** If `.td/PROJECT.md` already exists, abort: "This project is already initialized. Remove `.td/` first if you want to re-init."
-6. **Existing CLAUDE.md.** If present and not the td-flow contract: do not overwrite. Save it as `.td/frameworks/preserved-claude.md`. Tell the user.
+1. **Git state.** `.git` present? Remote? Default branch?
+2. **Stack signals.** Check `package.json`, `Cargo.toml`, `pyproject.toml`, `composer.json`, `Gemfile`, `go.mod`, `next.config.*`, `vite.config.*`, `astro.config.*`, `wrangler.toml`, `Dockerfile`, `manifest.json` (Tampermonkey/extension), `artisan` script.
+3. **Frameworks specifically:**
+   - `composer.json` has `laravel/laravel` → Laravel
+   - `composer.json` has `laravel/boost` → Laravel Boost (note: it auto-regenerates CLAUDE.md/AGENTS.md/junie/.mcp.json/boost.json — gitignore those)
+   - `next.config.*` → Next.js
+   - `vite.config.*` with `vite-plugin-monkey` → Tampermonkey userscript
+   - `wrangler.toml` → Cloudflare Workers/Pages
+   - `tailwind.config.*` → Tailwind
+   - `components/ui/` directory → shadcn
+4. **Test commands.** Read scripts from `package.json` or equivalent. Note `test`, `dev`, `build`, `deploy`.
+5. **Existing docs.** `README.md`, root `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`, `BLOCKS.md`, `.cursor/`, `.windsurfrules`.
+6. **Existing td-flow state.** If `.td/PROJECT.md` already exists, abort: "Project already initialized. Remove `.td/` first to re-init."
+7. **Existing root `CLAUDE.md`.** If present and not the td-flow contract, save the current content under a heading `## Preserved (pre-td-flow)` inside `.td/WORKWAY.md` § Framework specifics, then overwrite root `CLAUDE.md` with the canonical contract. Tell the user where the preserved content went.
 
-Print a brief 5–10 line map of findings.
+Print a 5–10 line map of findings.
 
-# Step 2 — Ask for the gaps
+# Step 2 — Ask for the gaps (small set)
 
-Ask in one message, as bullets the user can answer inline. Skip any answered confidently from Step 1. Group by destination doc so the user knows where each answer lands.
+Group by destination so the user knows where each answer lands. Skip any answered confidently from Step 1.
 
 **For PROJECT.md:**
 - What is this project, in 1–2 sentences?
-- Who is it for, in one sentence?
+- Who is it for?
 - First thing in active scope (one bullet)?
 
-**For TESTING.md § Local testing:**
+**For WORKWAY.md § Local testing:**
 - Test command (e.g. `npm test`, `cargo test`, "none")?
-- Dev server command and local URL (e.g. `npm run dev` / `http://localhost:3000`)?
-- One manual local check before shipping (e.g. "load the homepage, no console errors")?
+- Dev server command + local URL?
 
-**For TESTING.md § Live testing:**
+**For WORKWAY.md § Local UAT:**
+- Can I exercise the UI / endpoints myself, or does the user run it manually? (e.g. Tampermonkey userscripts → user; Laravel API → I can curl).
+- One sentence on what UAT looks like.
+
+**For WORKWAY.md § Production / Ship:**
 - Live URL (or "none" if not deployed)?
-- Deploy method (e.g. "auto on push to main", `npm run deploy`, "manual")?
-- One smoke check after shipping (or "none")?
-- Where the logs are (command or URL, or "none")?
+- Deploy method (e.g. "auto on push", `npm run deploy`, "manual")?
 
 # Step 3 — Write the docs
 
-Copy templates from `~/.claude/td-templates/` into the current directory, filling placeholders:
+Copy templates from `~/.claude/td-templates/` (or `~/projects/td/templates/<name>/` if `--template <name>` was passed):
 
-- `CLAUDE.md` → root, exactly as the template (do not modify)
+- `CLAUDE.md` → root, exactly as the template
 - `.td/PROJECT.md` → fill placeholders
-- `.td/TESTING.md` → fill placeholders for both Local and Live sections
-- `.td/ENV.md` → fill placeholders
-- `.td/STATE.md` → fill placeholders, set `Last:` to today's date
-- `.td/INBOX.md` → copy as-is
-- `.td/frameworks/.gitkeep` → empty file
-- `.gitignore` → merge with existing (do not clobber)
+- `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Production / Ship
+- `.td/STATE.md` → fill placeholders, set `Last:` to today
+- `.td/BACKLOG.md` → as-is
+- `.td/frameworks/.gitkeep` → empty (the dir is for rare overflow; default home for framework awareness is `WORKWAY.md` § Framework specifics)
+- `.gitignore` → merge with existing
 - `.env.example` → only if no `.env.example` exists
 
-Use the user's actual answers — do not invent values.
+# Step 4 — Pre-fill framework specifics
 
-# Step 4 — Install pre-commit hook
+For each framework detected in Step 1, append a section under `.td/WORKWAY.md` § Framework specifics. Examples:
 
-If `.git/` exists, copy `~/.claude/td-templates/../hooks/pre-commit` (i.e. `~/projects/td/hooks/pre-commit`) to `.git/hooks/pre-commit` and `chmod +x` it. The hook reads § Local testing → Test command from `.td/TESTING.md`.
+- **Laravel + Boost** detected:
+  ```
+  ### Laravel + Boost
+  - MCP server registered via `.mcp.json` (gitignored, regenerated by `boost:install`).
+  - Boost Docs API: 17k Laravel docs, semantic search.
+  - Boost regenerates `CLAUDE.md` / `AGENTS.md` / `junie/` / `boost.json` on each `boost:install` — they're gitignored.
+  - If Boost overwrites root `CLAUDE.md`: restore from `~/.claude/td-templates/CLAUDE.md` and tell the user.
+  ```
+  Also append to `.gitignore`:
+  ```
+  # Laravel Boost auto-regenerated artifacts (per Laravel docs)
+  AGENTS.md
+  junie/
+  boost.json
+  .mcp.json
+  ```
+
+- **Next.js**, **Vite**, **Tampermonkey/userscript**, **Cloudflare Workers**: short paragraph each on what they bring and any deploy quirks.
+
+Do not invent specifics — only write what's true based on detected files. Use `WebFetch` or `context7` if the user later asks me to research a framework deeper.
+
+# Step 5 — Install pre-commit hook
+
+If `.git/` exists, copy `~/projects/td/hooks/pre-commit` to `.git/hooks/pre-commit` and `chmod +x`. The hook reads `Test command` from `.td/WORKWAY.md` § Local testing.
 
 If `.git/` doesn't exist, ask: "Init a git repo now?" If yes, `git init`, then install the hook.
 
-# Step 5 — First commit
+# Step 6 — First commit
 
 ```
 git add CLAUDE.md .td/ .gitignore .env.example
@@ -68,21 +101,31 @@ git commit -m "chore: td-flow init"
 
 If a remote is configured, ask: "Push to `origin/main` now?" If yes, push.
 
-# Step 6 — Tell the user what they got
+# Step 7 — Tell the user what they got
 
-Print a short summary:
+Short summary:
 
-- Files created/updated
-- Pre-commit hook installed (or not, with reason)
-- Git: initialized / already present / pushed
-- How to use from here: just talk. Say what you want to build, fix, or change. Say "where are we" anytime. Say "let's wrap" before `/clear`.
-- One reminder: if a framework writes to CLAUDE.md (Laravel Boost etc.), tell Claude — they'll move it to `.td/frameworks/`.
+- Files created
+- Frameworks detected and pre-noted in WORKWAY.md
+- Pre-commit hook installed
+- Git: init/exists/pushed
+- How to use from here: just talk. Say what you want to build, fix, or change. I'll start the rhythm.
+
+# Save-as-template path
+
+This command also handles the inverse: when the user says "save this as a `<name>` template" (no slash command needed), I:
+
+1. Verify `.td/PROJECT.md` exists.
+2. Copy `.td/*` to `~/projects/td/templates/<name>/td/` (anonymized — strip user-specific values: project_name, live_url, db credentials, etc., back to placeholders).
+3. Copy current root `CLAUDE.md` to `~/projects/td/templates/<name>/CLAUDE.md` only if it differs from the canonical (it shouldn't, but check).
+4. Commit the framework repo: `chore: save <name> template`.
+5. Tell the user: "Saved as `<name>`. Future `/td-init --template <name>` will start from this shape."
 
 # Rules
 
-- Never overwrite an existing `CLAUDE.md` without preserving it to `.td/frameworks/preserved-claude.md`.
+- Never overwrite existing `CLAUDE.md` without preserving its content into `.td/WORKWAY.md` § Framework specifics first.
 - Never overwrite `.gitignore`. Merge.
 - Never overwrite `.env.example` if one exists.
 - Abort if `.td/PROJECT.md` already exists.
-- Use the user's answers — do not invent values.
-- After init, do not start a cycle. Wait for the user to say what they want to do.
+- Use the user's actual answers — do not invent values.
+- After init, do not start the rhythm. Wait for the user's first action-shaped statement.

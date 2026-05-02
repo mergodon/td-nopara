@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# td-flow pre-commit hook — runs the project's Test command from .td/TESTING.md § Local testing.
+# td-flow pre-commit hook — runs the project's Test command from .td/WORKWAY.md § Local testing.
 # Installed by /td-init. Do not bypass with --no-verify.
 
 set -e
 
-if [ ! -f .td/TESTING.md ]; then
-  echo "td-flow: .td/TESTING.md not found — skipping test check"
+if [ ! -f .td/WORKWAY.md ]; then
+  echo "td-flow: .td/WORKWAY.md not found — skipping test check"
   exit 0
 fi
 
@@ -17,10 +17,10 @@ CMD=$(awk '
     print
     exit
   }
-' .td/TESTING.md | xargs)
+' .td/WORKWAY.md | xargs)
 
 if [ -z "$CMD" ] || [ "$CMD" = "none" ] || [ "$CMD" = "{{test_command}}" ]; then
-  echo "td-flow: no runnable Test command in .td/TESTING.md § Local testing — skipping"
+  echo "td-flow: no runnable Test command in .td/WORKWAY.md § Local testing — skipping"
   exit 0
 fi
 
