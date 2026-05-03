@@ -12,7 +12,22 @@ TEMPLATES_LINK="$CLAUDE_DIR/td-templates"
 
 mkdir -p "$COMMANDS_DIR" "$SKILLS_DIR"
 
-# 1. Symlink slash commands
+# 1. Prune stale symlinks pointing into this repo's commands/ dir
+#    (catches retired commands like /td-ship from older versions)
+for link in "$COMMANDS_DIR"/*.md; do
+  [ -L "$link" ] || continue
+  resolved=$(readlink "$link")
+  case "$resolved" in
+    "$REPO_DIR/commands/"*)
+      if [ ! -e "$resolved" ]; then
+        echo "  pruned stale: /$(basename "$link" .md)"
+        rm "$link"
+      fi
+      ;;
+  esac
+done
+
+# 2. Symlink slash commands
 echo "→ installing slash commands to $COMMANDS_DIR"
 for cmd in "$REPO_DIR/commands/"*.md; do
   name=$(basename "$cmd")
@@ -24,7 +39,7 @@ for cmd in "$REPO_DIR/commands/"*.md; do
   echo "  /$(basename "$name" .md)"
 done
 
-# 2. Symlink the skill
+# 3. Symlink the skill
 echo "→ installing skill to $SKILLS_DIR/td-flow"
 SKILL_LINK="$SKILLS_DIR/td-flow"
 if [ -L "$SKILL_LINK" ] || [ -d "$SKILL_LINK" ]; then
@@ -33,7 +48,7 @@ fi
 ln -s "$REPO_DIR/skill" "$SKILL_LINK"
 echo "  td-flow"
 
-# 3. Symlink templates dir (commands resolve files from here)
+# 4. Symlink templates dir (commands resolve files from here)
 echo "→ linking templates to $TEMPLATES_LINK"
 if [ -L "$TEMPLATES_LINK" ] || [ -d "$TEMPLATES_LINK" ]; then
   rm -rf "$TEMPLATES_LINK"

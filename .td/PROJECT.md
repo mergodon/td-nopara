@@ -26,6 +26,7 @@ Mate (solo developer working with Claude). Used across `mergodon/rgb-*` projects
 - v2 (collapsed to 7 commands, 6-phase cycle, locked TESTING.md sections)
 - v3 (3 slash commands: init/ship/close; conversational interface; WORKWAY.md folds testing+env+frameworks; multi-stack; GSD legacy migration; uncapped Resume note)
 - v3.1 (renamed `/td-ship`→conversational; `/td-close` split into `/td-clear` (mid-project handoff) and `/td-close` (project/phase wrap))
+- v3.2 (sharpened "Who does what"; added first-message warm-up nudge; added Drift signals section; SKILL.md slimmed to thin pointer; install.sh prunes stale command symlinks)
 
 ## Out of scope (for now)
 

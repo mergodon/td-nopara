@@ -2,9 +2,9 @@
 
 This file is the contract. It stays at root. The user controls it. If a framework (e.g. Laravel Boost) overwrites it, the user will say so and I restore it — that's an edge case, not the default.
 
-## Who's who
+## Who does what
 
-I orchestrate. The user is a skilled engineer — runs commands, reads code, helps with manual UAT when needed — but expects me to do the work, not narrate it.
+I plan, write code, run tests, commit, push, and update docs. The user does what only they can: browser UAT, decisions, secrets, manual deploys, and redirecting me. If I'm asking the user to do something they didn't reserve for themselves, I'm offloading.
 
 ## How we work
 
@@ -31,9 +31,27 @@ If something doesn't fit one of those five files, it probably doesn't need a doc
 
 ## Nudges I do without being asked
 
+- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering.
 - Before a meaningful piece of work: **"Before I dive in, anything else on your mind that should ride along?"**
 - When the conversation drifts through small unrelated stuff: **"We're scattered — want to wrap and start fresh?"**
-- After shipping something meaningful: I suggest `/td-close` if context is getting heavy.
+- After a piece is done: I commit and push without re-asking every time — that's the rhythm. The user can say "wait, don't push yet" to break it.
+- When context is getting heavy mid-project: I suggest `/td-clear`.
+- When a project (or major phase) is genuinely wrapping: I suggest `/td-close`.
+
+## Drift signals I surface
+
+I watch for these and flag with one line — the user decides:
+
+- `work/<topic>.md` cold for 7+ days → "still active, BACKLOG, or drop?"
+- `STATE.Topic` and `work/<topic>.md` disagree → ask which is right.
+- PROJECT.md "Active scope" item has shipping commits → propose moving to Shipped.
+- WORKWAY test command no longer exists in `package.json`/equivalent → flag.
+- BACKLOG > 15 items → suggest triage at next `/td-clear`.
+- 5+ local commits ahead of `origin/main` → ask if holding for a reason.
+- Root `CLAUDE.md` drifted from canonical and the user didn't say so → ask if Boost/Cursor/etc. overwrote it.
+- Stack signals changed (new framework file, removed dependency) and `WORKWAY.md` § Framework specifics not updated → flag.
+- I've fixed the same kind of issue 3+ times → ask about root cause.
+- About to commit a file that looks like a secret (`.env`, token, key) → stop and confirm.
 
 ## Where things go (natural-language → doc)
 
@@ -47,8 +65,9 @@ When the user tells me something at the start of a message, action-shaped:
 - "remember to X later" / "park this" → append `.td/BACKLOG.md`
 - "feedback on td-flow" → append `~/projects/td/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
-- "ship it" / "we're done" → `/td-ship`
-- "let's wrap" / "save it" / about to /clear → `/td-close`
+- "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
+- "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
+- "wrap the project" / "we're done with this" / project actually finished → `/td-close`
 - "where are we" → read STATE.md, summarize
 - "save this as a `<name>` template" → copy current `.td/` shape (anonymized) to `~/projects/td/templates/<name>/`
 
@@ -58,7 +77,8 @@ Mid-conversation mentions don't trigger updates — only explicit, action-shaped
 
 - Topic piece: `feat(<topic>): <one-line>` or `fix(<topic>): <one-line>`
 - Doc-only update: `docs: <what changed>`
-- Close cleanup: `chore: close <topic>`
+- Clear-time prune: `chore: clear <topic>`
+- Close-time wrap: `chore: close <project-or-phase>`
 - Framework cleanup: `chore: restore CLAUDE.md, relocate <name> guidelines`
 
 ## Framework guidelines
@@ -78,7 +98,7 @@ Framework-specific instructions (Laravel Boost, Next.js, Tailwind, shadcn) live 
 ## The three slash commands
 
 - `/td-init` — bootstrap or migrate a project (one-time per project).
-- `/td-ship` — local checks pass → one commit → push to `origin/main`.
-- `/td-close` — cleanup the documentation, update STATE, push. Run before `/clear`.
+- `/td-clear` — mid-project context reset. Save STATE handoff, light prune, push. Run before `/clear` when the project continues.
+- `/td-close` — wrap the project (or a major phase). Full doc audit, prune everything `git log` covers, push.
 
-Everything else is conversational.
+Everything else — including shipping individual pieces — is conversational.
