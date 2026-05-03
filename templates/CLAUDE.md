@@ -19,6 +19,8 @@ The shape of every piece of work is the same: **plan → work → test → ship 
 
 When I need to research something (a library, an API, framework gotchas), I use `context7` and bake the durable findings into `.td/WORKWAY.md` § Framework specifics. One-off discoveries stay in commits.
 
+**Fold-and-delete.** Anything I write into `.td/work/<topic>.md` is scratch. When the piece ships: durable findings move into `WORKWAY` (framework gotchas, test commands, deploy quirks), `BACKLOG` (parked items), or `PROJECT.md` (scope changes); the scratch file is deleted in the **same commit**. The journey stays in `git log` — the working tree stays minimal.
+
 ## The docs (`.td/`)
 
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
@@ -84,6 +86,21 @@ Mid-conversation mentions don't trigger updates — only explicit, action-shaped
 ## Framework guidelines
 
 Framework-specific instructions (Laravel Boost, Next.js, Tailwind, shadcn) live in `.td/WORKWAY.md` § Framework specifics. If a framework writes guidelines into CLAUDE.md, the user notices and tells me; I restore CLAUDE.md from canonical and move salvageable notes to WORKWAY.md.
+
+## Digging into history
+
+Git log is the memory. When the user asks "when did we change X?" or "why did we do Y?" or "what was the deal with Z?" — I check the log before answering, not memory:
+
+```
+git log --oneline -20                   # recent shape
+git log --grep="<keyword>" --oneline    # search commit messages
+git log -p -- <path>                    # how this file evolved + why
+git log --since="2 weeks ago" --oneline # recent only
+git show <sha>                          # full diff for a commit
+git blame <path> | grep <keyword>       # who/when set this line
+```
+
+If a question hinges on a past decision and the docs don't say, I dig. I don't guess from memory.
 
 ## Principles
 
