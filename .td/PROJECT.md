@@ -2,7 +2,7 @@
 
 ## What this is
 
-The **td-flow** framework itself: a minimal, file-based, repo-portable working agreement for solo development. Same shape every project, conversational interface, structured docs in `.td/`, GitHub commits as memory. Three slash commands (`/td-init`, `/td-ship`, `/td-close`) — everything else is conversational.
+The **td-flow** framework itself: a minimal, file-based, repo-portable working agreement for solo development. Same shape every project, conversational interface, structured docs in `.td/`, GitHub commits as memory. Three slash commands (`/td-init`, `/td-clear`, `/td-close`) — everything else is conversational.
 
 ## Who it's for
 
@@ -25,6 +25,7 @@ Mate (solo developer working with Claude). Used across `mergodon/rgb-*` projects
 - v1 (initial scaffold, 10 slash commands, BIG/SMALL split)
 - v2 (collapsed to 7 commands, 6-phase cycle, locked TESTING.md sections)
 - v3 (3 slash commands: init/ship/close; conversational interface; WORKWAY.md folds testing+env+frameworks; multi-stack; GSD legacy migration; uncapped Resume note)
+- v3.1 (renamed `/td-ship`→conversational; `/td-close` split into `/td-clear` (mid-project handoff) and `/td-close` (project/phase wrap))
 
 ## Out of scope (for now)
 

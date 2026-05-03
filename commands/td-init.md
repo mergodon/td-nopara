@@ -2,7 +2,7 @@
 description: Bootstrap td-flow in the current directory. Brownfield-aware. Detects stack and pre-fills WORKWAY.md framework awareness. Optional --template <name> to start from a saved starter.
 ---
 
-You are initializing td-flow. After this runs, the user just talks; the only other slash command is `/td-clear` for context resets.
+You are initializing td-flow. After this runs, the user just talks. The other slash commands are `/td-clear` (mid-project context reset) and `/td-close` (project/phase wrap). Shipping pieces is conversational — no slash command.
 
 The argument may be `--template <name>` to start from a saved template at `~/projects/td/templates/<name>/` instead of the default `~/.claude/td-templates/`. If `<name>` doesn't exist, abort and list available templates.
 

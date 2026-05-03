@@ -4,20 +4,20 @@ Project:  td-flow
 Topic:    idle
 Phase:    idle
 Blocker:  none
-Last:     2026-05-03 — v3 shipped, repo eats its own dog food (`.td/` set up for the framework itself)
+Last:     2026-05-03 — v3.1 shipped: `/td-ship` removed (conversational), `/td-close` split into `/td-clear` (mid-project handoff) and `/td-close` (project/phase wrap)
 
 ## Resume note
 
-td-flow is a minimal solo-developer framework hosted at `mergodon/td-nopara`. It went through three iterations in two days (v1 → v2 → v3). The current shape is stable and worth using before more changes.
+td-flow is a minimal solo-developer framework hosted at `mergodon/td-nopara`. It went through three iterations in two days (v1 → v2 → v3), then a v3.1 command-shape adjustment.
 
-**The contract** — `CLAUDE.md` at root (universal across projects). The conversation is the interface. Three slash commands: `/td-init`, `/td-ship`, `/td-close`. Everything else is conversational.
+**The contract** — `CLAUDE.md` at root (universal across projects). The conversation is the interface. Three slash commands: `/td-init`, `/td-clear`, `/td-close`. Everything else is conversational — including shipping individual pieces (tests pass → commit → push).
 
 **The five docs** — `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/STATE.md`, `.td/BACKLOG.md`, `.td/work/<topic>.md`. WORKWAY.md is the workhorse — locked sections (Local testing, Local UAT, Live, Framework specifics, Notes) so any natural-language statement has an unambiguous home.
 
 **Key decisions made this session:**
 
 1. **CLAUDE.md stays at root.** Don't move, don't proxy, don't loader-pattern. Frameworks like Laravel Boost may overwrite it; that's an edge case fixed by hand, not engineered around.
-2. **Three slash commands only.** `/td-init` (bootstrap or migrate), `/td-ship` (local checks → commit → push), `/td-close` (cleanup docs + update STATE + push, before `/clear`).
+2. **Three slash commands only.** `/td-init` (bootstrap or migrate), `/td-clear` (mid-project STATE handoff + light prune + push, before `/clear`), `/td-close` (project or phase wrap: full doc audit + prune + push). Shipping individual pieces is conversational — no slash command.
 3. **No rigid rhythm.** The shape is plan → work → test → ship → close, but depth is picked from context. Sometimes one edit and one line; sometimes a multi-step plan with a backlog. Constants: read STATE on every fresh context, capture state in STATE, follow WORKWAY for testing.
 4. **WORKWAY.md folded TESTING + ENV + frameworks/.** One file, locked sections. Multi-stack supported via H3 subsections (`### Python`, `### C++`).
 5. **Resume note uncapped.** Multi-step plans live there. During execution it's skim-only; for fresh-context orientation it's read in full.

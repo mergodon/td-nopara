@@ -33,7 +33,7 @@ Manual verification before pushing. For projects where I can't fully exercise th
 
 ## Live
 
-Production / deployed environment. How the change reaches users; how I verify it after `/td-ship`.
+Production / deployed environment. How the change reaches users; how I verify it after pushing.
 
 - Live URL:        {{live_url_or_none}}
 - Deploy:          {{deploy_command_or_auto_on_push}}

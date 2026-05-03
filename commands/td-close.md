@@ -1,34 +1,31 @@
 ---
-description: Cleanup the documentation, update state with current findings, push. Run before context reset so the next session picks up cold.
+description: Wrap the project (or a major phase). Full doc audit, structure check, prune everything git already covers, validate PROJECT.md against reality, push.
 ---
 
-You are wrapping the current session. Documentation is the focus: clean it up, capture what's true now, push. Optimization, code review, refactoring — all out of scope. If something invites that, surface it as a backlog item or a future topic and move on.
+You are closing the project (or a major phase). The work is done — shipped, live if it has a live, tested. This is the deeper cleanup that `/td-clear` skips: walk every doc, validate it against current code and `git log`, prune anything redundant, restructure if drift has crept in. End with a clean, minimal `.td/` that an outsider could read in 2 minutes and understand the project.
 
-# Step 1 — Audit current state
+If state shows clearly mid-flight (active `Topic`, `work/<topic>.md` files, unfinished plan in Resume note), still run — projects-per-hour is normal here. But surface in Step 1: "This looks mid-flight — are you wrapping the whole thing, or did you mean `/td-clear`?" and wait for the answer.
 
-- Read `.td/STATE.md`, `.td/work/` listing, `.td/PROJECT.md`.
-- `git status --short` — uncommitted changes? If yes: stop, ask the user "Commit them as a checkpoint, stash, or discard?" and wait. Do not proceed until working tree is clean.
+# Step 1 — Confirm intent and audit state
+
+- Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
+- `git status --short` — uncommitted? If yes: stop, ask "Commit, stash, or discard?" Wait.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
+- If STATE shows mid-flight: ask the user "wrapping the whole project, or did you mean `/td-clear`?" Wait.
 
-# Step 2 — Quick code sanity check (not a review)
+# Step 2 — Code sanity sweep
 
-Skim recent changes (`git log -p -1` or `git diff origin/main..HEAD` if local commits exist). Look for ONLY these:
+Skim the working tree and recent commits for:
 
 - Accidentally committed secrets (`.env` values, tokens, keys).
-- Obvious leftovers (commented-out blocks, dead `if false`, debug prints).
+- Obvious leftovers: commented-out blocks, dead `if false`, debug prints, `console.log`, `dd()`.
+- TODO/FIXME comments. Surface them as one line each — user decides: park to BACKLOG, fix now, or leave.
 
-If found, surface as one line and ask the user. **Don't refactor, don't optimize, don't restructure** — that's a separate topic, not part of close.
+Don't refactor. Don't optimize. Surface, don't act.
 
 # Step 3 — Squash local-only commits (if any)
 
-If 2+ commits are ahead of `origin/main`, ask: "Squash these N local commits into one? Suggested message: `<message>`."
-
-Suggested message format:
-
-- Inside an active topic mid-piece: `feat(<topic>): <one-line> (checkpoint)`
-- Otherwise: ask the user for a one-line message.
-
-If confirmed:
+If 2+ commits ahead of `origin/main`, offer to squash. Same rules as `/td-clear`:
 
 ```
 git reset --soft origin/main
@@ -37,53 +34,87 @@ git commit -m "<message>"
 
 Never squash commits already on `origin/main`. Never force-push.
 
-# Step 4 — Remove redundant docs
+# Step 4 — Validate PROJECT.md against reality
 
-Walk `.td/` looking for content that git already covers:
+PROJECT.md describes what this project is. Drift is normal across many sessions — fix it now.
 
-- A `.td/work/<topic>.md` for a topic that's been shipped (its commits are in `git log`) → delete.
-- One-off settings flags noted in `.td/WORKWAY.md` § Notes that are already in committed code → delete the note.
-- Resolved blockers in `.td/STATE.md` → clear them out.
-- Backlog items that have shipped → delete the line.
+- **Stack section** — does it still match the dependency files (`package.json`, `composer.json`, etc.)? Update if drifted.
+- **Active scope** — anything listed there that's actually shipped? Move it to "Shipped". Anything that's been quietly abandoned? Ask the user before deleting.
+- **What this is / Who for** — re-read in light of what actually got built. If the one-liner no longer fits the project, propose a new one and ask.
 
-The principle: if `git log` or the current code holds the answer, the doc doesn't need to repeat it.
+# Step 5 — Validate WORKWAY.md against reality
 
-# Step 5 — Update STATE.md as a handoff
+- **Local testing** — does `Test command` still work? Run it. Does `Dev server` start? If a command is listed but the script no longer exists in `package.json` etc., flag it.
+- **Local UAT** — is the manual check description still accurate?
+- **Production / Ship** — live URL still up? Smoke command still works?
+- **Framework specifics** — anything noted here that's no longer relevant (e.g. a framework was removed)? Prune.
+- **Notes** — content that's now in committed code or covered by `git log`? Delete.
 
-Rewrite `.td/STATE.md` so a fresh conversation picks up cold. Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
+# Step 6 — Prune `.td/work/`
+
+For every `.td/work/<topic>.md`:
+
+- If the topic is shipped (commits in `git log` for `<topic>`): delete the file.
+- If the topic was abandoned: ask the user "delete or move to BACKLOG?"
+- If still in progress: this contradicts a "wrap" close — re-confirm with the user.
+
+After this step, `.td/work/` should be empty (or near-empty).
+
+# Step 7 — Prune BACKLOG.md
+
+- Lines describing work that's shipped → delete.
+- Lines that no longer make sense (referenced obsolete code, etc.) → delete.
+- Keep genuinely-still-parked items.
+
+# Step 8 — Prune STATE.md to "closed" shape
+
+After this command, STATE should signal "nothing pending". Rewrite it minimally:
 
 ```
 Project:  <name>
-Topic:    <current topic, or "idle">
-Phase:    <whatever describes where we are — pick a word that fits>
-Blocker:  <one-line if any, else "none">
-Last:     <YYYY-MM-DD HH:MM> — <one-line summary>
+Topic:    idle
+Phase:    closed (<YYYY-MM-DD>)
+Blocker:  none
+Last:     <YYYY-MM-DD HH:MM> — closed.
 
 ## Resume note
 
-<Plain prose. Can be 2 lines or 30. Whatever the next session needs to pick up cold:
-what we were doing, what's done, what's pending, gotchas, key file paths, the
-test command and where it lives, any context7 findings worth keeping. If we're
-in the middle of planning a multi-step thing, this is where the plan lives.>
+<One short paragraph: what got built, where it lives, what to know if you come
+back later. Not a changelog — git is the changelog. Just enough that a future
+session knows whether to /td-init fresh or pick up from here.>
 ```
 
-Resume note is the load-bearing part. During execution I'll skim it; for fresh-context orientation I'll read it fully. Don't artificially cap it.
+If the user said in Step 1 they're wrapping a phase (not the whole project), use a different `Topic` and `Phase` to reflect that — but the Resume note still summarizes what just wrapped, not what's coming next. The next session writes the next plan.
 
-# Step 6 — Push
+# Step 9 — Commit the cleanup
+
+One commit, explicit paths:
+
+```
+git add .td/ <any other touched docs>
+git commit -m "chore: close <project-or-phase-name>"
+```
+
+If nothing changed in Steps 4–8, skip this commit (don't make empty commits).
+
+# Step 10 — Push
 
 ```
 git push origin main
 ```
 
-If push is rejected (network, auth, divergence), surface the error and stop.
+If push is rejected, surface and stop.
 
-# Step 7 — Tell the user
+# Step 11 — Tell the user
 
-One sentence: `Closed. <N> commits pushed. STATE handoff written. Safe to /clear.`
+One sentence: `Closed. <N> commits pushed. <.td/ prune summary>. Safe to /clear.`
+
+If anything was surfaced for user decision in earlier steps and they deferred, repeat the list as a second line — they can pick up next session.
 
 # Rules
 
-- Working tree must be clean before pushing. Never push with uncommitted changes silently stashed.
+- Working tree clean before pushing. Never push with silently stashed changes.
 - Never force-push. Squashing is for local-only commits.
-- If the user says "discard" for uncommitted changes, ask explicit confirmation — destructive.
-- This command is the only place we rewrite recent local history. Day-to-day shipping never does.
+- This command IS allowed to delete docs and rewrite STATE/PROJECT/WORKWAY content — that's the point. But never delete `CLAUDE.md`, never delete the five canonical doc files (PROJECT/WORKWAY/STATE/BACKLOG remain even when minimal).
+- Don't invent values when fixing drift. If reality doesn't tell us, ask.
+- If the user defers any decision, leave it and continue — don't block the close on optional cleanup.

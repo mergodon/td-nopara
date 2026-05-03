@@ -27,9 +27,11 @@ In any project directory:
 claude
 /td-init                       # bootstrap or migrate (brownfield-aware)
 /td-init --template laravel    # bootstrap from a saved template
-/td-ship                       # local checks pass → one commit → push to origin/main
-/td-close                      # before /clear: cleanup docs, update STATE, push
+/td-clear                      # mid-project: save STATE handoff, light prune, push. Run before /clear.
+/td-close                      # wrap project (or phase): full doc audit, prune redundant docs, push.
 ```
+
+Shipping individual pieces is conversational: tests pass → commit → push to `origin/main`. No slash command for that.
 
 `/td-init` detects existing td-flow v1/v2, GSD legacy (`.planning/`, HTML markers), or rgb-buddy-2-style conventions (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`) and migrates them in place — no re-explaining.
 
@@ -40,10 +42,10 @@ After init, just talk:
 - "live URL is myapp.pages.dev" — updates `.td/WORKWAY.md` § Production / Ship
 - "remember to debounce later" — appends `.td/BACKLOG.md`
 - "save this as a `userscript` template" — extracts the current `.td/` shape into `~/projects/td/templates/userscript/`
-- "ship it" — runs Test → Ship → Close
+- "ship it" — tests pass, commit, push to `origin/main` (conversational)
 - "where are we" — summarizes `.td/STATE.md`
-- "ship it" — runs `/td-ship`
-- "let's wrap" — runs `/td-close`
+- "let's clear" / about to /clear — runs `/td-clear`
+- "wrap the project" / "we're done" — runs `/td-close`
 
 ## The rhythm
 
@@ -76,7 +78,7 @@ CLAUDE.md                ← contract at root; user controls
 ## Repo layout (this repo)
 
 ```
-commands/td-init.md   the only slash command
+commands/             slash commands (td-init, td-clear, td-close)
 templates/            files copied into target projects on /td-init
   CLAUDE.md           the universal contract
   td/PROJECT.md
