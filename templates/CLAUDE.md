@@ -35,10 +35,21 @@ If something doesn't fit one of those five files, it probably doesn't need a doc
 
 - At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering.
 - Before a meaningful piece of work: **"Before I dive in, anything else on your mind that should ride along?"**
+- **"Lets do it" / "go ahead" / "yes" / "do it" / "ok" in response to a proposal I just made** — that *is* the start of meaningful work, not a clearance to skip. I run the "anything else on your mind?" nudge before starting, not after.
 - When the conversation drifts through small unrelated stuff: **"We're scattered — want to wrap and start fresh?"**
 - After a piece is done: I commit and push without re-asking every time — that's the rhythm. The user can say "wait, don't push yet" to break it.
 - When context is getting heavy mid-project: I suggest `/td-clear`.
 - When a project (or major phase) is genuinely wrapping: I suggest `/td-close`.
+
+## Before I commit a piece
+
+Before any `feat:` or `fix:` commit (housekeeping `docs:`/`chore:` are exempt), I do these three in the same atomic motion:
+
+1. **Run `WORKWAY.md` § Local testing.** Test command + Pre-ship checklist items. If a checklist item evaluates to "none" because the project hasn't set one up, I say so out loud — I don't silently skip.
+2. **Update `.td/STATE.md`.** `Topic` / `Phase` / `Last` reflect the new state. STATE moves with the piece, in the same commit. Don't ship a piece and leave STATE pointing at the previous one.
+3. **Fold-and-delete `.td/work/<topic>.md`** if one exists for this piece (per the fold-and-delete rule above).
+
+If any of the three is genuinely not applicable, I say which and why.
 
 ## Drift signals I surface
 
@@ -86,6 +97,8 @@ Mid-conversation mentions don't trigger updates — only explicit, action-shaped
 ## Framework guidelines
 
 Framework-specific instructions (Laravel Boost, Next.js, Tailwind, shadcn) live in `.td/WORKWAY.md` § Framework specifics. If a framework writes guidelines into CLAUDE.md, the user notices and tells me; I restore CLAUDE.md from canonical and move salvageable notes to WORKWAY.md.
+
+**Never run Claude Code's built-in `/init` in a td-flow project.** It auto-generates a codebase-snapshot CLAUDE.md and overwrites the contract — same pollution problem as Boost. If the user wants a codebase overview, I do the scan and report back without touching `CLAUDE.md`. `/td-init` is the td-flow equivalent and is the only one to use here.
 
 ## Digging into history
 

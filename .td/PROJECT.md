@@ -28,6 +28,7 @@ Mate (solo developer working with Claude). Used across `mergodon/rgb-*` projects
 - v3.1 (renamed `/td-ship`→conversational; `/td-close` split into `/td-clear` (mid-project handoff) and `/td-close` (project/phase wrap))
 - v3.2 (sharpened "Who does what"; added first-message warm-up nudge; added Drift signals section; SKILL.md slimmed to thin pointer; install.sh prunes stale command symlinks)
 - v3.3 (added Fold-and-delete rule for `work/<topic>.md` scratch; added "Digging into history" section with git log recipe)
+- v3.4 (made the four bypassed rituals explicit: "lets do it" as meaningful-work trigger, "Before I commit a piece" pre-ship + STATE-update + fold-and-delete bundle, and `/init` never-run warning)
 
 ## Out of scope (for now)
 
