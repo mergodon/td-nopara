@@ -18,7 +18,7 @@ Mate (solo developer working with Claude). Used across `mergodon/rgb-*` projects
 
 ## Active scope
 
-(none — v3 just shipped; awaiting first real-project test)
+(none — v3.3 shipped; awaiting first real-project use to surface what's actually missing)
 
 ## Shipped
 

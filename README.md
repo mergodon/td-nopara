@@ -14,6 +14,8 @@ cd ~/projects/td
 
 Symlinks created:
 - `~/.claude/commands/td-init.md`
+- `~/.claude/commands/td-clear.md`
+- `~/.claude/commands/td-close.md`
 - `~/.claude/skills/td-flow`
 - `~/.claude/td-templates`
 
