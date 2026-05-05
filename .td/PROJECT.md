@@ -29,10 +29,11 @@ Mate (solo developer working with Claude). Used across `mergodon/rgb-*` projects
 - v3.2 (sharpened "Who does what"; added first-message warm-up nudge; added Drift signals section; SKILL.md slimmed to thin pointer; install.sh prunes stale command symlinks)
 - v3.3 (added Fold-and-delete rule for `work/<topic>.md` scratch; added "Digging into history" section with git log recipe)
 - v3.4 (made the four bypassed rituals explicit: "lets do it" as meaningful-work trigger, "Before I commit a piece" pre-ship + STATE-update + fold-and-delete bundle, and `/init` never-run warning)
+- v3.5 (BACKLOG/PROJECT cleanup: dropped auto-test-suite item; rgb-buddy-2 set as next-session move for UAT + first-real-project validation; explicit self-validation rationale via drift signals + Before-I-commit bundle)
 
 ## Out of scope (for now)
 
 - Research / context7 deep integration in the rhythm — useful, deferred. Currently context7 is a tool I can use ad-hoc; not built into the cycle.
 - Subagents for parallel pieces — useful, deferred. Will revisit when a real project has 4+ truly independent pieces.
 - npm package / CLI / Electron studio (the gsd-2 mistake). Never.
-- Automated test suite for the framework itself — backlog (see BACKLOG.md).
+- Automated test suite for the framework itself — explicitly dropped 2026-05-05. We validate project-by-project as we use td-flow on real `rgb-*` repos. Drift signals + "Before I commit a piece" ritual are the self-validation.
