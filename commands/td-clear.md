@@ -4,13 +4,23 @@ description: Mid-project context reset. Save state, push, ready for /clear. Proj
 
 You are checkpointing the current session so the user can `/clear` and the next session picks up cold. The project is not done — it's mid-flight. Keep it fast: state handoff, prune obvious junk, push. Optimization, code review, restructuring — out of scope. If something invites that, surface it as a backlog item or a future topic and move on.
 
-# Step 1 — Audit current state
+# Step 1 — Update memory
+
+Before anything else, scan the session for things worth keeping in the auto-memory system (`~/.claude/projects/.../memory/`). Look for:
+
+- Decisions made that future sessions should know about (feedback, preferences, project choices)
+- Technical facts discovered that aren't obvious from the code
+- Anything the user explicitly said to remember
+
+Update existing memory files rather than creating duplicates. If nothing new was learned, skip silently — don't create empty updates.
+
+# Step 2 — Audit current state
 
 - Read `.td/STATE.md`, `.td/work/` listing, `.td/PROJECT.md`.
 - `git status --short` — uncommitted changes? If yes: stop, ask the user "Commit them as a checkpoint, stash, or discard?" and wait. Do not proceed until working tree is clean.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
 
-# Step 2 — Quick code sanity check (not a review)
+# Step 3 — Quick code sanity check (not a review)
 
 Skim recent changes (`git log -p -1` or `git diff origin/main..HEAD` if local commits exist). Look for ONLY these:
 
@@ -19,7 +29,7 @@ Skim recent changes (`git log -p -1` or `git diff origin/main..HEAD` if local co
 
 If found, surface as one line and ask the user. **Don't refactor, don't optimize, don't restructure** — that's a separate topic, not part of clear.
 
-# Step 3 — Squash local-only commits (if any)
+# Step 4 — Squash local-only commits (if any)
 
 If 2+ commits are ahead of `origin/main`, ask: "Squash these N local commits into one? Suggested message: `<message>`."
 
@@ -37,7 +47,15 @@ git commit -m "<message>"
 
 Never squash commits already on `origin/main`. Never force-push.
 
-# Step 4 — Light prune (only obvious dead docs)
+# Step 5 — Park anything before clearing
+
+Ask the user: **"Anything to add to the backlog before we clear?"**
+
+Wait for the answer. If they name something, append it to `.td/BACKLOG.md` as `- YYYY-MM-DD — <item>`. If they say nothing or no, continue immediately.
+
+This is a single question — don't prompt for elaboration or turn it into a planning session.
+
+# Step 6 — Light prune (only obvious dead docs)
 
 Walk `.td/` for content git already covers:
 
@@ -47,7 +65,7 @@ Walk `.td/` for content git already covers:
 
 Don't restructure. Don't second-guess `WORKWAY.md` content. The deeper cleanup is `/td-close`.
 
-# Step 5 — Update STATE.md as a handoff
+# Step 6 — Update STATE.md as a handoff
 
 Rewrite `.td/STATE.md` so a fresh conversation picks up cold. Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 
@@ -68,7 +86,7 @@ in the middle of planning a multi-step thing, this is where the plan lives.>
 
 Resume note is the load-bearing part. During execution I'll skim it; for fresh-context orientation I'll read it fully. Don't artificially cap it.
 
-# Step 6 — Push
+# Step 7 — Push
 
 ```
 git push origin main
@@ -76,7 +94,7 @@ git push origin main
 
 If push is rejected (network, auth, divergence), surface the error and stop.
 
-# Step 7 — Tell the user
+# Step 8 — Tell the user
 
 One sentence: `Cleared. <N> commits pushed. STATE handoff written. Safe to /clear.`
 

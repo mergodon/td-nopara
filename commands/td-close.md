@@ -6,14 +6,24 @@ You are closing the project (or a major phase). The work is done — shipped, li
 
 If state shows clearly mid-flight (active `Topic`, `work/<topic>.md` files, unfinished plan in Resume note), still run — projects-per-hour is normal here. But surface in Step 1: "This looks mid-flight — are you wrapping the whole thing, or did you mean `/td-clear`?" and wait for the answer.
 
-# Step 1 — Confirm intent and audit state
+# Step 1 — Update memory
+
+Before anything else, scan the session for things worth keeping in the auto-memory system (`~/.claude/projects/.../memory/`). Closing a project is the highest-value moment to capture — the full arc is visible. Look for:
+
+- Decisions made that future sessions should know about (feedback, preferences, project choices)
+- Technical facts discovered that aren't obvious from the code
+- Anything the user explicitly said to remember
+
+Update existing memory files rather than creating duplicates. If nothing new was learned, skip silently.
+
+# Step 3 — Confirm intent and audit state
 
 - Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
 - `git status --short` — uncommitted? If yes: stop, ask "Commit, stash, or discard?" Wait.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
 - If STATE shows mid-flight: ask the user "wrapping the whole project, or did you mean `/td-clear`?" Wait.
 
-# Step 2 — Code sanity sweep
+# Step 4 — Code sanity sweep
 
 Skim the working tree and recent commits for:
 
@@ -23,7 +33,7 @@ Skim the working tree and recent commits for:
 
 Don't refactor. Don't optimize. Surface, don't act.
 
-# Step 3 — Squash local-only commits (if any)
+# Step 5 — Squash local-only commits (if any)
 
 If 2+ commits ahead of `origin/main`, offer to squash. Same rules as `/td-clear`:
 
@@ -34,7 +44,7 @@ git commit -m "<message>"
 
 Never squash commits already on `origin/main`. Never force-push.
 
-# Step 4 — Validate PROJECT.md against reality
+# Step 6 — Validate PROJECT.md against reality
 
 PROJECT.md describes what this project is. Drift is normal across many sessions — fix it now.
 
@@ -42,7 +52,7 @@ PROJECT.md describes what this project is. Drift is normal across many sessions 
 - **Active scope** — anything listed there that's actually shipped? Move it to "Shipped". Anything that's been quietly abandoned? Ask the user before deleting.
 - **What this is / Who for** — re-read in light of what actually got built. If the one-liner no longer fits the project, propose a new one and ask.
 
-# Step 5 — Validate WORKWAY.md against reality
+# Step 7 — Validate WORKWAY.md against reality
 
 - **Local testing** — does `Test command` still work? Run it. Does `Dev server` start? If a command is listed but the script no longer exists in `package.json` etc., flag it.
 - **Local UAT** — is the manual check description still accurate?
@@ -50,7 +60,7 @@ PROJECT.md describes what this project is. Drift is normal across many sessions 
 - **Framework specifics** — anything noted here that's no longer relevant (e.g. a framework was removed)? Prune.
 - **Notes** — content that's now in committed code or covered by `git log`? Delete.
 
-# Step 6 — Prune `.td/work/`
+# Step 8 — Prune `.td/work/`
 
 For every `.td/work/<topic>.md`:
 
@@ -60,13 +70,13 @@ For every `.td/work/<topic>.md`:
 
 After this step, `.td/work/` should be empty (or near-empty).
 
-# Step 7 — Prune BACKLOG.md
+# Step 9 — Prune BACKLOG.md
 
 - Lines describing work that's shipped → delete.
 - Lines that no longer make sense (referenced obsolete code, etc.) → delete.
 - Keep genuinely-still-parked items.
 
-# Step 8 — Prune STATE.md to "closed" shape
+# Step 10 — Prune STATE.md to "closed" shape
 
 After this command, STATE should signal "nothing pending". Rewrite it minimally:
 
@@ -86,7 +96,7 @@ session knows whether to /td-init fresh or pick up from here.>
 
 If the user said in Step 1 they're wrapping a phase (not the whole project), use a different `Topic` and `Phase` to reflect that — but the Resume note still summarizes what just wrapped, not what's coming next. The next session writes the next plan.
 
-# Step 9 — Commit the cleanup
+# Step 11 — Commit the cleanup
 
 One commit, explicit paths:
 
@@ -97,7 +107,7 @@ git commit -m "chore: close <project-or-phase-name>"
 
 If nothing changed in Steps 4–8, skip this commit (don't make empty commits).
 
-# Step 10 — Push
+# Step 12 — Push
 
 ```
 git push origin main
@@ -105,11 +115,13 @@ git push origin main
 
 If push is rejected, surface and stop.
 
-# Step 11 — Tell the user
+# Step 13 — Tell the user
 
-One sentence: `Closed. <N> commits pushed. <.td/ prune summary>. Safe to /clear.`
+Two parts:
 
-If anything was surfaced for user decision in earlier steps and they deferred, repeat the list as a second line — they can pick up next session.
+**One sentence summary line:** `Closed. <N> commits pushed. <.td/ prune summary>.`
+
+**One short paragraph:** What got built and shipped, any meaningful decisions made, and the single most important thing to know if someone (or a future session) picks this up later. Not a changelog — git has that. Just the things that aren't obvious from reading the code.
 
 # Rules
 
