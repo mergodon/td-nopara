@@ -60,12 +60,19 @@ Each CR's body should be self-contained — a reader who has seen neither codeba
 3. Ping the sender to flip `status: shipped`.
 4. If rejecting, ping the sender with the reason; sender records it in their CR body.
 
-## Pruning
+## Removal — sender-owned, any time
 
-At `/td-close`, CRs in `status: shipped`, `status: rejected`, or `status: withdrawn` get pruned in the same commit (`chore: prune closed CRs`). `git log` preserves them. Open and accepted CRs survive close.
+**Removal of the CR file is always done by the sender. The receiver never touches the sender's `.td/cr/` folder.** Each side owns one artifact: sender owns the CR file in their `cr/`, receiver owns the matching one-line entry in their `BACKLOG.md`. Each end manages their own.
+
+A CR file is removable as soon as its `status` reaches a terminal value (`shipped`, `rejected`, or `withdrawn`) — there's no need to wait for `/td-close`. Typical flow:
+
+- Sender ships a CR by combining the status update and the file deletion into one commit: `chore(cr): CR-N shipped, prune` with the receiver's commit SHA in the body.
+- `/td-close` is a backstop — anything still terminal at close-time gets swept up in the close audit.
+
+`git log` preserves the full CR text + every status transition. The working tree only ever shows live conversations.
 
 ## Notification — today vs. tomorrow
 
-**Today (solo, switching hats):** the act of switching to the receiver project IS the notification. The `cr/` folder is your reading queue. The receiver's BACKLOG line is theirs.
+**Today (solo, switching hats):** the act of switching to the receiver project IS the notification. Your own `cr/` folder is your sent-mail; the other project's `BACKLOG.md` is your inbox.
 
 **Later (real collaborators):** layer GitHub Issues on top — file an issue on the receiver's repo, paste the CR link, set the `issue:` field in this CR's frontmatter. Same files, same lifecycle, just better notification + searchability. No restructuring needed.

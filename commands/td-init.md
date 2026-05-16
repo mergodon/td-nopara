@@ -97,6 +97,7 @@ Copy templates from `~/.claude/td-templates/` (or `~/projects/td/templates/<name
 - `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Production / Ship
 - `.td/STATE.md` → fill placeholders, set `Last:` to today
 - `.td/BACKLOG.md` → as-is
+- `.td/cr/README.md` → as-is (outbound change-request convention — receiver of inbound CRs files them as one-liners in BACKLOG.md per the README)
 - `.td/frameworks/.gitkeep` → empty (the dir is for rare overflow; default home for framework awareness is `WORKWAY.md` § Framework specifics)
 - `.gitignore` → merge with existing
 - `.env.example` → only if no `.env.example` exists
