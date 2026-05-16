@@ -96,6 +96,7 @@ skill/SKILL.md        skill definition (symlinked into ~/.claude/skills/td-flow)
 hooks/pre-commit      test-on-commit hook installed by /td-init
 install.sh            symlinks commands, skill, templates into ~/.claude/
 FEEDBACK.md           feedback about td-flow itself, captured from any project
+SERVICES.md           meta-registry: friendly name → GH slug → one-liner for the user's portfolio
 ```
 
 ## Cross-repo requests

@@ -2,9 +2,9 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    shipped (2026-05-16)
+Phase:    shipped (2026-05-17)
 Blocker:  none
-Last:     2026-05-16 — v3.7 shipped: retired td-bus in favor of GitHub Issues + per-project `## Cross-repo` registry. Deleted `bin/td-bus`, `bus-schema.sql`, `commands/td-bus-init.md`, bus blocks in `install.sh` + `README.md`. Added Cross-repo workflow + warm-up `gh issue list` nudge to root + template CLAUDE.md. Bus shipped and retired same day (~8h apart) once research on Projects v2 / Issues showed the bus was reinventing what GH already gives for free.
+Last:     2026-05-17 — SERVICES.md added (central friendly-name → GH slug registry for the ~95-repo portfolio; lookup-only, not exhaustive). td-nopara visibility **flipped to PRIVATE** — was actually public despite the doc claiming private. Earlier same day: inbox-scope guardrail (current repo by default; cross-repo opt-in via explicit triggers), unified-inbox query fix (`--owner` flag form; quoted-string broke), dropped `--involves @me` from cross-repo queries (REPO is the unit of interest, not GH identity — user has multiple identities across machines). Yesterday: v3.7 shipped retiring td-bus for GitHub Issues + per-project `## Cross-repo` registry; all 4 retirement-cleanup issues actioned by their projects' Claude sessions within ~1 hour; bus shipped+retired same day.
 
 ## Resume note
 
