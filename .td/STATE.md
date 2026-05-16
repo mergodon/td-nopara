@@ -20,13 +20,24 @@ Cross-repo shape now (for cold-start recall):
 
 **Loose ends + next moves:**
 
-1. **Live Turso DB still exists.** User can `turso db destroy td-bus-<you>` whenever — not blocking anything, just costs nothing to leave it idle.
-2. **`templates/CLAUDE.md` and root `CLAUDE.md` have drifted.** Template has the full Cross-repo section now; root has it too, but the older drift (template's etiquette callout vs. root's absence) was patched as part of v3.7. Worth a future audit to keep them in sync.
-3. **First real-project validation:** `cd ~/projects/rgb-buddy-2 && claude && /td-init` — still the unscheduled next-real-project move. Exercises brownfield detection on a fresh project. The rgb-buddy-2 repo also now has issue #7 (the bus-retirement cleanup) waiting in its inbox, so opening it doubles as warm-up-nudge validation.
-4. **First real cross-repo issue in anger — DONE 2026-05-16.** Filed 4 retirement-cleanup issues from `td-nopara` per the v3.7 workflow:
+1. **User actions still pending** (Claude can't do these without overreach):
+   - **Destroy cloud DB:** `turso db destroy td-bus-mergodon` (region `aws-ap-northeast-1`). User has no `turso` CLI installed; either `brew install tursodatabase/tap/turso` or use the Turso web UI.
+   - **Remove env vars** from `~/dotfiles/shell/secrets.zsh` lines 58-59 (`TD_BUS_URL` + `TD_BUS_TOKEN`). `~/.secrets` is a symlink to this file, so one edit covers both paths. Confirm with `env | grep TD_BUS_` in a fresh shell.
+
+2. **Local cleanup status (as of 2026-05-16):**
+   - `~/bin/td-bus` symlink: removed.
+   - `~/.td/bus.env`: not present (never created on this machine).
+   - `~/.td/` dir: not present.
+   - `bin/td-bus` + `bus-schema.sql` + `commands/td-bus-init.md` in repo: deleted in `b52bed0`.
+
+3. **Memo for affected projects** lives at `/tmp/td-bus-retirement-memo.md` — copy-pasteable summary of the convention + per-repo asks + issue links. Survives the session; regenerate from this STATE if lost.
+
+4. **First real-project validation:** `cd ~/projects/rgb-buddy-2 && claude && /td-init` — still unscheduled. Doubles as warm-up-nudge validation since rgb-buddy-2#7 is waiting in its inbox.
+
+5. **First real cross-repo issue in anger — DONE 2026-05-16.** Four retirement issues filed from `td-nopara` per the v3.7 workflow:
    - mergodon/anzsco-tasmanvisa-com#1
    - mergodon/anzscofinder-pipeline#1
    - mergodon/rgb-buddy-2#7
    - mergodon/tdphp-rgbtracker-mainweb#1
 
-   Each asks the receiving project to drop the stale `## td-bus` section from `.td/PROJECT.md` and delete `~/.td/bus.env` if present. When you open any of those projects, the warm-up `gh issue list --state open` should surface its issue automatically. Anything quirky in that flow → BACKLOG line tagged "feedback on cross-repo:".
+6. **`templates/CLAUDE.md` vs root `CLAUDE.md` drift** patched as part of v3.7; both have the full Cross-repo section now. Worth a future audit to keep them in sync going forward.
