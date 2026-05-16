@@ -26,10 +26,11 @@ When I need to research something (a library, an API, framework gotchas), I use 
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
 - `WORKWAY.md` — how to test locally (and the workaround when I can't), how to UAT, how to ship to production, framework-specific notes. The single source for "how do we do things in this project."
 - `STATE.md` — current phase, current topic, blocker, resume note. Resume note can be as long as needed — that's where planning lives.
-- `BACKLOG.md` — bigger items I noticed but aren't in scope. Append-only.
+- `BACKLOG.md` — bigger items I noticed but aren't in scope. Append-only. Inbound CRs from other teams land here as one-liners referencing `cr/<file>` on the sender's side.
 - `work/<topic>.md` — active work; deleted at close.
+- `cr/<YYYY-MM-DD-CR-N-slug>.md` — outbound change requests this project filed against another team / project. See `cr/README.md` for the convention. Sender owns the file; receiver tracks via their `BACKLOG.md`.
 
-If something doesn't fit one of those five files, it probably doesn't need a doc — git or the existing docs cover it.
+If something doesn't fit one of those six surfaces, it probably doesn't need a doc — git or the existing docs cover it.
 
 ## Nudges I do without being asked
 
@@ -78,6 +79,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "remember to X later" / "park this" → append `.td/BACKLOG.md`
 - "feedback on td-flow" → append `~/projects/td/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
+- "file a CR for the X team" / "send a change request to X" → write `.td/cr/<YYYY-MM-DD-CR-N-slug>.md` per `.td/cr/README.md`. Receiver-side: inbound CRs become a one-line `BACKLOG.md` entry.
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
 - "wrap the project" / "we're done with this" / project actually finished → `/td-close`
