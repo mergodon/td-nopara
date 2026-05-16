@@ -2,24 +2,25 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    closed (2026-05-04)
+Phase:    shipped (2026-05-16)
 Blocker:  none
-Last:     2026-05-05 — v3.5 shipped: BACKLOG/PROJECT cleanup. Auto-test-suite item dropped (validate per-project instead). rgb-buddy-2 set as the explicit next-session move (closes UAT + first-real-project validation in one).
+Last:     2026-05-16 — v3.6 shipped: td-bus (cross-project messaging via Turso/libsql). Single-file Python CLI at `bin/td-bus`, schema in `bus-schema.sql`, opt-in onboarding via `/td-bus-init`, README rewrite, installer wires `~/bin/td-bus`. Creds resolve env-first with `~/.td/bus.env` fallback. Four real apps registered on the live bus: anzscofinder, anzscofinder-pipeline, rgb-buddy, rgb-webapp.
 
 ## Resume note
 
-td-flow is the minimal, file-based, repo-portable framework hosted at `mergodon/td-nopara`. It eats its own dog food — this repo IS a td-flow project. Stable surface: root `CLAUDE.md` contract + 4 `.td/` docs (`PROJECT`, `WORKWAY`, `STATE`, `BACKLOG`) + `work/<topic>.md` scratch + 3 slash commands (`/td-init`, `/td-clear`, `/td-close`). Everything else is conversational.
+td-flow is the minimal, file-based, repo-portable framework hosted at `mergodon/td-nopara`. It eats its own dog food — this repo IS a td-flow project. Stable surface: root `CLAUDE.md` contract + 4 `.td/` docs (`PROJECT`, `WORKWAY`, `STATE`, `BACKLOG`) + `work/<topic>.md` scratch + 4 slash commands (`/td-init`, `/td-clear`, `/td-close`, `/td-bus-init`). Everything else is conversational.
 
-The full evolution lives in `git log` — read it before assuming current state. v3.1 split `/td-clear` from `/td-close`. v3.2 added drift signals, sharpened "Who does what", slimmed SKILL.md to a thin pointer, made `install.sh` prune stale command symlinks. v3.3 added the fold-and-delete rule and the "Digging into history" git recipe. v3.4 closed the loop on rituals that were getting bypassed in practice: "lets do it" is now explicitly a meaningful-work trigger, the "Before I commit a piece" section bundles pre-ship + STATE-update + fold-and-delete, and a hard rule was added: never run Claude Code's built-in `/init` in a td-flow project.
+The full evolution lives in `git log` — read it before assuming current state. v3.1 split `/td-clear` from `/td-close`. v3.2 added drift signals + install.sh pruning. v3.3 added fold-and-delete + "Digging into history". v3.4 made bypassed rituals explicit (the "lets do it" trigger, "Before I commit a piece" bundle, `/init` never-run rule). v3.5 cleaned BACKLOG/PROJECT and set rgb-buddy-2 as the next real-project move. **v3.6 shipped td-bus**: opt-in cross-project messaging on a shared Turso/libsql DB so registered apps can exchange CRs / notes / bugs without writing into each other's repos.
 
-**The very next move (do this first, do not iterate further on td-flow itself):**
+td-bus shape (for cold-start recall):
+- `apps` (canonical handle, description, optional long_description / contact / repo_path) + `messages` (type cr|note|bug, status enum open|accepted|shipped|rejected|withdrawn|done, FK'd to apps) + `replies` (append-only thread, cascade delete).
+- IDs are human-readable: `<from_app>-<TYPE>-<n>`, n computed by the CLI not the DB.
+- Creds: env vars `TD_BUS_URL` + `TD_BUS_TOKEN` preferred; `~/.td/bus.env` fallback. CLI dies fast with a clear message if both are missing.
+- Status transitions are role-gated: sender can withdraw, recipient can accept / ship (requires `--sha`) / reject, either can mark done.
 
-```
-cd ~/projects/rgb-buddy-2
-claude
-/td-init
-```
+**Next moves (still pending — not blocked, just unscheduled):**
 
-This single move exercises the brownfield detection (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` mapping), confirms the v3.4 rituals fire on a real project (drift signals, "Before I commit a piece", "lets do it" trigger), and produces the first real-project commit history under td-flow v3.4. Anything quirky → file as a "feedback on td-flow: …" line that lands in this repo's BACKLOG.md.
+1. First real-project validation pass: `cd ~/projects/rgb-buddy-2 && claude && /td-init`. Exercises brownfield detection (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`) + confirms the v3.4 rituals fire on a fresh project. Anything quirky → BACKLOG line tagged "feedback on td-flow:".
+2. First end-to-end bus exchange in anger: send a real CR between two of the four registered apps, walk it through `send → accept → ship --sha → done`, watch for friction. Anything quirky → BACKLOG line tagged "feedback on td-bus:".
 
-How we know v3.4 actually works without an automated test: the framework's own drift signals + "Before I commit a piece" bundle are the validation mechanism. After one or two real-project sessions, scan the resulting commits — if STATE.md updates ride alongside `feat:` commits, scratch files got fold-and-deleted, and "anything else on your mind?" appears at piece-start, the rituals are live. If they don't, surface as feedback and tighten CLAUDE.md again.
+How we know the framework actually works without an automated test: drift signals + "Before I commit a piece" bundle are the validation mechanism. Today's pull-and-review surfaced exactly the drift it was supposed to — STATE was stale post-bus, PROJECT.md was missing v3.6. The rituals are doing their job; just need to fire on the commit side too.
