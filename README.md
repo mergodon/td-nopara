@@ -111,7 +111,7 @@ Projects sometimes need things from other projects. Convention: each `.td/PROJEC
 
 Workflow: I read the registry, `gh repo view <slug>` to confirm access + read the target repo for context, then `gh issue create --repo <slug>`. Discussion in issue comments. The receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides. No file-based CRs, no separate inbox, no status enum, no labels.
 
-Unified view across all your repos: `gh search issues "user:<owner> involves:@me state:open"`.
+Unified view across all your repos: `gh search issues --owner <owner> --involves @me --state open`.
 
 The section is opt-in — projects with no cross-repo relationships skip it. Details in `templates/CLAUDE.md § Cross-repo`.
 

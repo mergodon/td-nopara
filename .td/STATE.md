@@ -10,7 +10,7 @@ Last:     2026-05-16 — v3.7 shipped: retired td-bus in favor of GitHub Issues 
 
 td-flow is the minimal, file-based, repo-portable framework hosted at `mergodon/td-nopara`. It eats its own dog food — this repo IS a td-flow project. Stable surface: root `CLAUDE.md` contract + 4 `.td/` docs (`PROJECT`, `WORKWAY`, `STATE`, `BACKLOG`) + `work/<topic>.md` scratch + 3 slash commands (`/td-init`, `/td-clear`, `/td-close`). Everything else is conversational.
 
-The full evolution lives in `git log` — read it before assuming current state. v3.1 split `/td-clear` from `/td-close`. v3.2 added drift signals + install.sh pruning. v3.3 added fold-and-delete + "Digging into history". v3.4 made bypassed rituals explicit. v3.5 cleaned BACKLOG/PROJECT. v3.6 shipped td-bus (Turso/libsql + Python CLI). **v3.7 retired td-bus** — too much surface for a solo dev when GH Issues + `gh search issues "user:<owner> involves:@me state:open"` does the same job with zero infra.
+The full evolution lives in `git log` — read it before assuming current state. v3.1 split `/td-clear` from `/td-close`. v3.2 added drift signals + install.sh pruning. v3.3 added fold-and-delete + "Digging into history". v3.4 made bypassed rituals explicit. v3.5 cleaned BACKLOG/PROJECT. v3.6 shipped td-bus (Turso/libsql + Python CLI). **v3.7 retired td-bus** — too much surface for a solo dev when GH Issues + `gh search issues --owner <owner> --involves @me --state open` does the same job with zero infra.
 
 Cross-repo shape now (for cold-start recall):
 - Per-project: `.td/PROJECT.md § Cross-repo` lists repos this project files CRs against. Opt-in — only present when the project has a real cross-repo relationship to declare. No template scaffold.
@@ -34,10 +34,12 @@ Cross-repo shape now (for cold-start recall):
 
 4. **First real-project validation:** `cd ~/projects/rgb-buddy-2 && claude && /td-init` — still unscheduled. Doubles as warm-up-nudge validation since rgb-buddy-2#7 is waiting in its inbox.
 
-5. **First real cross-repo issue in anger — DONE 2026-05-16.** Four retirement issues filed from `td-nopara` per the v3.7 workflow:
-   - mergodon/anzsco-tasmanvisa-com#1
-   - mergodon/anzscofinder-pipeline#1
-   - mergodon/rgb-buddy-2#7
-   - mergodon/tdphp-rgbtracker-mainweb#1
+5. **First real cross-repo issue in anger — DONE + VALIDATED 2026-05-16.** Four retirement issues filed from `td-nopara` per the v3.7 workflow; **all four closed by their projects' Claude sessions within ~1 hour** of filing. Validation outcomes:
+   - **anzsco-tasmanvisa-com#1** — closed by `matevisky` with rich comment (commit 289e179): td-bus refs removed, CLAUDE.md restored to canonical, `## Cross-repo` registry added pointing at `mergodon/anzscofinder-pipeline`. Full v3.7 migration done.
+   - **anzscofinder-pipeline#1** — closed silently via commit.
+   - **rgb-buddy-2#7** — closed silently via commit.
+   - **tdphp-rgbtracker-mainweb#1** — closed by `cicmorgi` with detailed audit comment: repo never adopted `.td/` (uses `.work/`), no td-bus refs found, no changes needed, framework already pulled to e4d8e2c. Also confirmed the technical nuance that fresh `env` output in a Claude session shows pre-removal vars only because the session inherited them at startup (verifies my earlier finding about Bash-tool env inheritance).
+   - **Found bug during this review**: the documented unified-inbox query was wrong — `gh search issues "user:X involves:@me state:open"` (quoted form) breaks because gh interprets the whole quoted string as a single phrase. Corrected to flag form `gh search issues --owner <owner> --involves @me --state open` in root CLAUDE.md, templates/CLAUDE.md, README.md, and this STATE.md. The unquoted positional form also works; flag form chosen for readability.
+   - **Bonus signal**: while running the corrected query I noticed 4 new open issues in `mergodon/anzsco-tasmanvisa-com` (#2–5) titled `(CR-X consumer follow-up)`. That's the v3.7 cross-repo convention being used organically beyond the bus retirement — anzscofinder-pipeline filing real CRs into its Laravel consumer.
 
 6. **`templates/CLAUDE.md` vs root `CLAUDE.md` drift** patched as part of v3.7; both have the full Cross-repo section now. Worth a future audit to keep them in sync going forward.

@@ -92,7 +92,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "feedback on td-flow" → append `~/projects/td/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
 - "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh issue create --repo <slug>` with body = ask + why + source.
-- "any incoming?" / "check the inbox" → `gh issue list --state open` (current repo) or `gh search issues "user:<owner> involves:@me state:open"` (all your repos).
+- "any incoming?" / "check the inbox" → `gh issue list --state open` (current repo) or `gh search issues --owner <owner> --involves @me --state open` (all your repos — note flag form; quoted-string form breaks).
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
 - "wrap the project" / "we're done with this" / project actually finished → `/td-close`
