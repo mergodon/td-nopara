@@ -25,7 +25,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-CREDS_PATH = Path.home() / ".td" / "bus.env"
+FALLBACK_CREDS_PATH = Path.home() / ".td" / "bus.env"
 VALID_TYPES = ("cr", "note", "bug")
 VALID_STATUSES = ("open", "accepted", "shipped", "rejected", "withdrawn", "done")
 
@@ -35,21 +35,40 @@ VALID_STATUSES = ("open", "accepted", "shipped", "rejected", "withdrawn", "done"
 
 
 def load_creds() -> tuple[str, str]:
-    if not CREDS_PATH.exists():
-        die(
-            f"credentials not found at {CREDS_PATH}. "
-            "Run /td-bus-init or write the file manually with TD_BUS_URL + TD_BUS_TOKEN."
-        )
-    env: dict[str, str] = {}
-    for line in CREDS_PATH.read_text().splitlines():
-        line = line.strip()
-        if line and not line.startswith("#") and "=" in line:
+    """Resolve TD_BUS_URL + TD_BUS_TOKEN.
+
+    Order of precedence:
+      1. Process env vars (TD_BUS_URL, TD_BUS_TOKEN) — preferred. Lets users
+         source from ~/.secrets / ~/dotfiles/shell/secrets.zsh / wherever they
+         keep their other API keys.
+      2. Fallback file at ~/.td/bus.env (legacy path / portability for fresh
+         machines that don't have a ~/.secrets convention).
+    """
+    url = os.environ.get("TD_BUS_URL")
+    token = os.environ.get("TD_BUS_TOKEN")
+
+    if (not url or not token) and FALLBACK_CREDS_PATH.exists():
+        for line in FALLBACK_CREDS_PATH.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            # Tolerate both `KEY=value` and `export KEY=value`
+            if line.startswith("export "):
+                line = line[len("export "):]
             k, v = line.split("=", 1)
-            env[k.strip()] = v.strip().strip('"\'')
-    url = env.get("TD_BUS_URL")
-    token = env.get("TD_BUS_TOKEN")
+            k, v = k.strip(), v.strip().strip('"\'')
+            if k == "TD_BUS_URL" and not url:
+                url = v
+            elif k == "TD_BUS_TOKEN" and not token:
+                token = v
+
     if not url or not token:
-        die(f"TD_BUS_URL or TD_BUS_TOKEN missing in {CREDS_PATH}")
+        die(
+            "TD_BUS_URL / TD_BUS_TOKEN not set. Add them to ~/.secrets (or wherever "
+            "your shell sources env vars), or to ~/.td/bus.env as a fallback. "
+            "Run /td-bus-init for guided setup."
+        )
+
     return url.replace("libsql://", "https://"), token
 
 
@@ -221,11 +240,9 @@ def parse_duration(s: str) -> timedelta:
 
 def cmd_init(args: argparse.Namespace) -> None:
     """Interactive onboarding for the current app. Used by /td-bus-init."""
-    if not CREDS_PATH.exists():
-        die(
-            f"credentials missing at {CREDS_PATH}. "
-            "Create the file with TD_BUS_URL + TD_BUS_TOKEN (chmod 600) and re-run."
-        )
+    # Trigger creds resolution early — fail-fast with a clear message if the
+    # bus isn't configured on this machine.
+    load_creds()
     default_name = Path.cwd().name
     name = input(f"App name [{default_name}]: ").strip() or default_name
     res = execute("SELECT name, description FROM apps WHERE name = ?", [name])

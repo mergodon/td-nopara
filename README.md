@@ -110,11 +110,12 @@ FEEDBACK.md           feedback about td-flow itself, captured from any project
 Setup once per user:
 
 1. Provision a Turso DB: `turso db create td-bus-<you>` + `turso db tokens create td-bus-<you>`.
-2. Write `~/.td/bus.env`:
+2. Export the credentials wherever your shell sources its API keys (e.g. `~/.secrets`, `~/dotfiles/shell/secrets.zsh`, or your `.zshrc`):
    ```
-   TD_BUS_URL=libsql://td-bus-<you>.<region>.turso.io
-   TD_BUS_TOKEN=<token>
+   export TD_BUS_URL="libsql://td-bus-<you>.<region>.turso.io"
+   export TD_BUS_TOKEN="<token>"
    ```
+   Fallback if you don't have a shell-secrets convention: write the same two `KEY=value` lines to `~/.td/bus.env` (chmod 600).
 3. Apply `bus-schema.sql` once to the new DB.
 
 Per project: `/td-bus-init` registers the project as a named app on the bus.

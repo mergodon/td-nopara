@@ -8,16 +8,22 @@ After this runs, the project can send/receive messages via `td-bus send`, `td-bu
 
 # Step 0 — Credentials check
 
-Confirm `~/.td/bus.env` exists and contains `TD_BUS_URL` + `TD_BUS_TOKEN`. If missing:
+Resolve `TD_BUS_URL` + `TD_BUS_TOKEN`. Order of precedence the CLI uses:
+
+1. Process env vars — set them once in `~/.secrets` (or `~/dotfiles/shell/secrets.zsh`, or `.zshrc`) so every shell + Claude session inherits them. **Preferred path.**
+2. Fallback file at `~/.td/bus.env` — for fresh machines without a shell-secrets convention.
+
+Run `env | grep TD_BUS_` to check. If both are unset:
 
 1. Tell the user: "td-bus needs Turso credentials. Provision once via `turso db create td-bus-<you>` + `turso db tokens create td-bus-<you>`. Paste the URL + token below."
 2. Prompt for `TD_BUS_URL` (format `libsql://...`) and `TD_BUS_TOKEN`.
-3. Write `~/.td/bus.env`:
+3. Append to `~/.secrets` (or whatever file the user names — read `~/.zshrc` / `~/.zprofile` for `source` lines if unsure):
    ```
-   TD_BUS_URL=<url>
-   TD_BUS_TOKEN=<token>
+   export TD_BUS_URL="<url>"
+   export TD_BUS_TOKEN="<token>"
    ```
-4. `mkdir -p ~/.td && chmod 700 ~/.td && chmod 600 ~/.td/bus.env`.
+   Then tell the user to `source ~/.secrets` (or open a new shell) to pick them up.
+4. **Fallback path only** if the user has no shell-secrets convention: write `~/.td/bus.env` (chmod 600) with the two `KEY=value` lines.
 5. Apply the schema to the freshly provisioned DB:
    ```
    # Pipeline against the DB via the bin script; if schema already applied, IF NOT EXISTS makes it a no-op.
