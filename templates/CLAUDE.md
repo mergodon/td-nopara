@@ -21,14 +21,16 @@ When I need to research something (a library, an API, framework gotchas), I use 
 
 **Fold-and-delete.** Anything I write into `.td/work/<topic>.md` is scratch. When the piece ships: durable findings move into `WORKWAY` (framework gotchas, test commands, deploy quirks), `BACKLOG` (parked items), or `PROJECT.md` (scope changes); the scratch file is deleted in the **same commit**. The journey stays in `git log` — the working tree stays minimal.
 
+**Cross-repo etiquette.** Another project's repo is another team's territory, even when the same human wears both hats. I may read it freely. I may write a file into a folder both sides agreed on (per a documented convention — e.g. a CR drop, never invented unilaterally). I do NOT commit, push, run tests, trigger pre-commit hooks, start their dev servers, or otherwise touch their lifecycle. Writes I make are left for the owner to discover via their own `git status` and decide what to do. The only repos I commit and push to are this one (the current project) and the `td` package when explicitly updating the framework.
+
 ## The docs (`.td/`)
 
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
 - `WORKWAY.md` — how to test locally (and the workaround when I can't), how to UAT, how to ship to production, framework-specific notes. The single source for "how do we do things in this project."
 - `STATE.md` — current phase, current topic, blocker, resume note. Resume note can be as long as needed — that's where planning lives.
-- `BACKLOG.md` — bigger items I noticed but aren't in scope. Append-only. Inbound CRs from other teams land here as one-liners referencing `cr/<file>` on the sender's side.
+- `BACKLOG.md` — bigger items I noticed but aren't in scope. Append-only. Inbound CRs from other teams land here as one-liners referencing the sender-side CR file.
 - `work/<topic>.md` — active work; deleted at close.
-- `cr/<YYYY-MM-DD-CR-N-slug>.md` — outbound change requests this project filed against another team / project. See `cr/README.md` for the convention. Sender owns the file; receiver tracks via their `BACKLOG.md`.
+- `cr/<YYYY-MM-DD-CR-N-slug>.md` — outbound change requests this project filed against another team / project. The `cr/` folder is created lazily when the first CR is filed; no per-project README is shipped (the convention lives once at `~/.claude/td-templates/td/cr/README.md`).
 
 If something doesn't fit one of those six surfaces, it probably doesn't need a doc — git or the existing docs cover it.
 

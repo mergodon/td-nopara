@@ -97,8 +97,8 @@ Copy templates from `~/.claude/td-templates/` (or `~/projects/td/templates/<name
 - `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Production / Ship
 - `.td/STATE.md` → fill placeholders, set `Last:` to today
 - `.td/BACKLOG.md` → as-is
-- `.td/cr/README.md` → as-is (outbound change-request convention — receiver of inbound CRs files them as one-liners in BACKLOG.md per the README)
 - `.td/frameworks/.gitkeep` → empty (the dir is for rare overflow; default home for framework awareness is `WORKWAY.md` § Framework specifics)
+- **No `.td/cr/` files.** The cr/ slot is documented in root `CLAUDE.md`; the folder springs into existence when the first outbound CR is filed. The canonical convention lives at `~/.claude/td-templates/td/cr/README.md` — projects don't mirror it.
 - `.gitignore` → merge with existing
 - `.env.example` → only if no `.env.example` exists
 

@@ -1,8 +1,14 @@
 # `.td/cr/` — change requests this project has filed against other teams
 
+**Canonical convention doc — lives once, in the td template at `~/.claude/td-templates/td/cr/README.md`. Projects do NOT mirror it. Each project's `.td/cr/` folder is empty until the first CR is filed; CLAUDE.md mentions the slot and points readers here.**
+
 Outbound channel only. Each file in `.td/cr/` is a change request **this project sent to another team / project**. Inbound CRs (asks others sent to us) live as one-line entries in `.td/BACKLOG.md` referencing the sender's CR id — no parallel `cr/in/` folder.
 
 This keeps a single canonical copy of every CR (in the sender's repo), and avoids the drift problem of mirroring files across repos.
+
+## Cross-repo etiquette (mirrors the root `CLAUDE.md` rule)
+
+Senders write CR files only into **their own** repo's `.td/cr/`. Receivers reading the sender's CR add a one-line entry into **their own** `BACKLOG.md` — they never edit the sender's CR file. Nobody runs `git commit`, `git push`, tests, or pre-commit hooks on the other team's repo. If you need to flag something on the other side, file a CR — that IS the channel.
 
 ## File naming
 
