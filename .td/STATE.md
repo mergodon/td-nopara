@@ -22,7 +22,7 @@ Cross-repo shape now (for cold-start recall):
 
 1. **User actions still pending** (Claude can't do these without overreach):
    - **Destroy cloud DB:** `turso db destroy td-bus-mergodon` (region `aws-ap-northeast-1`). User has no `turso` CLI installed; either `brew install tursodatabase/tap/turso` or use the Turso web UI.
-   - **Remove env vars** from `~/dotfiles/shell/secrets.zsh` lines 58-59 (`TD_BUS_URL` + `TD_BUS_TOKEN`). `~/.secrets` is a symlink to this file, so one edit covers both paths. Confirm with `env | grep TD_BUS_` in a fresh shell.
+   - **~~Remove env vars from `~/dotfiles/shell/secrets.zsh`~~** — DONE 2026-05-16. Removed the 3-line td-bus block (comment header + `TD_BUS_URL` + `TD_BUS_TOKEN`) via sed-by-pattern with a `.bak` backup; verified diff showed only those 3 lines changed; backup deleted. `~/dotfiles` is a git repo (`matevisky/_dotfiles`); the modified `secrets.zsh` is uncommitted there — user's call when/how to commit in their own repo per v3.7 cross-repo etiquette. Confirm in a new shell with `env | grep TD_BUS_` (should be empty).
 
 2. **Local cleanup status (as of 2026-05-16):**
    - `~/bin/td-bus` symlink: removed.
