@@ -28,11 +28,12 @@ When I need to research something (a library, an API, framework gotchas), I use 
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
 - `WORKWAY.md` — how to test locally (and the workaround when I can't), how to UAT, how to ship to production, framework-specific notes. The single source for "how do we do things in this project."
 - `STATE.md` — current phase, current topic, blocker, resume note. Resume note can be as long as needed — that's where planning lives.
-- `BACKLOG.md` — bigger items I noticed but aren't in scope. Append-only. Inbound CRs from other teams land here as one-liners referencing the sender-side CR file.
+- `BACKLOG.md` — bigger items I noticed but aren't in scope. Append-only.
 - `work/<topic>.md` — active work; deleted at close.
-- `cr/<YYYY-MM-DD-CR-N-slug>.md` — outbound change requests this project filed against another team / project. The `cr/` folder is created lazily when the first CR is filed; no per-project README is shipped (the convention lives once at `~/.claude/td-templates/td/cr/README.md`).
 
-If something doesn't fit one of those six surfaces, it probably doesn't need a doc — git or the existing docs cover it.
+If something doesn't fit one of those five surfaces, it probably doesn't need a doc — git or the existing docs cover it.
+
+**Cross-project messaging lives on the td-bus (Turso cloud DB), not in repo files.** If the project is registered on the bus (`/td-bus-init`), use `td-bus inbox / outbox / send / reply / show / accept / ship / reject / withdraw / done` to exchange change requests, notes, and bug reports with other projects. No `.td/cr/` folder; no inbound entries in `BACKLOG.md`. See `~/projects/td/README.md § td-bus`.
 
 ## Nudges I do without being asked
 
@@ -81,7 +82,8 @@ When the user tells me something at the start of a message, action-shaped:
 - "remember to X later" / "park this" → append `.td/BACKLOG.md`
 - "feedback on td-flow" → append `~/projects/td/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
-- "file a CR for the X team" / "send a change request to X" → write `.td/cr/<YYYY-MM-DD-CR-N-slug>.md` per `.td/cr/README.md`. Receiver-side: inbound CRs become a one-line `BACKLOG.md` entry.
+- "file a CR for the X team" / "send a change request to X" → `td-bus send X "<title>" --type cr` (project must be registered via `/td-bus-init` first).
+- "check the inbox" / "any CRs?" → `td-bus inbox` (use `--json` for structured output).
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
 - "wrap the project" / "we're done with this" / project actually finished → `/td-close`

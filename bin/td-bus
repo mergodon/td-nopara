@@ -1,0 +1,592 @@
+#!/usr/bin/env python3
+"""td-bus — cross-project messaging via Turso/libsql cloud DB.
+
+Single-file, stdlib only. Reads ~/.td/bus.env for TD_BUS_URL + TD_BUS_TOKEN.
+Talks to Turso's v2/pipeline HTTP API. All commands accept --json for
+machine-readable output (default is human-readable).
+
+App identity: the active app defaults to the basename of the current working
+directory. Override with --app <name> (mostly useful when Claude operates
+across projects in one session).
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+CREDS_PATH = Path.home() / ".td" / "bus.env"
+VALID_TYPES = ("cr", "note", "bug")
+VALID_STATUSES = ("open", "accepted", "shipped", "rejected", "withdrawn", "done")
+
+# ──────────────────────────────────────────────────────────────────────────
+# Credentials + transport
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def load_creds() -> tuple[str, str]:
+    if not CREDS_PATH.exists():
+        die(
+            f"credentials not found at {CREDS_PATH}. "
+            "Run /td-bus-init or write the file manually with TD_BUS_URL + TD_BUS_TOKEN."
+        )
+    env: dict[str, str] = {}
+    for line in CREDS_PATH.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            env[k.strip()] = v.strip().strip('"\'')
+    url = env.get("TD_BUS_URL")
+    token = env.get("TD_BUS_TOKEN")
+    if not url or not token:
+        die(f"TD_BUS_URL or TD_BUS_TOKEN missing in {CREDS_PATH}")
+    return url.replace("libsql://", "https://"), token
+
+
+def execute(stmt: str, args: list[Any] | None = None) -> dict[str, Any]:
+    """Execute a single SQL statement. Returns the response payload."""
+    return pipeline([(stmt, args or [])])[0]
+
+
+def pipeline(statements: list[tuple[str, list[Any]]]) -> list[dict[str, Any]]:
+    """Execute multiple statements in one HTTP roundtrip."""
+    url, token = load_creds()
+    requests: list[dict[str, Any]] = []
+    for stmt, args in statements:
+        requests.append(
+            {
+                "type": "execute",
+                "stmt": {"sql": stmt, "args": [_arg(a) for a in args]},
+            }
+        )
+    requests.append({"type": "close"})
+    req = Request(
+        f"{url}/v2/pipeline",
+        data=json.dumps({"requests": requests}).encode(),
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        resp = urlopen(req, timeout=15)
+        body = json.loads(resp.read())
+    except HTTPError as e:
+        die(f"HTTP {e.code}: {e.read().decode()}")
+    except URLError as e:
+        die(f"network error: {e.reason}")
+
+    out: list[dict[str, Any]] = []
+    for r in body.get("results", []):
+        if r.get("type") != "ok":
+            die(f"sql error: {json.dumps(r)}")
+        resp_obj = r.get("response", {})
+        if resp_obj.get("type") == "execute":
+            out.append(resp_obj.get("result", {}))
+    return out
+
+
+def _arg(v: Any) -> dict[str, str]:
+    if v is None:
+        return {"type": "null", "value": ""}
+    if isinstance(v, bool):
+        return {"type": "integer", "value": "1" if v else "0"}
+    if isinstance(v, int):
+        return {"type": "integer", "value": str(v)}
+    if isinstance(v, float):
+        return {"type": "float", "value": str(v)}
+    return {"type": "text", "value": str(v)}
+
+
+def rows(result: dict[str, Any]) -> list[dict[str, Any]]:
+    """Convert a Turso execute result into a list of column-keyed dicts."""
+    cols = [c["name"] for c in result.get("cols", [])]
+    out = []
+    for raw in result.get("rows", []):
+        row = {}
+        for col, cell in zip(cols, raw):
+            t = cell.get("type")
+            v = cell.get("value")
+            if t == "null":
+                row[col] = None
+            elif t == "integer":
+                row[col] = int(v)
+            elif t == "float":
+                row[col] = float(v)
+            else:
+                row[col] = v
+        out.append(row)
+    return out
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Helpers
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def die(msg: str, code: int = 1) -> None:
+    if os.environ.get("TD_BUS_JSON") == "1":
+        print(json.dumps({"error": msg}), file=sys.stderr)
+    else:
+        print(f"td-bus: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+
+def emit(data: Any, human: callable | None = None) -> None:
+    """Print as JSON if --json, otherwise call the human renderer."""
+    if os.environ.get("TD_BUS_JSON") == "1":
+        print(json.dumps(data, indent=2, default=str))
+    elif human:
+        human(data)
+    else:
+        print(json.dumps(data, indent=2, default=str))
+
+
+def current_app(override: str | None) -> str:
+    if override:
+        return override
+    return Path.cwd().name
+
+
+def assert_app_registered(name: str) -> dict[str, Any]:
+    res = execute("SELECT * FROM apps WHERE name = ?", [name])
+    found = rows(res)
+    if not found:
+        die(
+            f"app '{name}' is not registered on the bus. "
+            "Run /td-bus-init in that project, or `td-bus apps register {name} --description ...`."
+        )
+    # Bump last_seen
+    execute("UPDATE apps SET last_seen_at = datetime('now') WHERE name = ?", [name])
+    return found[0]
+
+
+def next_id(from_app: str, msg_type: str) -> str:
+    """Compute the next per-(from_app, type) sequential id."""
+    res = execute(
+        "SELECT id FROM messages WHERE from_app = ? AND type = ?",
+        [from_app, msg_type],
+    )
+    pattern = re.compile(rf"^{re.escape(from_app)}-{msg_type.upper()}-(\d+)$")
+    nums = []
+    for r in rows(res):
+        m = pattern.match(r["id"])
+        if m:
+            nums.append(int(m.group(1)))
+    n = (max(nums) + 1) if nums else 1
+    return f"{from_app}-{msg_type.upper()}-{n}"
+
+
+def read_body(body_file: str | None, editor: bool, prompt: str) -> str:
+    """Read the message body from --body-file, $EDITOR, or stdin."""
+    if body_file:
+        return Path(body_file).read_text()
+    if editor or sys.stdin.isatty():
+        ed = os.environ.get("EDITOR", "vi")
+        with tempfile.NamedTemporaryFile("w+", suffix=".md", delete=False) as f:
+            f.write(f"<!-- {prompt} — save and quit to send, leave empty to abort -->\n\n")
+            tmp = f.name
+        subprocess.call([ed, tmp])
+        body = Path(tmp).read_text()
+        Path(tmp).unlink()
+        # Strip the prompt line if untouched
+        body = re.sub(r"^<!--.*?-->\n?", "", body, count=1).strip()
+        if not body:
+            die("aborted: empty body")
+        return body
+    return sys.stdin.read().strip()
+
+
+def parse_duration(s: str) -> timedelta:
+    """Parse '7d', '24h', '30m' into a timedelta."""
+    m = re.match(r"^(\d+)([dhm])$", s)
+    if not m:
+        die(f"bad duration '{s}' — use Nd / Nh / Nm")
+    n, unit = int(m.group(1)), m.group(2)
+    return {"d": timedelta(days=n), "h": timedelta(hours=n), "m": timedelta(minutes=n)}[unit]
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Commands
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def cmd_init(args: argparse.Namespace) -> None:
+    """Interactive onboarding for the current app. Used by /td-bus-init."""
+    if not CREDS_PATH.exists():
+        die(
+            f"credentials missing at {CREDS_PATH}. "
+            "Create the file with TD_BUS_URL + TD_BUS_TOKEN (chmod 600) and re-run."
+        )
+    default_name = Path.cwd().name
+    name = input(f"App name [{default_name}]: ").strip() or default_name
+    res = execute("SELECT name, description FROM apps WHERE name = ?", [name])
+    existing = rows(res)
+    if existing:
+        print(f"App '{name}' is already registered: {existing[0]['description']}")
+        ans = input("Update description? [y/N]: ").strip().lower()
+        if ans != "y":
+            print("Nothing to do.")
+            return
+    description = input("One-line description: ").strip()
+    if not description:
+        die("description is required")
+    long_desc = input("Long description (optional, blank to skip): ").strip() or None
+    contact = input("Contact / owner (optional): ").strip() or None
+    repo_path = str(Path.cwd())
+
+    if existing:
+        execute(
+            "UPDATE apps SET description=?, long_description=?, contact=?, repo_path=? WHERE name=?",
+            [description, long_desc, contact, repo_path, name],
+        )
+        print(f"Updated '{name}'.")
+    else:
+        execute(
+            "INSERT INTO apps (name, description, long_description, contact, repo_path) VALUES (?, ?, ?, ?, ?)",
+            [name, description, long_desc, contact, repo_path],
+        )
+        print(f"Registered '{name}' on the bus.")
+
+
+def cmd_apps(args: argparse.Namespace) -> None:
+    res = execute(
+        "SELECT name, description, registered_at, last_seen_at FROM apps ORDER BY name"
+    )
+    data = rows(res)
+    emit(data, lambda d: _render_apps(d))
+
+
+def cmd_apps_show(args: argparse.Namespace) -> None:
+    res = execute("SELECT * FROM apps WHERE name = ?", [args.name])
+    found = rows(res)
+    if not found:
+        die(f"app '{args.name}' not registered")
+    emit(found[0], lambda d: _render_app_profile(d))
+
+
+def cmd_apps_register(args: argparse.Namespace) -> None:
+    """Non-interactive register, mostly for scripted use."""
+    repo_path = args.repo_path or str(Path.cwd())
+    execute(
+        "INSERT INTO apps (name, description, long_description, contact, repo_path) VALUES (?, ?, ?, ?, ?)",
+        [args.name, args.description, args.long_description, args.contact, repo_path],
+    )
+    emit({"registered": args.name}, lambda d: print(f"Registered '{args.name}'."))
+
+
+def cmd_send(args: argparse.Namespace) -> None:
+    from_app = current_app(args.app)
+    assert_app_registered(from_app)
+    assert_app_registered(args.to)
+    if args.type not in VALID_TYPES:
+        die(f"--type must be one of {','.join(VALID_TYPES)}")
+    if from_app == args.to:
+        die("cannot send a message to yourself")
+
+    body = read_body(args.body_file, args.editor, f"Body for {args.type.upper()} to {args.to}")
+    msg_id = next_id(from_app, args.type)
+    created_at = args.created_at or None
+    if created_at:
+        execute(
+            "INSERT INTO messages (id, from_app, to_app, type, title, body, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [msg_id, from_app, args.to, args.type, args.title, body, created_at, created_at],
+        )
+    else:
+        execute(
+            "INSERT INTO messages (id, from_app, to_app, type, title, body) VALUES (?, ?, ?, ?, ?, ?)",
+            [msg_id, from_app, args.to, args.type, args.title, body],
+        )
+    emit({"id": msg_id, "from": from_app, "to": args.to, "type": args.type, "title": args.title},
+         lambda d: print(f"Sent {d['id']} → {d['to']}: {d['title']}"))
+
+
+def cmd_reply(args: argparse.Namespace) -> None:
+    from_app = current_app(args.app)
+    assert_app_registered(from_app)
+    msg = _get_msg_or_die(args.id)
+    if from_app not in (msg["from_app"], msg["to_app"]):
+        die(f"app '{from_app}' is neither sender nor recipient of {args.id}")
+    body = read_body(args.body_file, args.editor, f"Reply to {args.id}")
+    execute(
+        "INSERT INTO replies (message_id, from_app, body) VALUES (?, ?, ?)",
+        [args.id, from_app, body],
+    )
+    execute("UPDATE messages SET updated_at = datetime('now') WHERE id = ?", [args.id])
+    emit({"replied_to": args.id, "from": from_app}, lambda d: print(f"Replied to {d['replied_to']}"))
+
+
+def cmd_inbox(args: argparse.Namespace) -> None:
+    _list_messages(args, direction="inbox")
+
+
+def cmd_outbox(args: argparse.Namespace) -> None:
+    _list_messages(args, direction="outbox")
+
+
+def _list_messages(args: argparse.Namespace, direction: str) -> None:
+    app = current_app(args.app)
+    field = "to_app" if direction == "inbox" else "from_app"
+    where = [f"{field} = ?"]
+    params: list[Any] = [app]
+    if args.type:
+        where.append("type = ?")
+        params.append(args.type)
+    if args.status:
+        statuses = args.status.split(",")
+        placeholders = ",".join("?" * len(statuses))
+        where.append(f"status IN ({placeholders})")
+        params.extend(statuses)
+    elif not args.all:
+        where.append("status != 'done'")
+    sql = (
+        "SELECT id, from_app, to_app, type, title, status, shipped_in, created_at, updated_at "
+        f"FROM messages WHERE {' AND '.join(where)} ORDER BY updated_at DESC"
+    )
+    data = rows(execute(sql, params))
+    emit(data, lambda d: _render_message_list(d, direction, app))
+
+
+def cmd_show(args: argparse.Namespace) -> None:
+    msg = _get_msg_or_die(args.id)
+    reps = rows(execute(
+        "SELECT from_app, body, created_at FROM replies WHERE message_id = ? ORDER BY created_at",
+        [args.id],
+    ))
+    out = dict(msg)
+    out["replies"] = reps
+    emit(out, lambda d: _render_message_detail(d))
+
+
+def cmd_status_transition(target: str):
+    def runner(args: argparse.Namespace) -> None:
+        app = current_app(args.app)
+        msg = _get_msg_or_die(args.id)
+        # Sender-only transitions
+        sender_only = ("withdrawn",)
+        # Receiver-only transitions
+        receiver_only = ("accepted", "shipped", "rejected")
+        if target in sender_only and app != msg["from_app"]:
+            die(f"only the sender ({msg['from_app']}) can {target}")
+        if target in receiver_only and app != msg["to_app"]:
+            die(f"only the recipient ({msg['to_app']}) can mark {target}")
+        # done is open to either party
+        if target == "shipped":
+            if not args.sha:
+                die("--sha <commit-sha> is required for ship")
+            execute(
+                "UPDATE messages SET status=?, shipped_in=?, updated_at=datetime('now') WHERE id=?",
+                [target, args.sha, args.id],
+            )
+        else:
+            execute(
+                "UPDATE messages SET status=?, updated_at=datetime('now') WHERE id=?",
+                [target, args.id],
+            )
+        # Reason appended as a reply for the visibility
+        if getattr(args, "reason", None):
+            execute(
+                "INSERT INTO replies (message_id, from_app, body) VALUES (?, ?, ?)",
+                [args.id, app, f"[{target}] {args.reason}"],
+            )
+        emit({"id": args.id, "status": target},
+             lambda d: print(f"{d['id']} → {d['status']}"))
+    return runner
+
+
+def cmd_prune(args: argparse.Namespace) -> None:
+    cutoff = (datetime.now(timezone.utc) - parse_duration(args.older_than)).strftime("%Y-%m-%d %H:%M:%S")
+    res = execute(
+        "DELETE FROM messages WHERE status = 'done' AND updated_at < ?",
+        [cutoff],
+    )
+    affected = res.get("affected_row_count", 0)
+    emit({"deleted": affected, "cutoff": cutoff},
+         lambda d: print(f"Pruned {d['deleted']} done messages older than {args.older_than}."))
+
+
+def cmd_delete(args: argparse.Namespace) -> None:
+    app = current_app(args.app)
+    msg = _get_msg_or_die(args.id)
+    if app != msg["from_app"]:
+        die(f"only the sender ({msg['from_app']}) can hard-delete a message")
+    if not args.yes:
+        ans = input(f"Hard delete {args.id}? This cannot be undone. [y/N]: ").strip().lower()
+        if ans != "y":
+            print("Cancelled.")
+            return
+    execute("DELETE FROM messages WHERE id = ?", [args.id])
+    emit({"deleted": args.id}, lambda d: print(f"Deleted {d['deleted']}."))
+
+
+def _get_msg_or_die(msg_id: str) -> dict[str, Any]:
+    found = rows(execute("SELECT * FROM messages WHERE id = ?", [msg_id]))
+    if not found:
+        die(f"message '{msg_id}' not found")
+    return found[0]
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Human renderers
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def _render_apps(data: list[dict[str, Any]]) -> None:
+    if not data:
+        print("(no apps registered)")
+        return
+    print(f"{'NAME':<32}  DESCRIPTION")
+    print(f"{'-'*32}  {'-'*40}")
+    for r in data:
+        print(f"{r['name']:<32}  {r['description'][:60]}")
+
+
+def _render_app_profile(d: dict[str, Any]) -> None:
+    print(f"# {d['name']}")
+    print(f"  description : {d['description']}")
+    print(f"  contact     : {d.get('contact') or '-'}")
+    print(f"  repo_path   : {d.get('repo_path') or '-'}")
+    print(f"  registered  : {d['registered_at']}")
+    print(f"  last seen   : {d.get('last_seen_at') or '(never via CLI)'}")
+    if d.get("long_description"):
+        print()
+        print(d["long_description"])
+
+
+def _render_message_list(data: list[dict[str, Any]], direction: str, app: str) -> None:
+    if not data:
+        print(f"({direction} empty for {app})")
+        return
+    label = "FROM" if direction == "inbox" else "TO"
+    print(f"{'ID':<32}  {label:<28}  {'TYPE':<5}  {'STATUS':<11}  TITLE")
+    print(f"{'-'*32}  {'-'*28}  {'-'*5}  {'-'*11}  {'-'*40}")
+    for r in data:
+        peer = r["from_app"] if direction == "inbox" else r["to_app"]
+        print(f"{r['id']:<32}  {peer:<28}  {r['type']:<5}  {r['status']:<11}  {r['title'][:50]}")
+
+
+def _render_message_detail(d: dict[str, Any]) -> None:
+    print(f"# {d['id']} — {d['title']}")
+    print(f"  {d['from_app']} → {d['to_app']}  [{d['type']}, {d['status']}]")
+    if d.get("shipped_in"):
+        print(f"  shipped in: {d['shipped_in']}")
+    print(f"  created: {d['created_at']}  updated: {d['updated_at']}")
+    print()
+    print(d["body"])
+    if d.get("replies"):
+        print()
+        print("---")
+        print("## Discussion")
+        for r in d["replies"]:
+            print()
+            print(f"### {r['created_at']} — {r['from_app']}")
+            print(r["body"])
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# argparse
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="td-bus", description="Cross-project messaging.")
+    p.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    sub.add_parser("init", help="onboard the current app (interactive)").set_defaults(fn=cmd_init)
+
+    a = sub.add_parser("apps", help="list registered apps")
+    a.set_defaults(fn=cmd_apps)
+
+    a = sub.add_parser("apps-show", help="show one app's profile")
+    a.add_argument("name")
+    a.set_defaults(fn=cmd_apps_show)
+
+    a = sub.add_parser("apps-register", help="non-interactive register (scripted use)")
+    a.add_argument("name")
+    a.add_argument("--description", required=True)
+    a.add_argument("--long-description", default=None)
+    a.add_argument("--contact", default=None)
+    a.add_argument("--repo-path", default=None)
+    a.set_defaults(fn=cmd_apps_register)
+
+    a = sub.add_parser("send", help="send a message")
+    a.add_argument("to", help="recipient app name")
+    a.add_argument("title")
+    a.add_argument("--type", default="cr", choices=VALID_TYPES)
+    a.add_argument("--app", default=None, help="override sender app (default: pwd basename)")
+    a.add_argument("--body-file", default=None)
+    a.add_argument("--editor", action="store_true", help="open $EDITOR for body")
+    a.add_argument("--created-at", default=None, help="override created_at (ISO 8601, for migrations)")
+    a.set_defaults(fn=cmd_send)
+
+    a = sub.add_parser("reply", help="reply to a message")
+    a.add_argument("id")
+    a.add_argument("--app", default=None)
+    a.add_argument("--body-file", default=None)
+    a.add_argument("--editor", action="store_true")
+    a.set_defaults(fn=cmd_reply)
+
+    for name in ("inbox", "outbox"):
+        a = sub.add_parser(name, help=f"list {name}")
+        a.add_argument("--app", default=None)
+        a.add_argument("--type", default=None, choices=VALID_TYPES)
+        a.add_argument(
+            "--status",
+            default=None,
+            help="comma-separated statuses; default excludes 'done'",
+        )
+        a.add_argument("--all", action="store_true", help="include done messages")
+        a.set_defaults(fn=cmd_inbox if name == "inbox" else cmd_outbox)
+
+    a = sub.add_parser("show", help="show one message + replies")
+    a.add_argument("id")
+    a.set_defaults(fn=cmd_show)
+
+    for status in ("accept", "ship", "reject", "withdraw", "done"):
+        target = "accepted" if status == "accept" else status + ("d" if status.endswith("e") else "ed")
+        # Normalize the mapping explicitly
+        mapping = {"accept": "accepted", "ship": "shipped", "reject": "rejected",
+                   "withdraw": "withdrawn", "done": "done"}
+        target = mapping[status]
+        a = sub.add_parser(status, help=f"transition status → {target}")
+        a.add_argument("id")
+        a.add_argument("--app", default=None)
+        if status in ("reject", "withdraw"):
+            a.add_argument("--reason", default=None, help="appended as a reply")
+        if status == "ship":
+            a.add_argument("--sha", required=True, help="commit SHA in receiver's repo")
+        a.set_defaults(fn=cmd_status_transition(target))
+
+    a = sub.add_parser("prune", help="delete 'done' messages older than --older-than (default 7d)")
+    a.add_argument("--older-than", default="7d")
+    a.set_defaults(fn=cmd_prune)
+
+    a = sub.add_parser("delete", help="hard delete a message (sender only)")
+    a.add_argument("id")
+    a.add_argument("--app", default=None)
+    a.add_argument("--yes", action="store_true", help="skip confirmation")
+    a.set_defaults(fn=cmd_delete)
+
+    return p
+
+
+def main() -> None:
+    parser = build_parser()
+    args = parser.parse_args()
+    if args.json:
+        os.environ["TD_BUS_JSON"] = "1"
+    args.fn(args)
+
+
+if __name__ == "__main__":
+    main()

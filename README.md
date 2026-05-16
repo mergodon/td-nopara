@@ -16,8 +16,10 @@ Symlinks created:
 - `~/.claude/commands/td-init.md`
 - `~/.claude/commands/td-clear.md`
 - `~/.claude/commands/td-close.md`
+- `~/.claude/commands/td-bus-init.md`
 - `~/.claude/skills/td-flow`
 - `~/.claude/td-templates`
+- `~/bin/td-bus` (cross-project messaging CLI; needs `$HOME/bin` on PATH)
 
 To update on any machine: `git pull && ./install.sh`.
 
@@ -29,6 +31,7 @@ In any project directory:
 claude
 /td-init                       # bootstrap or migrate (brownfield-aware)
 /td-init --template laravel    # bootstrap from a saved template
+/td-bus-init                   # opt-in: onboard the project to td-bus (cross-project messaging)
 /td-clear                      # mid-project: save STATE handoff, light prune, push. Run before /clear.
 /td-close                      # wrap project (or phase): full doc audit, prune redundant docs, push.
 ```
@@ -80,7 +83,7 @@ CLAUDE.md                ← contract at root; user controls
 ## Repo layout (this repo)
 
 ```
-commands/             slash commands (td-init, td-clear, td-close)
+commands/             slash commands (td-init, td-clear, td-close, td-bus-init)
 templates/            files copied into target projects on /td-init
   CLAUDE.md           the universal contract
   td/PROJECT.md
@@ -94,9 +97,41 @@ templates/            files copied into target projects on /td-init
   <name>/             saved starter templates (laravel, userscript, etc.)
 skill/SKILL.md        skill definition (symlinked into ~/.claude/skills/td-flow)
 hooks/pre-commit      test-on-commit hook installed by /td-init
-install.sh            symlinks commands, skill, templates into ~/.claude/
+bin/td-bus            cross-project messaging CLI (symlinked into ~/bin/)
+bus-schema.sql        Turso/libsql schema for the td-bus messaging DB
+install.sh            symlinks commands, skill, templates, td-bus into ~/.claude/ and ~/bin/
 FEEDBACK.md           feedback about td-flow itself, captured from any project
 ```
+
+## td-bus — cross-project messaging
+
+`/td-bus-init` is opt-in. Projects that talk to other projects can join a shared **Turso/libsql cloud DB** to exchange messages (change requests, notes, bug reports) without writing into each other's repos.
+
+Setup once per user:
+
+1. Provision a Turso DB: `turso db create td-bus-<you>` + `turso db tokens create td-bus-<you>`.
+2. Write `~/.td/bus.env`:
+   ```
+   TD_BUS_URL=libsql://td-bus-<you>.<region>.turso.io
+   TD_BUS_TOKEN=<token>
+   ```
+3. Apply `bus-schema.sql` once to the new DB.
+
+Per project: `/td-bus-init` registers the project as a named app on the bus.
+
+Then any Claude session in any registered project can use:
+
+```
+td-bus inbox                                # incoming messages
+td-bus outbox                               # outgoing messages
+td-bus send <to> "<title>" --type cr|note|bug
+td-bus show <id>
+td-bus reply <id>
+td-bus accept|ship|reject|withdraw|done <id>
+td-bus prune --older-than 7d                # delete done messages
+```
+
+All commands take `--json` for machine-readable output (Claude's mode). See `bin/td-bus --help`.
 
 ## Saving and reusing templates
 
