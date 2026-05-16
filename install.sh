@@ -9,9 +9,14 @@ CLAUDE_DIR="$HOME/.claude"
 COMMANDS_DIR="$CLAUDE_DIR/commands"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 TEMPLATES_LINK="$CLAUDE_DIR/td-templates"
-BIN_DIR="$HOME/bin"
 
-mkdir -p "$COMMANDS_DIR" "$SKILLS_DIR" "$BIN_DIR"
+mkdir -p "$COMMANDS_DIR" "$SKILLS_DIR"
+
+# Cleanup: prior bus install left ~/bin/td-bus around; drop the orphan symlink.
+if [ -L "$HOME/bin/td-bus" ]; then
+  rm "$HOME/bin/td-bus"
+  echo "  pruned stale: ~/bin/td-bus (td-bus retired in favor of gh issues)"
+fi
 
 # 1. Prune stale symlinks pointing into this repo's commands/ dir
 #    (catches retired commands like /td-ship from older versions)
@@ -57,24 +62,6 @@ fi
 ln -s "$REPO_DIR/templates" "$TEMPLATES_LINK"
 echo "  templates linked"
 
-# 5. Symlink the td-bus CLI into $HOME/bin (cross-project messaging)
-echo "→ installing td-bus CLI to $BIN_DIR/td-bus"
-BUS_LINK="$BIN_DIR/td-bus"
-if [ -L "$BUS_LINK" ] || [ -f "$BUS_LINK" ]; then
-  rm "$BUS_LINK"
-fi
-ln -s "$REPO_DIR/bin/td-bus" "$BUS_LINK"
-echo "  td-bus linked"
-
-if ! command -v python3 >/dev/null 2>&1; then
-  echo "  warning: python3 not found on PATH — td-bus needs it. Install via Xcode CLT or brew."
-fi
-
-case ":$PATH:" in
-  *":$BIN_DIR:"*) ;;
-  *) echo "  note: $BIN_DIR is not on your PATH. Add to your shell rc:  export PATH=\"\$HOME/bin:\$PATH\"" ;;
-esac
-
 echo
 echo "td-flow installed."
 echo
@@ -82,6 +69,8 @@ echo "Try it:"
 echo "  cd ~/projects/some-project"
 echo "  claude"
 echo "  /td-init           # bootstrap td-flow"
-echo "  /td-bus-init       # opt-in to cross-project messaging (needs Turso DB + TD_BUS_URL/TD_BUS_TOKEN env vars; see README § td-bus)"
+echo
+echo "Cross-project requests use GitHub issues (\`gh issue create --repo <slug>\`)."
+echo "Add a \`## Cross-repo\` section to .td/PROJECT.md per project — see CLAUDE.md § Cross-repo."
 echo
 echo "To update later: pull this repo, then re-run ./install.sh"

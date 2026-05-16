@@ -4,23 +4,23 @@ Project:  td-flow
 Topic:    idle
 Phase:    shipped (2026-05-16)
 Blocker:  none
-Last:     2026-05-16 — v3.6 shipped: td-bus (cross-project messaging via Turso/libsql). Single-file Python CLI at `bin/td-bus`, schema in `bus-schema.sql`, opt-in onboarding via `/td-bus-init`, README rewrite, installer wires `~/bin/td-bus`. Creds resolve env-first with `~/.td/bus.env` fallback. Four real apps registered on the live bus: anzscofinder, anzscofinder-pipeline, rgb-buddy, rgb-webapp.
+Last:     2026-05-16 — v3.7 shipped: retired td-bus in favor of GitHub Issues + per-project `## Cross-repo` registry. Deleted `bin/td-bus`, `bus-schema.sql`, `commands/td-bus-init.md`, bus blocks in `install.sh` + `README.md`. Added Cross-repo workflow + warm-up `gh issue list` nudge to root + template CLAUDE.md. Bus shipped and retired same day (~8h apart) once research on Projects v2 / Issues showed the bus was reinventing what GH already gives for free.
 
 ## Resume note
 
-td-flow is the minimal, file-based, repo-portable framework hosted at `mergodon/td-nopara`. It eats its own dog food — this repo IS a td-flow project. Stable surface: root `CLAUDE.md` contract + 4 `.td/` docs (`PROJECT`, `WORKWAY`, `STATE`, `BACKLOG`) + `work/<topic>.md` scratch + 4 slash commands (`/td-init`, `/td-clear`, `/td-close`, `/td-bus-init`). Everything else is conversational.
+td-flow is the minimal, file-based, repo-portable framework hosted at `mergodon/td-nopara`. It eats its own dog food — this repo IS a td-flow project. Stable surface: root `CLAUDE.md` contract + 4 `.td/` docs (`PROJECT`, `WORKWAY`, `STATE`, `BACKLOG`) + `work/<topic>.md` scratch + 3 slash commands (`/td-init`, `/td-clear`, `/td-close`). Everything else is conversational.
 
-The full evolution lives in `git log` — read it before assuming current state. v3.1 split `/td-clear` from `/td-close`. v3.2 added drift signals + install.sh pruning. v3.3 added fold-and-delete + "Digging into history". v3.4 made bypassed rituals explicit (the "lets do it" trigger, "Before I commit a piece" bundle, `/init` never-run rule). v3.5 cleaned BACKLOG/PROJECT and set rgb-buddy-2 as the next real-project move. **v3.6 shipped td-bus**: opt-in cross-project messaging on a shared Turso/libsql DB so registered apps can exchange CRs / notes / bugs without writing into each other's repos.
+The full evolution lives in `git log` — read it before assuming current state. v3.1 split `/td-clear` from `/td-close`. v3.2 added drift signals + install.sh pruning. v3.3 added fold-and-delete + "Digging into history". v3.4 made bypassed rituals explicit. v3.5 cleaned BACKLOG/PROJECT. v3.6 shipped td-bus (Turso/libsql + Python CLI). **v3.7 retired td-bus** — too much surface for a solo dev when GH Issues + `gh search issues "user:<owner> involves:@me state:open"` does the same job with zero infra.
 
-td-bus shape (for cold-start recall):
-- `apps` (canonical handle, description, optional long_description / contact / repo_path) + `messages` (type cr|note|bug, status enum open|accepted|shipped|rejected|withdrawn|done, FK'd to apps) + `replies` (append-only thread, cascade delete).
-- IDs are human-readable: `<from_app>-<TYPE>-<n>`, n computed by the CLI not the DB.
-- Creds: env vars `TD_BUS_URL` + `TD_BUS_TOKEN` preferred; `~/.td/bus.env` fallback. CLI dies fast with a clear message if both are missing.
-- Status transitions are role-gated: sender can withdraw, recipient can accept / ship (requires `--sha`) / reject, either can mark done.
+Cross-repo shape now (for cold-start recall):
+- Per-project: `.td/PROJECT.md § Cross-repo` lists repos this project files CRs against. Opt-in — only present when the project has a real cross-repo relationship to declare. No template scaffold.
+- Workflow: I check the registry → `gh repo view <slug>` to verify access + read target's README/PROJECT.md for context → `gh issue create --repo <slug>` with body = ask + why + source → discuss in comments → receiver closes via `Closes <slug>#N`.
+- Warm-up: at first message of fresh session I run `gh issue list --state open` and surface incoming alongside STATE.
+- Etiquette: never commit/push/test in another repo. The only write into another project's territory is via `gh issue create`.
 
-**Next moves (still pending — not blocked, just unscheduled):**
+**Loose ends + next moves:**
 
-1. First real-project validation pass: `cd ~/projects/rgb-buddy-2 && claude && /td-init`. Exercises brownfield detection (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`) + confirms the v3.4 rituals fire on a fresh project. Anything quirky → BACKLOG line tagged "feedback on td-flow:".
-2. First end-to-end bus exchange in anger: send a real CR between two of the four registered apps, walk it through `send → accept → ship --sha → done`, watch for friction. Anything quirky → BACKLOG line tagged "feedback on td-bus:".
-
-How we know the framework actually works without an automated test: drift signals + "Before I commit a piece" bundle are the validation mechanism. Today's pull-and-review surfaced exactly the drift it was supposed to — STATE was stale post-bus, PROJECT.md was missing v3.6. The rituals are doing their job; just need to fire on the commit side too.
+1. **Live Turso DB still exists.** User can `turso db destroy td-bus-<you>` whenever — not blocking anything, just costs nothing to leave it idle. The local `~/.td/bus.env` (if it exists) is also orphaned and can be deleted.
+2. **`templates/CLAUDE.md` and root `CLAUDE.md` have drifted.** Template has the full Cross-repo section now; root has it too, but the older drift (template's etiquette callout vs. root's absence) was patched as part of v3.7. Worth a future audit to keep them in sync.
+3. **First real-project validation:** `cd ~/projects/rgb-buddy-2 && claude && /td-init` — still the unscheduled next-real-project move. Exercises brownfield detection on a fresh project.
+4. **First real cross-repo issue in anger:** file one CR via `gh issue create --repo <some-mergodon-repo>` from another project; confirm the warm-up nudge surfaces it next session. Anything quirky → BACKLOG line tagged "feedback on cross-repo:".

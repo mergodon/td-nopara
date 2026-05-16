@@ -21,7 +21,18 @@ When I need to research something (a library, an API, framework gotchas), I use 
 
 **Fold-and-delete.** Anything I write into `.td/work/<topic>.md` is scratch. When the piece ships: durable findings move into `WORKWAY` (framework gotchas, test commands, deploy quirks), `BACKLOG` (parked items), or `PROJECT.md` (scope changes); the scratch file is deleted in the **same commit**. The journey stays in `git log` — the working tree stays minimal.
 
-**Cross-repo etiquette.** Another project's repo is another team's territory, even when the same human wears both hats. I may read it freely. I may write a file into a folder both sides agreed on (per a documented convention — e.g. a CR drop, never invented unilaterally). I do NOT commit, push, run tests, trigger pre-commit hooks, start their dev servers, or otherwise touch their lifecycle. Writes I make are left for the owner to discover via their own `git status` and decide what to do. The only repos I commit and push to are this one (the current project) and the `td` package when explicitly updating the framework.
+## Cross-repo
+
+Another project's repo is another team's territory, even when the same human wears both hats. I read freely. I do NOT commit, push, run tests, trigger pre-commit hooks, start their dev servers, or otherwise touch their lifecycle. The way to ask another project to do something is to file a GitHub issue.
+
+`.td/PROJECT.md § Cross-repo` is the per-project registry of repos this project legitimately files against. The section is opt-in — only present when the project has a real cross-repo relationship to declare. To file:
+
+1. Check `.td/PROJECT.md § Cross-repo`. If the target isn't listed, ask the user before filing.
+2. `gh repo view <slug>` to verify access. Read its README (and `.td/PROJECT.md` if it's a td-flow project) for enough context to write a meaningful body.
+3. `gh issue create --repo <slug> --title "..." --body "..."`. Body has: the ask, the why, and the source (this commit / this file / current session).
+4. Discuss in `gh issue comment <id> --repo <slug>`. The receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
+
+No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
 ## The docs (`.td/`)
 
@@ -33,11 +44,9 @@ When I need to research something (a library, an API, framework gotchas), I use 
 
 If something doesn't fit one of those five surfaces, it probably doesn't need a doc — git or the existing docs cover it.
 
-**Cross-project messaging lives on the td-bus (Turso cloud DB), not in repo files.** If the project is registered on the bus (`/td-bus-init`), use `td-bus inbox / outbox / send / reply / show / accept / ship / reject / withdraw / done` to exchange change requests, notes, and bug reports with other projects. No `.td/cr/` folder; no inbound entries in `BACKLOG.md`. See `~/projects/td/README.md § td-bus`.
-
 ## Nudges I do without being asked
 
-- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering.
+- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Also run `gh issue list --state open` and surface incoming asks (one line, or "(inbox empty)") alongside the STATE summary.
 - Before a meaningful piece of work: **"Before I dive in, anything else on your mind that should ride along?"**
 - **"Lets do it" / "go ahead" / "yes" / "do it" / "ok" in response to a proposal I just made** — that *is* the start of meaningful work, not a clearance to skip. I run the "anything else on your mind?" nudge before starting, not after.
 - When the conversation drifts through small unrelated stuff: **"We're scattered — want to wrap and start fresh?"**
@@ -82,8 +91,8 @@ When the user tells me something at the start of a message, action-shaped:
 - "remember to X later" / "park this" → append `.td/BACKLOG.md`
 - "feedback on td-flow" → append `~/projects/td/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
-- "file a CR for the X team" / "send a change request to X" → `td-bus send X "<title>" --type cr` (project must be registered via `/td-bus-init` first).
-- "check the inbox" / "any CRs?" → `td-bus inbox` (use `--json` for structured output).
+- "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh issue create --repo <slug>` with body = ask + why + source.
+- "any incoming?" / "check the inbox" → `gh issue list --state open` (current repo) or `gh search issues "user:<owner> involves:@me state:open"` (all your repos).
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
 - "wrap the project" / "we're done with this" / project actually finished → `/td-close`
