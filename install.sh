@@ -82,6 +82,6 @@ echo "Try it:"
 echo "  cd ~/projects/some-project"
 echo "  claude"
 echo "  /td-init           # bootstrap td-flow"
-echo "  /td-bus-init       # opt-in to cross-project messaging (needs Turso DB + ~/.td/bus.env)"
+echo "  /td-bus-init       # opt-in to cross-project messaging (needs Turso DB + TD_BUS_URL/TD_BUS_TOKEN env vars; see README § td-bus)"
 echo
 echo "To update later: pull this repo, then re-run ./install.sh"
