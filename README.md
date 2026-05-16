@@ -35,7 +35,7 @@ claude
 
 Shipping individual pieces is conversational: tests pass → commit → push to `origin/main`. No slash command for that.
 
-`/td-init` detects existing td-flow v1/v2, GSD legacy (`.planning/`, HTML markers), or rgb-buddy-2-style conventions (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md`) and migrates them in place — no re-explaining.
+`/td-init` detects existing td-flow v1/v2, GSD-style legacy planning conventions, or brownfield repos with ad-hoc patterns (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` and similar) and migrates them in place — no re-explaining.
 
 After init, just talk:
 
@@ -96,7 +96,6 @@ skill/SKILL.md        skill definition (symlinked into ~/.claude/skills/td-flow)
 hooks/pre-commit      test-on-commit hook installed by /td-init
 install.sh            symlinks commands, skill, templates into ~/.claude/
 FEEDBACK.md           feedback about td-flow itself, captured from any project
-SERVICES.md           meta-registry: friendly name → GH slug → one-liner for the user's portfolio
 ```
 
 ## Cross-repo requests
@@ -106,15 +105,25 @@ Projects sometimes need things from other projects. Convention: each `.td/PROJEC
 ```markdown
 ## Cross-repo
 
-- `mergodon/anzscofinder` — Laravel app, ANZSCO workflows + auth + billing.
-- `mergodon/rgb-webapp` — Laravel app at rgbtracker.mergodon.com.
+- `<your-org>/<consumer-app>` — Laravel app, user-facing surface.
+- `<your-org>/<backend-service>` — Python/FastAPI matching engine.
 ```
 
-Workflow: I read the registry, `gh repo view <slug>` to confirm access + read the target repo for context, then `gh issue create --repo <slug>`. Discussion in issue comments. The receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides. No file-based CRs, no separate inbox, no status enum, no labels.
+Workflow: read the registry, `gh repo view <slug>` to confirm access + read the target repo for context, then `gh issue create --repo <slug>`. Discussion in issue comments. The receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides. No file-based CRs, no separate inbox, no status enum, no labels.
 
-Unified view across all your repos: `gh search issues --owner <owner> --involves @me --state open`.
+Unified view across all your repos: `gh search issues --owner <your-org> --state open` (REPO is the unit of interest; no author filter — works regardless of which GH identity you're using).
 
 The section is opt-in — projects with no cross-repo relationships skip it. Details in `templates/CLAUDE.md § Cross-repo`.
+
+### Private registry companion
+
+td-flow keeps user-specific data out of this public framework repo. The user's portfolio of projects (friendly name → GH slug → one-liner) lives in a separate **private** companion repo. Set the env var `TD_REGISTRY` in your shell rc:
+
+```sh
+export TD_REGISTRY="<your-org>/td-registry"
+```
+
+The framework reads `$TD_REGISTRY` to find your registry. Forkers create their own private registry repo by the same pattern — td-flow remains generic; user data stays private.
 
 ## Saving and reusing templates
 
