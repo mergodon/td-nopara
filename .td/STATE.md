@@ -20,7 +20,13 @@ Cross-repo shape now (for cold-start recall):
 
 **Loose ends + next moves:**
 
-1. **Live Turso DB still exists.** User can `turso db destroy td-bus-<you>` whenever — not blocking anything, just costs nothing to leave it idle. The local `~/.td/bus.env` (if it exists) is also orphaned and can be deleted.
+1. **Live Turso DB still exists.** User can `turso db destroy td-bus-<you>` whenever — not blocking anything, just costs nothing to leave it idle.
 2. **`templates/CLAUDE.md` and root `CLAUDE.md` have drifted.** Template has the full Cross-repo section now; root has it too, but the older drift (template's etiquette callout vs. root's absence) was patched as part of v3.7. Worth a future audit to keep them in sync.
-3. **First real-project validation:** `cd ~/projects/rgb-buddy-2 && claude && /td-init` — still the unscheduled next-real-project move. Exercises brownfield detection on a fresh project.
-4. **First real cross-repo issue in anger:** file one CR via `gh issue create --repo <some-mergodon-repo>` from another project; confirm the warm-up nudge surfaces it next session. Anything quirky → BACKLOG line tagged "feedback on cross-repo:".
+3. **First real-project validation:** `cd ~/projects/rgb-buddy-2 && claude && /td-init` — still the unscheduled next-real-project move. Exercises brownfield detection on a fresh project. The rgb-buddy-2 repo also now has issue #7 (the bus-retirement cleanup) waiting in its inbox, so opening it doubles as warm-up-nudge validation.
+4. **First real cross-repo issue in anger — DONE 2026-05-16.** Filed 4 retirement-cleanup issues from `td-nopara` per the v3.7 workflow:
+   - mergodon/anzsco-tasmanvisa-com#1
+   - mergodon/anzscofinder-pipeline#1
+   - mergodon/rgb-buddy-2#7
+   - mergodon/tdphp-rgbtracker-mainweb#1
+
+   Each asks the receiving project to drop the stale `## td-bus` section from `.td/PROJECT.md` and delete `~/.td/bus.env` if present. When you open any of those projects, the warm-up `gh issue list --state open` should surface its issue automatically. Anything quirky in that flow → BACKLOG line tagged "feedback on cross-repo:".
