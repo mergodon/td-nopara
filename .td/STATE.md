@@ -2,9 +2,9 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    shipped (2026-05-17)
+Phase:    shipped v4.0 (2026-05-17)
 Blocker:  none
-Last:     2026-05-17 — **v3.8 closed + validated + renamed**. v3.8 ships the public/private split (framework public, user-specific data in private `td-registry` discovered via `$TD_REGISTRY`); validation pass with 3 live scenarios (all green; one real-world signal: a post-bus-retirement issue already used the friendly-name convention organically). Closing housekeeping today: **GH repo renamed `mergodon/td-nopara` → `mergodon/td-flow`** and local folder renamed `~/projects/td/` → `~/projects/td-flow/` for naming consistency (friendly name, project name, slug, and local path all now match). All doc refs updated across td-flow + td-registry; GH redirects keep old refs working.
+Last:     2026-05-17 — **v4.0 cut — public-identity milestone.** Builds on v3.8 (public/private split landed earlier today) by aligning the public brand: GH repo renamed `mergodon/td-nopara` → `mergodon/td-flow`, local clone renamed `~/projects/td/` → `~/projects/td-flow/`. Friendly name, project name, slug, and local path all line up for the first time. Post-rename validation pass found three downstream projects on this machine (`anzscofinder-pipeline`, `anzscofinder`, `familycop`) still pointing at the old `~/projects/td/` path in their per-project `CLAUDE.md`; reconcile happens in each project's own Claude session per the README "Updating an existing td-flow project" flow. GH redirects keep old slug refs working.
 
 ## Resume note
 
@@ -30,7 +30,7 @@ Cross-repo shape (for cold-start recall):
 
 4. **One bug found during validation review**: original unified-inbox query syntax was wrong — quoted-string `gh search issues "user:X involves:@me state:open"` breaks because gh interprets the whole quoted blob as a single search phrase. Fixed to `--owner` flag form; later dropped `--involves @me` entirely (REPO is the unit, not GH identity).
 
-5. **Slash-command enrichment (Piece 2)** — pending: enrich `/td-init` to auto-register new projects in `$TD_REGISTRY`'s `SERVICES.md`, `/td-clear` to surface inbox + outbox in the resume note, `/td-close` to check unresolved issues before wrapping. Triggered by the v3.8 registry split; ready to start whenever — v3.8 surface is now stable + public.
+5. **Slash-command enrichment (Piece 2)** — pending: enrich `/td-init` to auto-register new projects in `$TD_REGISTRY`'s `SERVICES.md`, `/td-clear` to surface inbox + outbox in the resume note, `/td-close` to check unresolved issues before wrapping. Triggered by the v3.8 registry split; ready to start whenever — v4.0 surface is now stable + public.
 
 7. **~~Pending external rename~~** `mergodon/rgb-buddy-2` → `mergodon/rgb-ggbuddy` — DONE 2026-05-17. GH rename landed; td-registry SERVICES.md updated (commit `5335fc7` in td-registry). Remaining: the renamed repo itself needs a local-side cleanup pass (git remote, internal doc refs, .td docs if any). Process documented; user will paste prompt into rgb-ggbuddy Claude session.
 

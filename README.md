@@ -129,7 +129,7 @@ The framework reads `$TD_REGISTRY` to find your registry. Forkers create their o
 
 ## Updating an existing td-flow project
 
-If you initialized a project before v3.8, your project's local `CLAUDE.md` was copied from the template *at that time* and is now stale. To update:
+If you initialized a project before v4.0 (or before the `td-nopara` → `td-flow` rename), your project's local `CLAUDE.md` was copied from the template *at that time* and is now stale. Common symptom: it still references `~/projects/td/` (the old clone path) instead of `~/projects/td-flow/`. To update:
 
 1. **Pull the framework**: `cd ~/projects/td-flow && git pull && ./install.sh`
 2. **Confirm `$TD_REGISTRY` is set** in your shell: `env | grep TD_REGISTRY` (should print `mergodon/td-registry` or your fork's equivalent). Open a new shell tab if you just added the export.

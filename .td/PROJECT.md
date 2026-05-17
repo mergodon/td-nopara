@@ -20,7 +20,7 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 
 ## Active scope
 
-(none — v3.8 shipped; awaiting first real-project `/td-init` + first real outside-fork to surface what the published methodology actually needs)
+(none — v4.0 shipped; awaiting first real-project `/td-init` + first real outside-fork to surface what the published methodology actually needs)
 
 ## Shipped
 
@@ -35,6 +35,7 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 - v3.6 (td-bus shipped: opt-in cross-project messaging on a shared Turso/libsql DB. Single-file Python CLI, schema, `/td-bus-init` slash command, installer wired `~/bin/td-bus`. **Retired same day in v3.7** after reviewing GitHub Projects v2 / Issues — reinventing GH Issues for a solo dev violated CLAUDE.md's own "GitHub is the memory. Don't duplicate." principle.)
 - v3.7 (td-bus retired in favor of GitHub Issues + per-project `## Cross-repo` registry in `.td/PROJECT.md`. Deleted bus CLI, schema, slash command, and `install.sh` blocks. Added cross-repo workflow + warm-up `gh issue list` to root + template `CLAUDE.md`. `## Cross-repo` is opt-in per project — no scaffold. Inbox-scope guardrail: current repo by default, cross-repo opt-in via explicit triggers. Identity-agnostic queries — REPO is the unit, not GH user.)
 - v3.8 (public/private split: SERVICES.md (and future user-specific data) moved out of this repo into a private companion registry repo discovered via `$TD_REGISTRY`. The framework repo flipped back to public so the methodology can be shared/forked; user data stays private. Pattern: public framework + per-user private registry.)
+- v4.0 (public-identity milestone: GH repo renamed `mergodon/td-nopara` → `mergodon/td-flow`; local clone path renamed `~/projects/td/` → `~/projects/td-flow/`. Friendly name, project name, GH slug, and local path now all line up. Doc refs reconciled across `td-flow` + `td-registry`; downstream-project reconcile guidance updated in README. No surface change to commands, skill, or contract.)
 
 ## Out of scope (for now)
 
