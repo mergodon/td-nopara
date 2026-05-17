@@ -14,7 +14,7 @@ The contract — including the "Who does what" matrix, the routing map ("where t
 - The user runs `/td-init` and asks how to proceed.
 - The user mentions td-flow, the rhythm, or any of the structured docs.
 - The user asks "where are we" or "how do I test this" and `.td/` exists.
-- The user says "save this as a `<name>` template" — copy the current `.td/` shape (anonymized) to `~/projects/td/templates/<name>/`.
+- The user says "save this as a `<name>` template" — copy the current `.td/` shape (anonymized) to `~/projects/td-flow/templates/<name>/`.
 - The user mentions a framework polluting `CLAUDE.md` (Boost, etc.) — restore from canonical, log salvage into `.td/WORKWAY.md` § Framework specifics.
 
 ## The rhythm (plan → work → test → ship → close)

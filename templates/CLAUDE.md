@@ -32,7 +32,7 @@ Another project's repo is another team's territory, even when the same human wea
 3. `gh issue create --repo <slug> --title "..." --body "..."`. Body has: the ask, the why, and the source.
 4. Discuss in `gh issue comment <id> --repo <slug>`. The receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
 
-**Use friendly project names in messages, not GH slugs or identities.** When filing or commenting cross-repo (issue titles, bodies, comments — the human-readable text), reference projects by their **friendly name** (e.g., `Filed from anzscofinder-pipeline`), not by GH slug (`mergodon/anzscofinder-pipeline`) and not by GH user identity. The friendly name comes from `SERVICES.md` in `$TD_REGISTRY` (look up the originating project's GH slug to find its friendly name). If the originating project isn't in SERVICES.md, fall back to the first H1 heading in its `.td/PROJECT.md`, then to the local directory basename. **Why:** GH slugs change on rename, GH identities vary by machine, friendly names stay stable and read clearly across sessions. **Exception:** `Closes <slug>#N` in commit messages keeps the full GH slug — that syntax is GitHub's mechanical auto-close, not a message.
+**Use friendly project names in messages, not GH slugs or identities.** When filing or commenting cross-repo (issue titles, bodies, comments — the human-readable text), reference projects by their **friendly name** (e.g., `Filed from <consumer-app>`), not by GH slug (`<your-org>/<consumer-app>`) and not by GH user identity. The friendly name comes from `SERVICES.md` in `$TD_REGISTRY` (look up the originating project's GH slug to find its friendly name). If the originating project isn't in SERVICES.md, fall back to the first H1 heading in its `.td/PROJECT.md`, then to the local directory basename. **Why:** GH slugs change on rename, GH identities vary by machine, friendly names stay stable and read clearly across sessions. **Exception:** `Closes <slug>#N` in commit messages keeps the full GH slug — that syntax is GitHub's mechanical auto-close, not a message.
 
 No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
@@ -93,7 +93,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "we use Laravel/Next/X" / framework-specific gotcha → `.td/WORKWAY.md` § Framework specifics
 - "stack changes to X" / "scope is X" → `.td/PROJECT.md`
 - "remember to X later" / "park this" → append `.td/BACKLOG.md`
-- "feedback on td-flow" → append `~/projects/td/FEEDBACK.md`
+- "feedback on td-flow" → append `~/projects/td-flow/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
 - "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh issue create --repo <slug>` with body = ask + why + source.
 - "any incoming?" / "check the inbox" / "CRs?" → `gh issue list --state open` (current repo ONLY — the default; never widen here).
@@ -102,7 +102,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
 - "wrap the project" / "we're done with this" / project actually finished → `/td-close`
 - "where are we" → read STATE.md, summarize
-- "save this as a `<name>` template" → copy current `.td/` shape (anonymized) to `~/projects/td/templates/<name>/`
+- "save this as a `<name>` template" → copy current `.td/` shape (anonymized) to `~/projects/td-flow/templates/<name>/`
 
 Mid-conversation mentions don't trigger updates — only explicit, action-shaped statements at the start of a message do.
 

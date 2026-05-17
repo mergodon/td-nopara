@@ -2,13 +2,13 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    shipped (2026-05-17)
+Phase:    shipped v4.0 (2026-05-17)
 Blocker:  none
-Last:     2026-05-17 — **v3.8 closed + validated**: public/private split shipped; td-nopara flipped to public. Companion private registry at `<your-org>/td-registry` discovered via `$TD_REGISTRY` env var. Validation pass (3 live scenarios in scratch playbook, all green; real-world signal: a post-bus-retirement issue already used friendly-name convention organically before v3.8 codified it). Friendly-name-in-messages rule codified with `Closes <slug>#N` exception. install.sh now warns on missing `$TD_REGISTRY`. Same-day groundwork: inbox-scope guardrail, unified-inbox query fix, `--involves @me` dropped (REPO is the unit, not identity).
+Last:     2026-05-17 — **v4.0 cut — public-identity milestone.** Builds on v3.8 (public/private split landed earlier today) by aligning the public brand: GH repo renamed `mergodon/td-nopara` → `mergodon/td-flow`, local clone renamed `~/projects/td/` → `~/projects/td-flow/`. Friendly name, project name, slug, and local path all line up for the first time. Post-rename validation pass found three downstream projects on this machine (`anzscofinder-pipeline`, `anzscofinder`, `familycop`) still pointing at the old `~/projects/td/` path in their per-project `CLAUDE.md`; reconcile happens in each project's own Claude session per the README "Updating an existing td-flow project" flow. GH redirects keep old slug refs working.
 
 ## Resume note
 
-td-flow is the minimal, file-based, repo-portable methodology hosted at `mergodon/td-nopara` (public). It eats its own dog food — this repo IS a td-flow project. Stable surface: root `CLAUDE.md` contract + 4 `.td/` docs (`PROJECT`, `WORKWAY`, `STATE`, `BACKLOG`) + `work/<topic>.md` scratch + 3 slash commands (`/td-init`, `/td-clear`, `/td-close`). User-specific data (SERVICES.md + future outbound-issue logs) lives in a separate private companion repo discovered via `$TD_REGISTRY`. Everything else is conversational.
+td-flow is the minimal, file-based, repo-portable methodology hosted at `mergodon/td-flow` (public). It eats its own dog food — this repo IS a td-flow project. Stable surface: root `CLAUDE.md` contract + 4 `.td/` docs (`PROJECT`, `WORKWAY`, `STATE`, `BACKLOG`) + `work/<topic>.md` scratch + 3 slash commands (`/td-init`, `/td-clear`, `/td-close`). User-specific data (SERVICES.md + future outbound-issue logs) lives in a separate private companion repo discovered via `$TD_REGISTRY`. Everything else is conversational.
 
 The full evolution lives in `git log` — read it before assuming current state. v3.1 split `/td-clear` from `/td-close`. v3.2 added drift signals + install.sh pruning. v3.3 added fold-and-delete + "Digging into history". v3.4 made bypassed rituals explicit. v3.5 cleaned BACKLOG/PROJECT. v3.6 shipped td-bus (Turso/libsql + Python CLI). **v3.7 retired td-bus** — too much surface for a solo dev when GH Issues + `gh search issues --owner <your-org> --state open` does the same job with zero infra. **v3.8 split user data into a private companion registry** so the framework can be public as a methodology while user-specific information stays private.
 
@@ -30,7 +30,7 @@ Cross-repo shape (for cold-start recall):
 
 4. **One bug found during validation review**: original unified-inbox query syntax was wrong — quoted-string `gh search issues "user:X involves:@me state:open"` breaks because gh interprets the whole quoted blob as a single search phrase. Fixed to `--owner` flag form; later dropped `--involves @me` entirely (REPO is the unit, not GH identity).
 
-5. **Slash-command enrichment (Piece 2)** — pending: enrich `/td-init` to auto-register new projects in `$TD_REGISTRY`'s `SERVICES.md`, `/td-clear` to surface inbox + outbox in the resume note, `/td-close` to check unresolved issues before wrapping. Triggered by the v3.8 registry split; ready to start whenever — v3.8 surface is now stable + public.
+5. **Slash-command enrichment (Piece 2)** — pending: enrich `/td-init` to auto-register new projects in `$TD_REGISTRY`'s `SERVICES.md`, `/td-clear` to surface inbox + outbox in the resume note, `/td-close` to check unresolved issues before wrapping. Triggered by the v3.8 registry split; ready to start whenever — v4.0 surface is now stable + public.
 
 7. **~~Pending external rename~~** `mergodon/rgb-buddy-2` → `mergodon/rgb-ggbuddy` — DONE 2026-05-17. GH rename landed; td-registry SERVICES.md updated (commit `5335fc7` in td-registry). Remaining: the renamed repo itself needs a local-side cleanup pass (git remote, internal doc refs, .td docs if any). Process documented; user will paste prompt into rgb-ggbuddy Claude session.
 
