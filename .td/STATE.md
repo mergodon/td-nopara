@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    shipped (2026-05-17)
 Blocker:  none
-Last:     2026-05-17 — **v3.8 shipped**: split `SERVICES.md` (and future user-specific data) out of the public framework repo into a separate **private companion** registry repo. Framework now reads `$TD_REGISTRY` env var to discover the registry. The pattern: public methodology + per-user private registry; anyone forking td-flow can spin up their own registry repo by the same convention. `td-nopara` visibility re-flipped to public as part of this. Earlier same day: inbox-scope guardrail (current repo by default; cross-repo opt-in via explicit triggers), unified-inbox query fix (`--owner` flag form; quoted-string broke), dropped `--involves @me` (REPO is the unit of interest, not GH identity), `SERVICES.md` first added then moved to registry.
+Last:     2026-05-17 — **v3.8 closed + validated**: public/private split shipped; td-nopara flipped to public. Companion private registry at `<your-org>/td-registry` discovered via `$TD_REGISTRY` env var. Validation pass (3 live scenarios in scratch playbook, all green; real-world signal: a post-bus-retirement issue already used friendly-name convention organically before v3.8 codified it). Friendly-name-in-messages rule codified with `Closes <slug>#N` exception. install.sh now warns on missing `$TD_REGISTRY`. Same-day groundwork: inbox-scope guardrail, unified-inbox query fix, `--involves @me` dropped (REPO is the unit, not identity).
 
 ## Resume note
 
@@ -31,6 +31,8 @@ Cross-repo shape (for cold-start recall):
 
 4. **One bug found during validation review**: original unified-inbox query syntax was wrong — quoted-string `gh search issues "user:X involves:@me state:open"` breaks because gh interprets the whole quoted blob as a single search phrase. Fixed to `--owner` flag form; later dropped `--involves @me` entirely (REPO is the unit, not GH identity).
 
-5. **Slash-command enrichment (Piece 2)** — pending: enrich `/td-init` to auto-register new projects in `$TD_REGISTRY`'s `SERVICES.md`, `/td-clear` to surface inbox + outbox in the resume note, `/td-close` to check unresolved issues before wrapping. Triggered by the v3.8 registry split; will land as a follow-up commit after this v3.8 surface stabilizes.
+5. **Slash-command enrichment (Piece 2)** — pending: enrich `/td-init` to auto-register new projects in `$TD_REGISTRY`'s `SERVICES.md`, `/td-clear` to surface inbox + outbox in the resume note, `/td-close` to check unresolved issues before wrapping. Triggered by the v3.8 registry split; ready to start whenever — v3.8 surface is now stable + public.
+
+7. **Pending external rename**: `mergodon/rgb-buddy-2` → `mergodon/rgb-ggbuddy` (owner handling separately). When it lands, run the cascade (logged in BACKLOG).
 
 6. **`templates/CLAUDE.md` vs root `CLAUDE.md` drift** patched as part of v3.7+v3.8 work; both have the full Cross-repo section now. Worth a future audit to keep them in sync going forward.
