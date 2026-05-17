@@ -32,7 +32,7 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
 - After migration, ask: "Delete `.planning/`? (its content is now in `.td/`)." If yes, `git rm -r .planning/`.
 - Tell the user what got migrated.
 
-**rgb-buddy-2-style convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` exist (and not GSD):
+**Brownfield ad-hoc convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` exist (and not GSD):
 - Read `.claude/agreements/*.md`. Most agreements are universal td-flow rails (cadence, push-after-commit, run-commands) — they're already in CLAUDE.md and don't need preservation. Project-specific ones (branding, uat-style) → append as items in `WORKWAY.md` § Notes.
 - Read `ARCHITECTURE.md`. Keep it at root as-is (it's a stable doc the user already maintains); link to it from `.td/PROJECT.md`.
 - Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, archive it (rename to `BLOCKS-archive.md` or leave as-is — ask the user).

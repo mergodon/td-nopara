@@ -54,6 +54,6 @@ CLAUDE.md                ← contract at root, user controls it
 
 Shipping individual pieces is conversational: tests pass → commit → push to `origin/main`. No slash command.
 
-Migration: `/td-init` detects existing td-flow v1/v2, GSD legacy (`.planning/`, HTML markers), or rgb-buddy-2-style conventions and maps them to v3 without re-asking.
+Migration: `/td-init` detects existing td-flow v1/v2, GSD-style legacy planning conventions, or brownfield repos with ad-hoc patterns (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` and similar) and maps them to v3 without re-asking.
 
 For the routing map, nudges, drift signals, and commit conventions — read root `CLAUDE.md`.
