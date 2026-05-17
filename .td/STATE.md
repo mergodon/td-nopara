@@ -22,8 +22,7 @@ Cross-repo shape (for cold-start recall):
 
 **Loose ends + next moves:**
 
-1. **User actions still pending** (Claude can't do these without overreach):
-   - **Destroy retired Turso DB**: `turso db destroy <your-bus-db>` whenever. User has no `turso` CLI installed; either `brew install tursodatabase/tap/turso` or use the Turso web UI.
+1. **~~Destroy retired Turso DB~~** — DONE 2026-05-17. Bus retirement is now fully closed: framework code removed (v3.7), local creds removed (env vars + ~/.td/bus.env), cloud DB destroyed.
 
 2. **First real-project validation** of the v3.7+v3.8 framework on a brownfield repo — still unscheduled. Exercises brownfield detection on a fresh project and confirms the rituals fire end-to-end.
 
@@ -33,6 +32,6 @@ Cross-repo shape (for cold-start recall):
 
 5. **Slash-command enrichment (Piece 2)** — pending: enrich `/td-init` to auto-register new projects in `$TD_REGISTRY`'s `SERVICES.md`, `/td-clear` to surface inbox + outbox in the resume note, `/td-close` to check unresolved issues before wrapping. Triggered by the v3.8 registry split; ready to start whenever — v3.8 surface is now stable + public.
 
-7. **Pending external rename**: `mergodon/rgb-buddy-2` → `mergodon/rgb-ggbuddy` (owner handling separately). When it lands, run the cascade (logged in BACKLOG).
+7. **~~Pending external rename~~** `mergodon/rgb-buddy-2` → `mergodon/rgb-ggbuddy` — DONE 2026-05-17. GH rename landed; td-registry SERVICES.md updated (commit `5335fc7` in td-registry). Remaining: the renamed repo itself needs a local-side cleanup pass (git remote, internal doc refs, .td docs if any). Process documented; user will paste prompt into rgb-ggbuddy Claude session.
 
 6. **`templates/CLAUDE.md` vs root `CLAUDE.md` drift** patched as part of v3.7+v3.8 work; both have the full Cross-repo section now. Worth a future audit to keep them in sync going forward.
