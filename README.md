@@ -7,8 +7,8 @@ Same shape every project. Conversational interface — after `/td-init`, you jus
 ## Install
 
 ```
-git clone https://github.com/mergodon/td-nopara ~/projects/td
-cd ~/projects/td
+git clone https://github.com/mergodon/td-flow ~/projects/td-flow
+cd ~/projects/td-flow
 ./install.sh
 ```
 
@@ -43,7 +43,7 @@ After init, just talk:
 - "test command is `npm test`" — updates `.td/WORKWAY.md` § Local testing
 - "live URL is myapp.pages.dev" — updates `.td/WORKWAY.md` § Production / Ship
 - "remember to debounce later" — appends `.td/BACKLOG.md`
-- "save this as a `userscript` template" — extracts the current `.td/` shape into `~/projects/td/templates/userscript/`
+- "save this as a `userscript` template" — extracts the current `.td/` shape into `~/projects/td-flow/templates/userscript/`
 - "ship it" — tests pass, commit, push to `origin/main` (conversational)
 - "where are we" — summarizes `.td/STATE.md`
 - "let's clear" / about to /clear — runs `/td-clear`
@@ -131,10 +131,10 @@ The framework reads `$TD_REGISTRY` to find your registry. Forkers create their o
 
 If you initialized a project before v3.8, your project's local `CLAUDE.md` was copied from the template *at that time* and is now stale. To update:
 
-1. **Pull the framework**: `cd ~/projects/td && git pull && ./install.sh`
+1. **Pull the framework**: `cd ~/projects/td-flow && git pull && ./install.sh`
 2. **Confirm `$TD_REGISTRY` is set** in your shell: `env | grep TD_REGISTRY` (should print `mergodon/td-registry` or your fork's equivalent). Open a new shell tab if you just added the export.
-3. **Reconcile your project's `CLAUDE.md`** against the latest template. Diff `~/projects/<your-project>/CLAUDE.md` vs `~/projects/td/templates/CLAUDE.md` and adopt the `§ Cross-repo` section, especially the parts that:
-   - reference `$TD_REGISTRY` (replaces the stale `~/projects/td/SERVICES.md` path)
+3. **Reconcile your project's `CLAUDE.md`** against the latest template. Diff `~/projects/<your-project>/CLAUDE.md` vs `~/projects/td-flow/templates/CLAUDE.md` and adopt the `§ Cross-repo` section, especially the parts that:
+   - reference `$TD_REGISTRY` (replaces the stale `~/projects/td-flow/SERVICES.md` path)
    - drop `--involves @me` from the unified-inbox query
    - explain the friendly-name-in-messages rule
 4. **Optional**: clone your registry locally for faster lookups:
@@ -144,7 +144,7 @@ If you initialized a project before v3.8, your project's local `CLAUDE.md` was c
 
 ## Saving and reusing templates
 
-When a project's setup is dialed in, you say "save this as a `<name>` template." I copy `.td/*` (anonymized — placeholders restored) to `~/projects/td/templates/<name>/`. Future `/td-init --template <name>` starts from that shape so a new Laravel project is configured like the previous one out of the gate.
+When a project's setup is dialed in, you say "save this as a `<name>` template." I copy `.td/*` (anonymized — placeholders restored) to `~/projects/td-flow/templates/<name>/`. Future `/td-init --template <name>` starts from that shape so a new Laravel project is configured like the previous one out of the gate.
 
 ## Frameworks (Laravel Boost, Next, etc.)
 

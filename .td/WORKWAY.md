@@ -30,9 +30,9 @@ The framework is fully testable locally. If a future change involves a Claude Co
 
 ## Live
 
-The "live" environment for this framework is `mergodon/td-nopara` on GitHub plus the symlinked install on each machine.
+The "live" environment for this framework is `mergodon/td-flow` on GitHub plus the symlinked install on each machine.
 
-- Live URL:        https://github.com/mergodon/td-nopara
+- Live URL:        https://github.com/mergodon/td-flow
 - Deploy:          `git push origin main` (immediate; symlinks pick up changes since `templates/`, `commands/`, `skill/` are linked, not copied)
 - Smoke after ship: re-run `./install.sh` on the local machine; verify the new content is visible
 - Logs:            none (this is just files + symlinks)
@@ -54,7 +54,7 @@ The "live" environment for this framework is `mergodon/td-nopara` on GitHub plus
 
 ### Multi-machine sync
 
-- Each machine gets a fresh `git clone https://github.com/mergodon/td-nopara ~/projects/td` then `./install.sh`.
+- Each machine gets a fresh `git clone https://github.com/mergodon/td-flow ~/projects/td-flow` then `./install.sh`.
 - Updates: `git pull && ./install.sh` (idempotent).
 - No global memory dependency — everything ships through git.
 

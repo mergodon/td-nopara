@@ -14,8 +14,8 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 - Bash for `install.sh` and the pre-commit hook.
 - AWK for extracting the test command from `WORKWAY.md` § Local testing.
 - Cross-project requests ride on GitHub Issues + `gh` CLI. No custom DB, no schema, no inbox service.
-- **Public methodology + private registry split.** This repo (`mergodon/td-nopara`) is public — it holds the methodology, slash commands, templates, install scripts. Anything user/portfolio-specific (friendly-name → GH-slug registry, outbound-issue logs) lives in a separate **private** companion repo discovered via the `$TD_REGISTRY` env var. Forkers create their own private registry repo by the same pattern.
-- Cloned to `~/projects/td/` on each machine.
+- **Public methodology + private registry split.** This repo (`mergodon/td-flow`) is public — it holds the methodology, slash commands, templates, install scripts. Anything user/portfolio-specific (friendly-name → GH-slug registry, outbound-issue logs) lives in a separate **private** companion repo discovered via the `$TD_REGISTRY` env var. Forkers create their own private registry repo by the same pattern.
+- Cloned to `~/projects/td-flow/` on each machine.
 - Distributed as symlinks into `~/.claude/commands/`, `~/.claude/skills/td-flow`, and `~/.claude/td-templates` via `install.sh`.
 
 ## Active scope
