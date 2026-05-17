@@ -125,6 +125,23 @@ export TD_REGISTRY="<your-org>/td-registry"
 
 The framework reads `$TD_REGISTRY` to find your registry. Forkers create their own private registry repo by the same pattern — td-flow remains generic; user data stays private.
 
+**Use friendly project names in cross-repo messages, not GH slugs.** When filing/commenting cross-repo, reference projects by their friendly name (e.g. "filed from `anzscofinder-pipeline`"), not by GH slug. GH slugs change on rename; friendly names stay stable across renames and identity-agnostic across machines.
+
+## Updating an existing td-flow project
+
+If you initialized a project before v3.8, your project's local `CLAUDE.md` was copied from the template *at that time* and is now stale. To update:
+
+1. **Pull the framework**: `cd ~/projects/td && git pull && ./install.sh`
+2. **Confirm `$TD_REGISTRY` is set** in your shell: `env | grep TD_REGISTRY` (should print `mergodon/td-registry` or your fork's equivalent). Open a new shell tab if you just added the export.
+3. **Reconcile your project's `CLAUDE.md`** against the latest template. Diff `~/projects/<your-project>/CLAUDE.md` vs `~/projects/td/templates/CLAUDE.md` and adopt the `§ Cross-repo` section, especially the parts that:
+   - reference `$TD_REGISTRY` (replaces the stale `~/projects/td/SERVICES.md` path)
+   - drop `--involves @me` from the unified-inbox query
+   - explain the friendly-name-in-messages rule
+4. **Optional**: clone your registry locally for faster lookups:
+   ```sh
+   gh repo clone $TD_REGISTRY ~/projects/td-registry
+   ```
+
 ## Saving and reusing templates
 
 When a project's setup is dialed in, you say "save this as a `<name>` template." I copy `.td/*` (anonymized — placeholders restored) to `~/projects/td/templates/<name>/`. Future `/td-init --template <name>` starts from that shape so a new Laravel project is configured like the previous one out of the gate.

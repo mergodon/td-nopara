@@ -29,8 +29,10 @@ Another project's repo is another team's territory, even when the same human wea
 
 1. Check `.td/PROJECT.md § Cross-repo`. If the target isn't listed, ask the user before filing.
 2. `gh repo view <slug>` to verify access. Read its README (and `.td/PROJECT.md` if it's a td-flow project) for enough context to write a meaningful body.
-3. `gh issue create --repo <slug> --title "..." --body "..."`. Body has: the ask, the why, and the source (this commit / this file / current session).
+3. `gh issue create --repo <slug> --title "..." --body "..."`. Body has: the ask, the why, and the source.
 4. Discuss in `gh issue comment <id> --repo <slug>`. The receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
+
+**Use friendly project names in messages, not GH slugs or identities.** When filing or commenting cross-repo (issue titles, bodies, comments — the human-readable text), reference projects by their **friendly name** (e.g., `Filed from anzscofinder-pipeline`), not by GH slug (`mergodon/anzscofinder-pipeline`) and not by GH user identity. The friendly name comes from `SERVICES.md` in `$TD_REGISTRY` (look up the originating project's GH slug to find its friendly name). If the originating project isn't in SERVICES.md, fall back to the first H1 heading in its `.td/PROJECT.md`, then to the local directory basename. **Why:** GH slugs change on rename, GH identities vary by machine, friendly names stay stable and read clearly across sessions. **Exception:** `Closes <slug>#N` in commit messages keeps the full GH slug — that syntax is GitHub's mechanical auto-close, not a message.
 
 No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
