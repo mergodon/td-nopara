@@ -2,9 +2,9 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    shipped v4.0 (2026-05-17)
+Phase:    shipped /td-refresh + project-soul cross-repo framing (2026-05-18)
 Blocker:  none
-Last:     2026-05-17 — **v4.0 cut — public-identity milestone.** Builds on v3.8 (public/private split landed earlier today) by aligning the public brand: GH repo renamed `mergodon/td-nopara` → `mergodon/td-flow`, local clone renamed `~/projects/td/` → `~/projects/td-flow/`. Friendly name, project name, slug, and local path all line up for the first time. Post-rename validation pass found three downstream projects on this machine (`anzscofinder-pipeline`, `anzscofinder`, `familycop`) still pointing at the old `~/projects/td/` path in their per-project `CLAUDE.md`; reconcile happens in each project's own Claude session per the README "Updating an existing td-flow project" flow. GH redirects keep old slug refs working.
+Last:     2026-05-18 — **Shipped `/td-refresh` + project-soul cross-repo framing.** New fourth slash command: `/td-refresh` diff-and-proposes project `CLAUDE.md` against the canonical at `~/projects/td-flow/CLAUDE.md`, section-by-section, never auto-overwrites. Contract additions in `§ Cross-repo`: the *speaker* in cross-repo dialogue is always the project, not the GH user behind it — issue bodies open with `**From:** <friendly-name>`, receivers list inbox as `<source-project>: <ask>`, comments back sign as the receiving project. New drift signal flags when local `CLAUDE.md` differs from canonical → suggest `/td-refresh`. Also: `templates/CLAUDE.md` synced byte-identical with canonical (closes v4.0 loose end #6 on template drift). Earlier in the session (2026-05-18): narrowed the "anything else on your mind?" nudge to fire only when scope is still open — was firing on already-scoped "go ahead" responses.
 
 ## Resume note
 
@@ -34,4 +34,4 @@ Cross-repo shape (for cold-start recall):
 
 7. **~~Pending external rename~~** `mergodon/rgb-buddy-2` → `mergodon/rgb-ggbuddy` — DONE 2026-05-17. GH rename landed; td-registry SERVICES.md updated (commit `5335fc7` in td-registry). Remaining: the renamed repo itself needs a local-side cleanup pass (git remote, internal doc refs, .td docs if any). Process documented; user will paste prompt into rgb-ggbuddy Claude session.
 
-6. **`templates/CLAUDE.md` vs root `CLAUDE.md` drift** patched as part of v3.7+v3.8 work; both have the full Cross-repo section now. Worth a future audit to keep them in sync going forward.
+6. **~~`templates/CLAUDE.md` vs root `CLAUDE.md` drift~~** — DONE 2026-05-18. `templates/CLAUDE.md` synced byte-identical with canonical as part of the `/td-refresh` ship. Going forward, the `/td-refresh` command + the new drift signal will keep downstream project copies in line; the in-repo template gets re-synced by hand when the canonical changes (no scaffolding yet — could be automated later, e.g. symlink `templates/CLAUDE.md` → `../CLAUDE.md`).

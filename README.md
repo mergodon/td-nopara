@@ -125,7 +125,7 @@ export TD_REGISTRY="<your-org>/td-registry"
 
 The framework reads `$TD_REGISTRY` to find your registry. Forkers create their own private registry repo by the same pattern — td-flow remains generic; user data stays private.
 
-**Use friendly project names in cross-repo messages, not GH slugs.** When filing/commenting cross-repo, reference projects by their friendly name (e.g. "filed from `anzscofinder-pipeline`"), not by GH slug. GH slugs change on rename; friendly names stay stable across renames and identity-agnostic across machines.
+**Use friendly project names in cross-repo messages, not GH slugs.** When filing/commenting cross-repo, reference projects by their friendly name (e.g. "filed from `<consumer-app>`"), not by GH slug. GH slugs change on rename; friendly names stay stable across renames and identity-agnostic across machines.
 
 ## Updating an existing td-flow project
 
