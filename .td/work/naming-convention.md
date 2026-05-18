@@ -124,7 +124,6 @@ These existing repos don't yet match the convention. Rename opportunistically wh
 
 | Current | Recommended | Notes |
 |---|---|---|
-| `mergodon/anzsco-tasmanvisa-com` | `mergodon/anzscofinder-web` | Sibling `anzscofinder-pipeline` already in family |
 | `mergodon/webapp-tonalium-com` | `mergodon/tonalium-web` | |
 | `mergodon/mergodoncom` | `mergodon/mergodon-web` | |
 | `mergodon/app_pkrdudes_com` | `mergodon/pkrdudes-app` | snake → kebab + drop `-com` |
