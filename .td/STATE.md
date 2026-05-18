@@ -1,10 +1,10 @@
 # State
 
 Project:  td-flow
-Topic:    naming-convention (drafted in td-flow; awaiting landing in td-registry)
-Phase:    drafted NAMING.md + added pointer in CLAUDE.md (2026-05-18)
+Topic:    idle
+Phase:    shipped /td-inbox (5th slash command) + td-registry exception in contract (2026-05-18)
 Blocker:  none
-Last:     2026-05-18 — **Drafted portfolio naming convention.** Full draft lives at `.td/work/naming-convention.md` ready to copy into `td-registry/NAMING.md` from a td-registry session. CLAUDE.md `§ Cross-repo` now has a one-paragraph pointer ("slug = friendly name = local dir, kebab-case, role suffix, family prefix when siblings exist; full convention at `NAMING.md` in `$TD_REGISTRY`"). Convention covers: single-identity rule, naming shape (`<product>` / `<family>-<role>` / `<product>-<role>`), role suffix vocab (`-web`, `-api`, `-app`, `-ext`, `-script`, `-mobile`, `-cli`, `-worker`, `-pipeline`, `-collector`, `-analytics`, `-infra`), domain↔slug mapping, retrofit steps, and an adoption table calling out ~17 concrete rename candidates (e.g. `anzsco-tasmanvisa-com` → `anzscofinder-web`, the `rgbtracker-*` → `rgb-*` family consolidation, the `tdgeneric-*-mainweb` → `<client>-web` cleanup). Earlier in the session: shipped `/td-refresh` + project-soul cross-repo framing (commits `f2e4541`, `2ef175e`); pulled 4 parallel commits from other machine via fast-forward (no content delta).
+Last:     2026-05-18 — **Shipped `/td-inbox`** — fifth slash command, routine inbox check. Walks open GH issues in the current repo (repo-scoped per `CLAUDE.md § Cross-repo`), surfaces each issue's body + comments + any commits referencing it (`git log --grep="#N"`), recommends close/comment/skip with a project-soul sign-off (`— <receiver-name>`). One-at-a-time walk, no auto-actions, always confirms drafted text. Outbound issues out of scope (future concern). Also this session: codified the `$TD_REGISTRY` exception in `CLAUDE.md § Cross-repo` — td-registry is a metadata proxy, edit/commit/push directly without asking; applied to update SERVICES.md row 11 (`anzsco-tasmanvisa-com` → `anzscofinder-web` rename landed). Fixed step-numbering bugs Peter introduced in `/td-clear` (two Step 6s) and `/td-close` (missing Step 2), plus a pre-existing typo in `/td-init` (commit step ref). Drafted portfolio naming convention earlier — `.td/work/naming-convention.md` still pending landing in `td-registry/NAMING.md`. Pull from other machine merged cleanly (no content delta). Five commits this session: `f2e4541`, `2ef175e`, `4eb176f`, `9067269`, `6caf33b`, `be277b6` + this one.
 
 ## Resume note
 
