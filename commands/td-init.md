@@ -4,7 +4,7 @@ description: Bootstrap td-flow in the current directory. Brownfield-aware. Detec
 
 You are initializing td-flow. After this runs, the user just talks. The other slash commands are `/td-clear` (mid-project context reset) and `/td-close` (project/phase wrap). Shipping pieces is conversational — no slash command.
 
-The argument may be `--template <name>` to start from a saved template at `~/projects/td/templates/<name>/` instead of the default `~/.claude/td-templates/`. If `<name>` doesn't exist, abort and list available templates.
+The argument may be `--template <name>` to start from a saved template at `~/projects/td-flow/templates/<name>/` instead of the default `~/.claude/td-templates/`. If `<name>` doesn't exist, abort and list available templates.
 
 # Step 0 — Detect existing td-flow or td-flow-like conventions
 
@@ -32,7 +32,7 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
 - After migration, ask: "Delete `.planning/`? (its content is now in `.td/`)." If yes, `git rm -r .planning/`.
 - Tell the user what got migrated.
 
-**rgb-buddy-2-style convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` exist (and not GSD):
+**Brownfield ad-hoc convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` exist (and not GSD):
 - Read `.claude/agreements/*.md`. Most agreements are universal td-flow rails (cadence, push-after-commit, run-commands) — they're already in CLAUDE.md and don't need preservation. Project-specific ones (branding, uat-style) → append as items in `WORKWAY.md` § Notes.
 - Read `ARCHITECTURE.md`. Keep it at root as-is (it's a stable doc the user already maintains); link to it from `.td/PROJECT.md`.
 - Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, archive it (rename to `BLOCKS-archive.md` or leave as-is — ask the user).
@@ -90,7 +90,7 @@ Group by destination so the user knows where each answer lands. Skip any answere
 
 # Step 3 — Write the docs
 
-Copy templates from `~/.claude/td-templates/` (or `~/projects/td/templates/<name>/` if `--template <name>` was passed):
+Copy templates from `~/.claude/td-templates/` (or `~/projects/td-flow/templates/<name>/` if `--template <name>` was passed):
 
 - `CLAUDE.md` → root, exactly as the template
 - `.td/PROJECT.md` → fill placeholders
@@ -98,6 +98,7 @@ Copy templates from `~/.claude/td-templates/` (or `~/projects/td/templates/<name
 - `.td/STATE.md` → fill placeholders, set `Last:` to today
 - `.td/BACKLOG.md` → as-is
 - `.td/frameworks/.gitkeep` → empty (the dir is for rare overflow; default home for framework awareness is `WORKWAY.md` § Framework specifics)
+- **No `## Cross-repo` scaffold in `PROJECT.md`.** The section is opt-in per project — the user adds it only when there's a real cross-repo relationship to declare. New projects start without it. The convention is documented in root `CLAUDE.md § Cross-repo`.
 - `.gitignore` → merge with existing
 - `.env.example` → only if no `.env.example` exists
 
@@ -128,7 +129,7 @@ Do not invent specifics — only write what's true based on detected files. Use 
 
 # Step 5 — Install pre-commit hook
 
-If `.git/` exists, copy `~/projects/td/hooks/pre-commit` to `.git/hooks/pre-commit` and `chmod +x`. The hook reads `Test command` from `.td/WORKWAY.md` § Local testing.
+If `.git/` exists, copy `~/projects/td-flow/hooks/pre-commit` to `.git/hooks/pre-commit` and `chmod +x`. The hook reads `Test command` from `.td/WORKWAY.md` § Local testing.
 
 If `.git/` doesn't exist, ask: "Init a git repo now?" If yes, `git init`, then install the hook.
 
@@ -156,8 +157,8 @@ Short summary:
 This command also handles the inverse: when the user says "save this as a `<name>` template" (no slash command needed), I:
 
 1. Verify `.td/PROJECT.md` exists.
-2. Copy `.td/*` to `~/projects/td/templates/<name>/td/` (anonymized — strip user-specific values: project_name, live_url, db credentials, etc., back to placeholders).
-3. Copy current root `CLAUDE.md` to `~/projects/td/templates/<name>/CLAUDE.md` only if it differs from the canonical (it shouldn't, but check).
+2. Copy `.td/*` to `~/projects/td-flow/templates/<name>/td/` (anonymized — strip user-specific values: project_name, live_url, db credentials, etc., back to placeholders).
+3. Copy current root `CLAUDE.md` to `~/projects/td-flow/templates/<name>/CLAUDE.md` only if it differs from the canonical (it shouldn't, but check).
 4. Commit the framework repo: `chore: save <name> template`.
 5. Tell the user: "Saved as `<name>`. Future `/td-init --template <name>` will start from this shape."
 

@@ -12,6 +12,12 @@ TEMPLATES_LINK="$CLAUDE_DIR/td-templates"
 
 mkdir -p "$COMMANDS_DIR" "$SKILLS_DIR"
 
+# Cleanup: prior bus install left ~/bin/td-bus around; drop the orphan symlink.
+if [ -L "$HOME/bin/td-bus" ]; then
+  rm "$HOME/bin/td-bus"
+  echo "  pruned stale: ~/bin/td-bus (td-bus retired in favor of gh issues)"
+fi
+
 # 1. Prune stale symlinks pointing into this repo's commands/ dir
 #    (catches retired commands like /td-ship from older versions)
 for link in "$COMMANDS_DIR"/*.md; do
@@ -59,9 +65,30 @@ echo "  templates linked"
 echo
 echo "td-flow installed."
 echo
+
+# Registry-pointer sanity check — warn if $TD_REGISTRY is unset.
+# v3.8 split SERVICES.md into a private companion registry repo
+# discovered via this env var. Without it, cross-repo lookups can't work.
+if [ -z "${TD_REGISTRY:-}" ]; then
+  echo "⚠️  TD_REGISTRY env var is not set."
+  echo "    td-flow uses a separate private registry repo for SERVICES.md +"
+  echo "    future outbound-issue logs. Set in your shell rc (e.g. zshenv):"
+  echo
+  echo "        export TD_REGISTRY=\"<your-org>/td-registry\""
+  echo
+  echo "    See README § \"Private registry companion\" for the full pattern."
+  echo
+else
+  echo "Registry: \$TD_REGISTRY = $TD_REGISTRY"
+  echo
+fi
+
 echo "Try it:"
 echo "  cd ~/projects/some-project"
 echo "  claude"
-echo "  /td-init"
+echo "  /td-init           # bootstrap td-flow"
+echo
+echo "Cross-project requests use GitHub issues (\`gh issue create --repo <slug>\`)."
+echo "Add a \`## Cross-repo\` section to .td/PROJECT.md per project — see CLAUDE.md § Cross-repo."
 echo
 echo "To update later: pull this repo, then re-run ./install.sh"

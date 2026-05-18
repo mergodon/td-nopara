@@ -21,6 +21,32 @@ When I need to research something (a library, an API, framework gotchas), I use 
 
 **Fold-and-delete.** Anything I write into `.td/work/<topic>.md` is scratch. When the piece ships: durable findings move into `WORKWAY` (framework gotchas, test commands, deploy quirks), `BACKLOG` (parked items), or `PROJECT.md` (scope changes); the scratch file is deleted in the **same commit**. The journey stays in `git log` — the working tree stays minimal.
 
+## Cross-repo
+
+Another project's repo is another team's territory, even when the same human wears both hats. I read freely. I do NOT commit, push, run tests, trigger pre-commit hooks, start their dev servers, or otherwise touch their lifecycle. The way to ask another project to do something is to file a GitHub issue.
+
+`.td/PROJECT.md § Cross-repo` is the per-project registry of repos this project legitimately files against. The section is opt-in — only present when the project has a real cross-repo relationship to declare. For the friendly-name → GH slug lookup across the user's whole portfolio, see `SERVICES.md` in the user's private registry at `$TD_REGISTRY` (env var, typically `<your-org>/td-registry`). Read from a local clone if available (e.g. `~/projects/td-registry/SERVICES.md`), otherwise `gh api repos/$TD_REGISTRY/contents/SERVICES.md --jq .content | base64 -d`. To file:
+
+1. Check `.td/PROJECT.md § Cross-repo`. If the target isn't listed, ask the user before filing.
+2. `gh repo view <slug>` to verify access. Read its README (and `.td/PROJECT.md` if it's a td-flow project) for enough context to write a meaningful body.
+3. `gh issue create --repo <slug> --title "..." --body "..."`. Body has: the ask, the why, and the source.
+4. Discuss in `gh issue comment <id> --repo <slug>`. The receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
+
+**Naming convention.** Slug = friendly name = local dir = package name; kebab-case lowercase ASCII; role suffix (`-web`, `-api`, `-app`, `-ext`, `-script`, `-cli`, etc.); family prefix when there are siblings; domain in `SERVICES.md`, not the slug. Full convention: `NAMING.md` in `$TD_REGISTRY` (same lookup as `SERVICES.md`).
+
+**Use friendly project names in messages, not GH slugs or identities.** When filing or commenting cross-repo (issue titles, bodies, comments — the human-readable text), reference projects by their **friendly name** (e.g., `Filed from <consumer-app>`), not by GH slug (`<your-org>/<consumer-app>`) and not by GH user identity. The friendly name comes from `SERVICES.md` in `$TD_REGISTRY` (look up the originating project's GH slug to find its friendly name). If the originating project isn't in SERVICES.md, fall back to the first H1 heading in its `.td/PROJECT.md`, then to the local directory basename. **Why:** GH slugs change on rename, GH identities vary by machine, friendly names stay stable and read clearly across sessions. **Exception:** `Closes <slug>#N` in commit messages keeps the full GH slug — that syntax is GitHub's mechanical auto-close, not a message.
+
+**Speak to the project, not the GH user.** GitHub's data model puts a user behind every issue and comment, but for td-flow the speaker is always the **project** — the GH account is incidental delivery. Frame cross-repo dialogue as project-to-project:
+
+- **When filing**, the issue body opens with `**From:** <friendly-name>` (resolved via SERVICES.md → PROJECT.md H1 → directory basename) so the receiver can identify the source project mechanically, regardless of which GH account opened it. Follow with the ask, the why, and any context.
+- **When reading** open issues in the receiver's inbox, list them as `<source-project>: <ask>`, parsed from the `**From:**` marker. If a body has no marker, surface it as `(unmarked) — <ask>` and treat it as a direct ask, not from a project.
+- **When commenting back**, sign as the speaking project: `— <receiver-project-name>`. The thread reads project-A ↔ project-B.
+- **Never address GH usernames in cross-repo prose.** Don't write "@mate asked..." — write "<project-name> asked..." even when the GH metadata shows the username.
+
+No labels, no status enum, no separate inbox. Open = pending; closed = done.
+
+**Inbox stays repo-scoped by default.** "CRs?" / "any incoming?" / warm-up checks run `gh issue list --state open` for the **current repo only**. I do NOT widen to all your repos unless you explicitly ask ("all repos", "global inbox", "everything open", "what's open across the board"). Issues in other repos are their projects' business — not background context to surface here. The `## Cross-repo` registry tells me which repos this project *files into*, not which I should *poll*.
+
 ## The docs (`.td/`)
 
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
@@ -33,9 +59,8 @@ If something doesn't fit one of those five files, it probably doesn't need a doc
 
 ## Nudges I do without being asked
 
-- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering.
-- Before a meaningful piece of work: **"Before I dive in, anything else on your mind that should ride along?"**
-- **"Lets do it" / "go ahead" / "yes" / "do it" / "ok" in response to a proposal I just made** — that *is* the start of meaningful work, not a clearance to skip. I run the "anything else on your mind?" nudge before starting, not after.
+- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Also run `gh issue list --state open` and surface incoming asks (one line, or "(inbox empty)") alongside the STATE summary.
+- Before a meaningful piece of work **where scope is still open**: **"Before I dive in, anything else on your mind that should ride along?"** Skip when the piece is small (single edit, a fix the user just described) OR when scope was already nailed down in the conversation. A "go ahead" / "do it" / "yes" on a concrete proposal is clearance to start, not a cue to re-ask — execute.
 - When the conversation drifts through small unrelated stuff: **"We're scattered — want to wrap and start fresh?"**
 - After a piece is done: I commit and push without re-asking every time — that's the rhythm. The user can say "wait, don't push yet" to break it.
 - When context is getting heavy mid-project: I suggest `/td-clear`.
@@ -62,6 +87,7 @@ I watch for these and flag with one line — the user decides:
 - BACKLOG > 15 items → suggest triage at next `/td-clear`.
 - 5+ local commits ahead of `origin/main` → ask if holding for a reason.
 - Root `CLAUDE.md` drifted from canonical and the user didn't say so → ask if Boost/Cursor/etc. overwrote it.
+- Root `CLAUDE.md` differs from canonical at `~/projects/td-flow/CLAUDE.md` (and the user didn't flag a framework overwrite) → flag once: "contract drifted from canonical — `/td-refresh` to review."
 - Stack signals changed (new framework file, removed dependency) and `WORKWAY.md` § Framework specifics not updated → flag.
 - I've fixed the same kind of issue 3+ times → ask about root cause.
 - About to commit a file that looks like a secret (`.env`, token, key) → stop and confirm.
@@ -76,13 +102,16 @@ When the user tells me something at the start of a message, action-shaped:
 - "we use Laravel/Next/X" / framework-specific gotcha → `.td/WORKWAY.md` § Framework specifics
 - "stack changes to X" / "scope is X" → `.td/PROJECT.md`
 - "remember to X later" / "park this" → append `.td/BACKLOG.md`
-- "feedback on td-flow" → append `~/projects/td/FEEDBACK.md`
+- "feedback on td-flow" → append `~/projects/td-flow/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
+- "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh issue create --repo <slug>` with body opening `**From:** <friendly-name>` followed by ask + why + source.
+- "any incoming?" / "check the inbox" / "CRs?" → `gh issue list --state open` (current repo ONLY — the default; never widen here).
+- "all repos?" / "global inbox" / "everything open" / "what's open across the board?" → `gh search issues --owner <owner> --involves @me --state open` (cross-repo, only on explicit ask; flag form, not quoted-string).
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
 - "wrap the project" / "we're done with this" / project actually finished → `/td-close`
 - "where are we" → read STATE.md, summarize
-- "save this as a `<name>` template" → copy current `.td/` shape (anonymized) to `~/projects/td/templates/<name>/`
+- "save this as a `<name>` template" → copy current `.td/` shape (anonymized) to `~/projects/td-flow/templates/<name>/`
 
 Mid-conversation mentions don't trigger updates — only explicit, action-shaped statements at the start of a message do.
 
@@ -125,10 +154,11 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 - Cleanup is part of the work — fix incidental drift in the same atomic commit.
 - Present results — every assumption, fix, and decision visible in the response. No opaque "done."
 
-## The three slash commands
+## The slash commands
 
 - `/td-init` — bootstrap or migrate a project (one-time per project).
 - `/td-clear` — mid-project context reset. Save STATE handoff, light prune, push. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or a major phase). Full doc audit, prune everything `git log` covers, push.
+- `/td-refresh` — review and apply deltas between this project's `CLAUDE.md` and canonical at `~/projects/td-flow/CLAUDE.md`. Diff-and-propose: never overwrites; you decide per section.
 
 Everything else — including shipping individual pieces — is conversational.

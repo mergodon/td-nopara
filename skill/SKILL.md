@@ -1,11 +1,11 @@
 ---
 name: td-flow
-description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-init, /td-clear, /td-close, or asks how this project works. After /td-init, the user just talks — Claude orchestrates.
+description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-init, /td-clear, /td-close, /td-refresh, or asks how this project works. After /td-init, the user just talks — Claude orchestrates.
 ---
 
 # td-flow
 
-Same shape every project. Conversational interface. Five docs. Three slash commands.
+Same shape every project. Conversational interface. Five docs. Four slash commands.
 
 The contract — including the "Who does what" matrix, the routing map ("where things go"), nudges, drift signals, and commit conventions — lives in root `CLAUDE.md`. This skill exists to surface the rhythm when context is heavy or `CLAUDE.md` isn't loaded yet. **Read root `CLAUDE.md` for anything specific.**
 
@@ -14,7 +14,7 @@ The contract — including the "Who does what" matrix, the routing map ("where t
 - The user runs `/td-init` and asks how to proceed.
 - The user mentions td-flow, the rhythm, or any of the structured docs.
 - The user asks "where are we" or "how do I test this" and `.td/` exists.
-- The user says "save this as a `<name>` template" — copy the current `.td/` shape (anonymized) to `~/projects/td/templates/<name>/`.
+- The user says "save this as a `<name>` template" — copy the current `.td/` shape (anonymized) to `~/projects/td-flow/templates/<name>/`.
 - The user mentions a framework polluting `CLAUDE.md` (Boost, etc.) — restore from canonical, log salvage into `.td/WORKWAY.md` § Framework specifics.
 
 ## The rhythm (plan → work → test → ship → close)
@@ -43,17 +43,18 @@ CLAUDE.md                ← contract at root, user controls it
 .git/hooks/pre-commit    ← runs Test command from WORKWAY.md § Local testing
 ```
 
-## The three slash commands
+## The slash commands
 
 ```
 /td-init                    # bootstrap or migrate (brownfield-aware)
 /td-init --template <name>  # bootstrap from a saved template (e.g. laravel)
 /td-clear                   # mid-project: STATE handoff + light prune + push. Before /clear.
 /td-close                   # wrap project (or phase): full doc audit + prune + push.
+/td-refresh                 # review deltas between this project's CLAUDE.md and canonical.
 ```
 
 Shipping individual pieces is conversational: tests pass → commit → push to `origin/main`. No slash command.
 
-Migration: `/td-init` detects existing td-flow v1/v2, GSD legacy (`.planning/`, HTML markers), or rgb-buddy-2-style conventions and maps them to v3 without re-asking.
+Migration: `/td-init` detects existing td-flow v1/v2, GSD-style legacy planning conventions, or brownfield repos with ad-hoc patterns (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` and similar) and maps them to v3 without re-asking.
 
 For the routing map, nudges, drift signals, and commit conventions — read root `CLAUDE.md`.
