@@ -19,7 +19,7 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
 - Rename `.td/INBOX.md` → `.td/BACKLOG.md` (preserve content, drop `[bug]`/`[idea]` tags).
 - If `.td/flow/<NN>-<name>.md` files exist (v1 piece files): consolidate into `.td/work/<topic>.md` if a flow is in progress; otherwise delete.
 - Tell the user what got migrated where.
-- Skip Step 2 (ask for gaps); jump to Step 5 (commit).
+- Skip Step 2 (ask for gaps); jump to Step 6 (commit).
 
 **GSD-1 / GSD legacy detected** — `.planning/` exists, OR root `CLAUDE.md` contains HTML markers like `<!-- GSD:project-start -->` or `<!-- GSD:stack-start -->`:
 - Read `.planning/` content (PROJECT.md, STATE.md, roadmap.md, etc. — GSD's old structure). Map values into the v3 docs:

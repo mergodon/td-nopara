@@ -65,7 +65,7 @@ Walk `.td/` for content git already covers:
 
 Don't restructure. Don't second-guess `WORKWAY.md` content. The deeper cleanup is `/td-close`.
 
-# Step 6 — Update STATE.md as a handoff
+# Step 7 — Update STATE.md as a handoff
 
 Rewrite `.td/STATE.md` so a fresh conversation picks up cold. Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 
@@ -86,7 +86,7 @@ in the middle of planning a multi-step thing, this is where the plan lives.>
 
 Resume note is the load-bearing part. During execution I'll skim it; for fresh-context orientation I'll read it fully. Don't artificially cap it.
 
-# Step 7 — Push
+# Step 8 — Push
 
 ```
 git push origin main
@@ -94,7 +94,7 @@ git push origin main
 
 If push is rejected (network, auth, divergence), surface the error and stop.
 
-# Step 8 — Tell the user
+# Step 9 — Tell the user
 
 One sentence: `Cleared. <N> commits pushed. STATE handoff written. Safe to /clear.`
 
