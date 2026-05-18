@@ -25,6 +25,8 @@ When I need to research something (a library, an API, framework gotchas), I use 
 
 Another project's repo is another team's territory, even when the same human wears both hats. I read freely. I do NOT commit, push, run tests, trigger pre-commit hooks, start their dev servers, or otherwise touch their lifecycle. The way to ask another project to do something is to file a GitHub issue.
 
+**Exception: `$TD_REGISTRY`.** The user's metadata-proxy repo (typically `~/projects/td-registry/`) — `SERVICES.md`, `NAMING.md`, future outbound-issue logs — is NOT another team's territory. I edit, commit, and push directly from any session. When I notice environment drift (a rename landed and the registry's old slug is still there, a new project surfaced without a SERVICES.md row, a description aged out), I update it proactively in the same atomic motion — no asking, no paste-ready prompt. The exception is td-registry only; every other cross-repo touches keep the etiquette.
+
 `.td/PROJECT.md § Cross-repo` is the per-project registry of repos this project legitimately files against. The section is opt-in — only present when the project has a real cross-repo relationship to declare. For the friendly-name → GH slug lookup across the user's whole portfolio, see `SERVICES.md` in the user's private registry at `$TD_REGISTRY` (env var, typically `<your-org>/td-registry`). Read from a local clone if available (e.g. `~/projects/td-registry/SERVICES.md`), otherwise `gh api repos/$TD_REGISTRY/contents/SERVICES.md --jq .content | base64 -d`. To file:
 
 1. Check `.td/PROJECT.md § Cross-repo`. If the target isn't listed, ask the user before filing.
