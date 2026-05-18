@@ -1,10 +1,10 @@
 # State
 
 Project:  td-flow
-Topic:    idle
-Phase:    shipped /td-refresh + project-soul cross-repo framing (2026-05-18)
+Topic:    naming-convention (drafted in td-flow; awaiting landing in td-registry)
+Phase:    drafted NAMING.md + added pointer in CLAUDE.md (2026-05-18)
 Blocker:  none
-Last:     2026-05-18 — **Shipped `/td-refresh` + project-soul cross-repo framing.** New fourth slash command: `/td-refresh` diff-and-proposes project `CLAUDE.md` against the canonical at `~/projects/td-flow/CLAUDE.md`, section-by-section, never auto-overwrites. Contract additions in `§ Cross-repo`: the *speaker* in cross-repo dialogue is always the project, not the GH user behind it — issue bodies open with `**From:** <friendly-name>`, receivers list inbox as `<source-project>: <ask>`, comments back sign as the receiving project. New drift signal flags when local `CLAUDE.md` differs from canonical → suggest `/td-refresh`. Also: `templates/CLAUDE.md` synced byte-identical with canonical (closes v4.0 loose end #6 on template drift). Earlier in the session (2026-05-18): narrowed the "anything else on your mind?" nudge to fire only when scope is still open — was firing on already-scoped "go ahead" responses.
+Last:     2026-05-18 — **Drafted portfolio naming convention.** Full draft lives at `.td/work/naming-convention.md` ready to copy into `td-registry/NAMING.md` from a td-registry session. CLAUDE.md `§ Cross-repo` now has a one-paragraph pointer ("slug = friendly name = local dir, kebab-case, role suffix, family prefix when siblings exist; full convention at `NAMING.md` in `$TD_REGISTRY`"). Convention covers: single-identity rule, naming shape (`<product>` / `<family>-<role>` / `<product>-<role>`), role suffix vocab (`-web`, `-api`, `-app`, `-ext`, `-script`, `-mobile`, `-cli`, `-worker`, `-pipeline`, `-collector`, `-analytics`, `-infra`), domain↔slug mapping, retrofit steps, and an adoption table calling out ~17 concrete rename candidates (e.g. `anzsco-tasmanvisa-com` → `anzscofinder-web`, the `rgbtracker-*` → `rgb-*` family consolidation, the `tdgeneric-*-mainweb` → `<client>-web` cleanup). Earlier in the session: shipped `/td-refresh` + project-soul cross-repo framing (commits `f2e4541`, `2ef175e`); pulled 4 parallel commits from other machine via fast-forward (no content delta).
 
 ## Resume note
 
