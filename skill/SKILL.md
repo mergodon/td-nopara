@@ -1,11 +1,11 @@
 ---
 name: td-flow
-description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-init, /td-clear, /td-close, /td-refresh, /td-inbox, /td-outbox, /td-incident, /td-park, or asks how this project works. After /td-init, the user just talks — Claude orchestrates.
+description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-init, /td-clear, /td-close, /td-refresh, /td-mailbox, /td-incident, /td-park, or asks how this project works. After /td-init, the user just talks — Claude orchestrates.
 ---
 
 # td-flow
 
-Same shape every project. Conversational interface. Five docs. Eight slash commands.
+Same shape every project. Conversational interface. Five docs. Seven slash commands.
 
 The contract — including the "Who does what" matrix, the routing map ("where things go"), nudges, drift signals, and commit conventions — lives in root `CLAUDE.md`. This skill exists to surface the rhythm when context is heavy or `CLAUDE.md` isn't loaded yet. **Read root `CLAUDE.md` for anything specific.**
 
@@ -51,8 +51,7 @@ CLAUDE.md                ← contract at root, user controls it
 /td-clear                   # mid-project: STATE handoff + light prune + push. Before /clear.
 /td-close                   # wrap project (or phase): full doc audit + prune + push.
 /td-refresh                 # review deltas between this project's CLAUDE.md and canonical.
-/td-inbox                   # walk open GH issues (grouped by Issue Type): close, comment, or skip.
-/td-outbox                  # walk issues this project filed into other repos (cross-repo).
+/td-mailbox                 # unified cross-repo walk: inbound + outbound in one pass.
 /td-incident                # live production fire mode — focus, diagnose, fix or park.
 /td-park                    # flush BACKLOG.md to GH Issues (with type + dedupe) mid-session.
 ```

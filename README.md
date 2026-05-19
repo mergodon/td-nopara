@@ -18,8 +18,7 @@ Symlinks created:
 - `~/.claude/commands/td-clear.md`
 - `~/.claude/commands/td-close.md`
 - `~/.claude/commands/td-refresh.md`
-- `~/.claude/commands/td-inbox.md`
-- `~/.claude/commands/td-outbox.md`
+- `~/.claude/commands/td-mailbox.md`
 - `~/.claude/commands/td-incident.md`
 - `~/.claude/commands/td-park.md`
 - `~/.claude/skills/td-flow`
@@ -35,8 +34,7 @@ To update on any machine: `git pull && ./install.sh`.
 | `/td-clear` | Mid-session checkpoint | Memory scan → light prune → STATE handoff → push. Ready for `/clear`. Fast. |
 | `/td-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
 | `/td-refresh` | When local CLAUDE.md drifts from canonical | Diff-and-propose per section. Never auto-overwrites. |
-| `/td-inbox` | Routine queue review (inbound) | Walk open GH issues filed INTO this repo, grouped by Issue Type (Epic with sub-issue progress first). Close / comment / skip. Ends with a pointer to `/td-outbox`. |
-| `/td-outbox` | Outbound CR check | Walk issues this project filed INTO other repos (cross-repo, via the `**From:**` marker). Group by state: awaiting reply / pending action / recently closed. Comment / verify / reopen / skip. |
+| `/td-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (cross-repo children of any parent in this repo — Epic sub-issues + outbound tracker). Close/comment/skip inbound, comment/verify/reopen/skip outbound. |
 | `/td-incident` | Live production fire | Drop everything else. Focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
 | `/td-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues with type selection + dedupe. Standalone version of `/td-close`'s park step. |
 
@@ -57,9 +55,9 @@ Most work is conversational. Here's what gets routed where:
 "let's plan a big redesign"           → starts a planning work file (later → Epic)
 "add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
 "file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
-"any incoming?" / "check inbox"       → gh issue list for current repo (or /td-inbox)
-"what did we file?" / "show outbox"   → /td-outbox (cross-repo, via **From:** marker)
-"did rgb-api respond yet?"            → /td-outbox or inline GraphQL search
+"any incoming?" / "check inbox"       → gh issue list for current repo (or /td-mailbox)
+"what did we file?" / "show outbox"   → /td-mailbox (the outbound section)
+"did rgb-api respond yet?"            → /td-mailbox or inline subIssues query
 "ship it"                             → tests pass → commit → push
 "where are we?"                       → summarizes STATE.md
 "let's clear" / about to /clear       → runs /td-clear
@@ -157,12 +155,14 @@ Me:  checks this project's .td/PROJECT.md § Cross-repo for the target repo,
               <ask + why + source>
        Type:  Feature
      Confirms with you. Runs `gh api graphql createIssue` against the target.
-     Returns the issue URL. The receiving project sees it via /td-inbox.
+     Returns the issue URL. The receiving project sees it via /td-mailbox.
+     **Then attaches** the new issue as a sub-issue of an Epic (if relevant)
+     or the outbound tracker Epic — so /td-mailbox finds it next time.
 [a few days later, this project]
-You: /td-outbox
-Me:  searches org-wide for issues with **From:** <this-project> in body,
-     groups by state. Shows rgb-api#42 as "Awaiting reply (3 days)".
-     [walks the issue: shows latest comments]
+You: /td-mailbox
+Me:  one query: all open issues in this repo + their cross-repo sub-issues.
+     Inbound section walks open issues (grouped by Type). Outbound section
+     shows rgb-api#42 as "Awaiting reply (3 days)" with last comments inline.
 You: "comment back: we can wait one more sprint"
 Me:  drafts comment, signs as <this-project>, confirms, posts.
 ```
@@ -188,7 +188,7 @@ GitHub Issues are the source of truth for parked work. At the org level, five Is
 
 Epics can have formal sub-issues across repos in the same org. Cross-project Epics typically live in `$TD_REGISTRY` (the only repo aware of the whole portfolio); per-project Epics live in the project's own repo. The parent's progress bar updates automatically as cross-repo sub-issues close.
 
-`/td-inbox` reads Issue Types via `gh api graphql` (the `gh` CLI doesn't filter by type natively yet, so we use GraphQL directly).
+`/td-mailbox` reads Issue Types via `gh api graphql` (the `gh` CLI doesn't filter by type natively yet, so we use GraphQL directly).
 
 **Forkers:** define your own Issue Types at your org level via github.com → org settings → Issue Types. The framework discovers them at runtime — no extra setup.
 
@@ -198,12 +198,13 @@ Projects sometimes need things from other projects. Convention:
 
 1. Each `.td/PROJECT.md` keeps an opt-in `## Cross-repo` section listing the repos this project legitimately files against.
 2. To file: `gh api graphql createIssue` (with the appropriate Type) against the target repo. Body opens with `**From:** <this-project>` so the receiver identifies the source mechanically — independent of which GH account opened the issue.
-3. The receiving project sees it via `/td-inbox`, walks the CR alongside their own queue.
-4. Receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
+3. **Attach** the new issue as a sub-issue of a parent in this repo (an existing Epic if it belongs to one, else the auto-created outbound tracker Epic). This is what lets `/td-mailbox` find it later — sub-issue linkage is the canonical sender-side reference.
+4. The receiving project sees it via `/td-mailbox` (inbound section), walks the CR alongside their own queue.
+5. Receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
 
 No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
-**Inbox + outbox are paired.** `/td-inbox` shows issues filed INTO this repo (incoming work). `/td-outbox` shows issues this project filed INTO other repos (outgoing work). Both use the `**From:**` body marker as the canonical identifier — independent of which GH account opened the issue. Together they cover both directions of cross-repo work.
+**`/td-mailbox` is the unified view.** One command walks both directions: inbound (filed INTO this repo) and outbound (cross-repo children of any parent in this repo). The outbound tracker Epic — body marked with `<!-- td-mailbox-tracker -->` — collects cross-repo filings that don't belong to a specific Epic; combined with Epic sub-issues, this gives an exact outbound set in one query, no org-wide search. The `**From:** <project>` body marker still goes on every filing as the human-readable source identifier independent of the GH account.
 
 Unified view across all your repos: `gh search issues --owner <your-org> --state open` (REPO is the unit of interest; no author filter — works regardless of which GH identity you're using).
 
@@ -250,7 +251,7 @@ Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `
 
 ```
 commands/             slash commands (td-init, td-clear, td-close, td-refresh,
-                                      td-inbox, td-outbox, td-incident, td-park)
+                                      td-mailbox, td-incident, td-park)
 templates/            files copied into target projects on /td-init
   CLAUDE.md           the universal contract
   td/PROJECT.md
