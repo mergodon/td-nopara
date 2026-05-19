@@ -164,5 +164,6 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 - `/td-refresh` — review and apply deltas between this project's `CLAUDE.md` and canonical at `~/projects/td-flow/CLAUDE.md`. Diff-and-propose: never overwrites; you decide per section.
 - `/td-inbox` — routine inbox check. Walks open GH issues grouped by Issue Type (Epic with sub-issue progress first, then Bug / Feature / Task / Idea), surfaces comments and related commits, then close / comment / skip each one. Repo-scoped.
 - `/td-incident` — live production fire mode. Drops everything else, sets STATE to incident, opens a work file, surfaces `DEBUG.md` if present. Resolves in-session, parks to GH as `Bug`, or files cross-repo.
+- `/td-park` — flush `BACKLOG.md` to GitHub Issues line-by-line with type selection and dedupe. Standalone mid-session declutter (the same flush runs automatically as part of `/td-close`).
 
 Everything else — including shipping individual pieces — is conversational.
