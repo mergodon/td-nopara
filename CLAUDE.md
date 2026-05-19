@@ -58,8 +58,9 @@ No labels, no status enum, no separate inbox. Open = pending; closed = done.
 - `STATE.md` — current phase, current topic, blocker, resume note. Resume note can be as long as needed — that's where planning lives.
 - `BACKLOG.md` — session-scoped parking. During work, append items I want to defer (`- YYYY-MM-DD — <item>`). At `/td-close`, BACKLOG flushes to GitHub Issues (with the appropriate type per the org's Issue Types) and the file ends empty. Starts empty each session.
 - `work/<topic>.md` — active work; deleted at close.
+- `DEBUG.md` *(optional)* — project-specific troubleshooting reference. Tooling URLs, symptom→diagnostic paths, gotchas, production debug commands. Read only when something's on fire. Created on demand (typically during a `/td-incident` close-out when a non-obvious diagnostic surfaced), not scaffolded at `/td-init`. Same opt-in pattern as `PROJECT.md § Cross-repo`. Template structure at `~/projects/td-flow/templates/td/DEBUG.md`.
 
-If something doesn't fit one of those five files, it probably doesn't need a doc — git or the existing docs cover it.
+If something doesn't fit one of those five core files (plus optional DEBUG.md), it probably doesn't need a doc — git or the existing docs cover it.
 
 ## Nudges I do without being asked
 
@@ -110,6 +111,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "flush the backlog" / "park the backlog to GH" / "empty BACKLOG" → invoke `/td-park` (or run its procedure inline if mid-conversation).
 - "let's plan X" / "start an Epic for X" / "I want to work on a big thing" → create `.td/work/<slug>.md` as planning scratch. When the plan is solid, promote: parent `Epic` via `gh api graphql createIssue` (current repo for per-project; `$TD_REGISTRY` for cross-project that spans multiple repos); concrete pieces as sub-issues via `addSubIssue` mutation (cross-repo within mergodon org supported). Fold-and-delete the work file at promotion.
 - "feedback on td-flow" → append `~/projects/td-flow/FEEDBACK.md`
+- "add to DEBUG" / "save this debug trick" / "this gotcha goes in the runbook" → write to `.td/DEBUG.md`. Create from `~/projects/td-flow/templates/td/DEBUG.md` template if missing.
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
 - "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh api graphql createIssue` mutation against the target repo with body opening `**From:** <friendly-name>` followed by ask + why + source. Use the `Bug`/`Feature`/`Task`/`Idea` type that fits.
 - "any incoming?" / "check the inbox" / "CRs?" → `gh issue list --state open` (current repo ONLY — the default; never widen here).
