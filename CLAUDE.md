@@ -163,5 +163,6 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 - `/td-close` — wrap the project (or a major phase). Full doc audit, prune everything `git log` covers, push.
 - `/td-refresh` — review and apply deltas between this project's `CLAUDE.md` and canonical at `~/projects/td-flow/CLAUDE.md`. Diff-and-propose: never overwrites; you decide per section.
 - `/td-inbox` — routine inbox check. Walks open GH issues in this repo, surfaces comments and related commits, then close / comment / skip each one. Repo-scoped.
+- `/td-incident` — live production fire mode. Drops everything else, sets STATE to incident, opens a work file, surfaces `DEBUG.md` if present. Resolves in-session, parks to GH as `Bug`, or files cross-repo.
 
 Everything else — including shipping individual pieces — is conversational.
