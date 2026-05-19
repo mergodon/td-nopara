@@ -51,7 +51,7 @@ CLAUDE.md                ← contract at root, user controls it
 /td-clear                   # mid-project: STATE handoff + light prune + push. Before /clear.
 /td-close                   # wrap project (or phase): full doc audit + prune + push.
 /td-refresh                 # review deltas between this project's CLAUDE.md and canonical.
-/td-inbox                   # walk open GH issues: close, comment, or skip per issue.
+/td-inbox                   # walk open GH issues (grouped by Issue Type): close, comment, or skip.
 /td-incident                # live production fire mode — focus, diagnose, fix or park.
 ```
 

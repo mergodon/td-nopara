@@ -1,81 +1,134 @@
 ---
-description: Routine inbox check — walk open GH issues in this repo, surface new comments and related commits, then close / comment / skip each one. Repo-scoped by default.
+description: Routine inbox check — walk open GH issues grouped by Issue Type (Epic / Bug / Feature / Task / Idea), surface sub-issue progress for Epics, then close / comment / skip each one. Repo-scoped by default.
 ---
 
-You are running the routine inbox check for this repo. The job: walk every open GitHub issue in this repo, surface what's there (body, comments, any commits that reference it), and help the user decide one issue at a time: **close, comment, or skip**. Repo-scoped by default — never widen to all repos here.
+You are running the routine inbox check for this repo. The job: walk every open GitHub issue, grouped by Issue Type so the highest-leverage items surface first, and help the user decide one issue at a time: **close, comment, or skip**. Repo-scoped by default — never widen to all repos here.
 
 # Step 0 — Verify we're in a td-flow project with GH access
 
 - Confirm `./.td/` exists. If missing: abort, "Not a td-flow project."
-- Verify `gh` is authenticated and the repo has a remote — `gh repo view --json name 2>/dev/null`. If it fails: abort, "No GitHub remote or `gh` not authenticated."
+- Verify `gh` is authenticated and has a remote: `gh repo view --json name,owner 2>/dev/null`. If it fails: abort, "No GitHub remote or `gh` not authenticated."
+- Capture the slug as `<owner>/<name>` for use in GraphQL queries below.
 
-# Step 1 — Gather open issues
+# Step 1 — Gather open issues via GraphQL
 
 ```
-gh issue list --state open --json number,title,body,createdAt,updatedAt,author,url --jq 'sort_by(.updatedAt) | reverse'
+gh api graphql -H "GraphQL-Features: sub_issues" -f query='
+  query($owner: String!, $name: String!) {
+    repository(owner: $owner, name: $name) {
+      issues(first: 50, states: OPEN, orderBy: {field: UPDATED_AT, direction: DESC}) {
+        nodes {
+          number
+          title
+          body
+          url
+          createdAt
+          updatedAt
+          author { login }
+          issueType { id name color }
+          subIssuesSummary { total completed percentCompleted }
+        }
+      }
+    }
+  }' -F owner=<owner> -F name=<name>
 ```
 
-If the list is empty: tell the user `Inbox empty. ✓` and exit. Don't write anything, don't commit anything.
+Parse the response. If `nodes` is empty: tell the user `Inbox empty. ✓` and exit.
 
-# Step 2 — Identify the current project's friendly name
+# Step 2 — Identify this project's friendly name
 
-Resolve the receiver's friendly name (used to sign comments and closures, per `CLAUDE.md § Cross-repo` project-soul rule):
+(Same as before — used to sign comments and closures.)
 
-1. Read `$TD_REGISTRY/SERVICES.md` (local clone first, else `gh api`). Find the row where the slug matches `mergodon/<this-repo>`. Use its Friendly column.
+1. Read `$TD_REGISTRY/SERVICES.md` (local clone first, else `gh api`). Find the row where the slug matches `<owner>/<name>`. Use its Friendly column.
 2. Fall back to the first H1 heading in `.td/PROJECT.md`.
-3. Final fallback: the basename of the current directory.
+3. Final fallback: the directory basename.
 
-Hold this as `<receiver-name>` for the rest of the run.
+Hold as `<receiver-name>` for the run.
 
-# Step 3 — For each issue, surface
+# Step 3 — Group and sort
 
-Walk the issue list most-recent-first. For each, gather and display:
+Bucket issues by `issueType.name`. Process buckets in this order (highest leverage first):
 
-**Header line:**
+1. **Epic** — big planning items, often with sub-issues. Surface progress prominently.
+2. **Bug** — broken things, usually want urgent attention.
+3. **Feature** — scoped new work.
+4. **Task** — concrete actionable items.
+5. **Idea** — exploratory, low urgency.
+6. **(untyped)** — issues without a type (pre-Issue-Type era or never assigned). Surface last.
+
+Within each bucket, sort by `updatedAt` descending.
+
+# Step 4 — Print the shape
+
+Before walking individual issues, print a compact summary:
+
 ```
-#<N>  <title>  (from: <source-project>, opened <YYYY-MM-DD>)
+N total open. Grouped:
+  Epic    (X)   <list of #N titles, one-line each, with [X/Y sub-issues] if any>
+  Bug     (X)   <list>
+  Feature (X)   <list>
+  Task    (X)   <list>
+  Idea    (X)   <list>
+  (untyped) (X) <list>
 ```
 
-- Parse `<source-project>` from the `**From:** <name>` marker at the top of the issue body, per the project-soul framing. If no marker, label as `(unmarked)`.
+Skip buckets that are empty.
+
+# Step 5 — For each issue (one at a time), surface
+
+Walk the buckets in priority order. For each issue:
+
+**Header:**
+```
+#<N>  <title>
+  Type: <Epic|Bug|Feature|Task|Idea|untyped>  from: <source-project>  opened <YYYY-MM-DD>
+  <if Epic with sub-issues: [<completed>/<total> sub-issues closed, <percentCompleted>%]>
+```
+
+- Parse `<source-project>` from the `**From:** <name>` marker at the top of the body. If absent, label `(unmarked)`.
 
 **Body:** print the issue body verbatim.
 
-**Comments:** `gh issue view <N> --comments` — show all comments inline as:
+**Comments:** fetch via the same GraphQL query (extend it to include `comments(last: 20) { nodes { author { login } body createdAt } }`) OR fall back to `gh issue view <N> --comments` for simplicity. Show all comments inline:
 ```
 [YYYY-MM-DD] <author or parsed source-project>: <comment body>
 ```
 
-**Related commits:** `git log --grep="#<N>" --oneline -10` — any commits in this repo that reference the issue number. Surface if any.
+**Related commits:** `git log --grep="#<N>" --oneline -10`. Surface any.
 
-**Recommendation** (one line):
-- If commits referencing `#<N>` look like a fix or include `Closes #<N>` syntax that didn't auto-close → "Looks resolved — close?"
-- If the most recent comment is from another project (parsed via `From:` or author ≠ this project) → "Awaiting reply — comment?"
-- If neither signal fires → "Pending — leave open?"
+**For Epics:** also surface sub-issues — query separately or extract from the GraphQL response (add `subIssues(first: 20) { nodes { number title state issueType { name } repository { nameWithOwner } } }` to the query). List each sub-issue as `  └─ <repo>#<N> [open|closed] <title>`.
 
-# Step 4 — Walk per issue (one at a time, apply before moving on)
+**Recommendation** (one line, type-aware):
+
+- **Epic** at 100% sub-issues closed → "All sub-issues closed — close the parent?"
+- **Epic** older than 30 days at 0% → "Stale — still pursuing?"
+- **Bug/Feature/Task** with commits referencing `#<N>` that look like a fix → "Looks resolved — close?"
+- Most recent comment from another project (parsed via `From:` or author ≠ this project) → "Awaiting reply — comment?"
+- **Idea** older than 60 days, untouched → "Stale idea — close?"
+- Otherwise → "Pending — leave open?"
+
+# Step 6 — Walk per issue (one at a time, apply before moving on)
 
 For each issue, wait for the user to say one of: `close` / `comment` / `skip` / freeform.
 
 **On `close`:**
 1. Ask "Closing comment? (yes / no)". Wait.
-2. If yes: draft a short closing comment based on the discussion (one sentence ideally, two max). Append the sign-off: `— <receiver-name>`. Show to the user, confirm.
+2. If yes: draft a short closing comment (one sentence ideally, two max), append `— <receiver-name>`, confirm.
 3. Run:
    - With comment: `gh issue close <N> --comment "<drafted text>"`
-   - Without comment: `gh issue close <N>`
+   - Without: `gh issue close <N>`
 
 **On `comment`:**
-1. Draft a comment based on the discussion + the user's intent (ask the user for the gist if it's not obvious). Append `— <receiver-name>`. Show to the user, confirm.
+1. Draft based on discussion + user intent (ask for the gist if not obvious), append `— <receiver-name>`, confirm.
 2. Run: `gh issue comment <N> --body "<drafted text>"`
 
-**On `skip`:** continue to the next issue.
+**On `skip`:** continue.
 
-**On freeform:** interpret as best you can — usually "I want to do X" maps to one of the three. If genuinely unclear, ask.
+**On freeform / "create a new issue":** the user can ask to file a new issue mid-walk — handle conversationally (resolve type, dedupe check, GraphQL create), then resume the walk where it was.
 
-Apply the action *before* moving to the next issue. Don't batch.
+Apply each action *before* moving to the next issue. Don't batch.
 
-# Step 5 — Summary
-
-After the last issue:
+# Step 7 — Summary
 
 ```
 Inbox reviewed: <total> issues. <closed> closed. <commented> commented on. <skipped> left open.
@@ -83,10 +136,11 @@ Inbox reviewed: <total> issues. <closed> closed. <commented> commented on. <skip
 
 # Rules
 
-- **Repo-scoped only.** Never widen to all repos here — that's a separate explicit trigger ("all repos" / "global inbox") per `CLAUDE.md § Cross-repo`.
-- **Always sign comments and closures** with `— <receiver-name>` (the project-soul rule). Never address GH usernames in the body.
-- **Never auto-close, never auto-post.** Always show drafted text and confirm before sending.
-- **Don't commit anything in this command** — closures and comments don't touch the working tree. This is purely a GH-side operation.
-- **One issue at a time.** No batching, no parallel walks. The user's attention is the bottleneck; respect it.
-- **If `gh` errors mid-walk** (rate limit, auth, network), stop and surface the error. Don't retry silently.
-- **Outbound issues (filed by this project into others)** are out of scope here. That's a future concern — for now, the user invokes `gh search issues --author @me --state open` explicitly when they want it.
+- **Repo-scoped only.** Never widen to all repos here — separate explicit trigger ("all repos") per `CLAUDE.md § Cross-repo`.
+- **Always sign comments and closures** with `— <receiver-name>` (project-soul rule). Never address GH usernames in cross-repo prose.
+- **Never auto-close, never auto-post.** Always show drafted text and confirm.
+- **One issue at a time.** No batching.
+- **Don't commit anything** — closures and comments are GH-side only.
+- **GraphQL header `sub_issues`** required for the `subIssuesSummary` field while the feature is in preview. The `gh api graphql` call includes it inline.
+- **If GraphQL errors** (rate limit, auth, schema drift on the preview field), surface the error and stop. Fall back to `gh issue list --json` for a degraded-mode listing without type grouping if the user insists on continuing.
+- **Outbound issues** (filed by this project into others) are out of scope here. Future concern.
