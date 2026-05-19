@@ -152,8 +152,8 @@ Me:  checks this project's .td/PROJECT.md § Cross-repo for the target repo,
      drafts:
        Title: Add timestamp field to /X endpoint
        Body:  **From:** <this-project>
-              <ask + why + source>
-       Type:  Feature
+              <ask + why>
+       Type:  Task
      Confirms with you. Runs `gh api graphql createIssue` against the target.
      Returns the issue URL. The receiving project sees it via /td-mailbox.
      **Then attaches** the new issue as a sub-issue of an Epic (if relevant)
@@ -181,9 +181,8 @@ GitHub Issues are the source of truth for parked work. At the org level, five Is
 | Type | When |
 |---|---|
 | `Idea` | exploratory, no commitment, browse later |
-| `Task` | specific piece of work — most things end up here |
+| `Task` | specific piece of work — most things end up here, including new features |
 | `Bug` | unexpected problem or broken behavior |
-| `Feature` | new functionality, scoped work |
 | `Epic` | bigger work that decomposes into sub-issues |
 
 Epics can have formal sub-issues across repos in the same org. Cross-project Epics typically live in `$TD_REGISTRY` (the only repo aware of the whole portfolio); per-project Epics live in the project's own repo. The parent's progress bar updates automatically as cross-repo sub-issues close.

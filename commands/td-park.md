@@ -25,7 +25,7 @@ gh api graphql -f query='
   query { organization(login: "mergodon") { issueTypes(first: 20) { nodes { id name } } } }'
 ```
 
-Parse the response. Build a map: `Idea` → `IT_kwDOCBYUis4CAOVk`, `Task` → `IT_kwDOCBYUis4BLGpS`, `Bug` → `IT_kwDOCBYUis4BLGpU`, `Feature` → `IT_kwDOCBYUis4BLGpY`, `Epic` → `<id>`. Hold for the run.
+Parse the response. Build a map: `Idea` → `<id>`, `Task` → `<id>`, `Bug` → `<id>`, `Epic` → `<id>`. Hold for the run. Don't hard-code IDs — they vary across orgs and can rotate when an Issue Type is renamed.
 
 (IDs may differ across orgs — always query fresh per run; cache is run-scoped, not session-scoped.)
 
@@ -44,8 +44,7 @@ For each line (in BACKLOG order):
    | Trigger in the line | Suggested Type |
    |---|---|
    | "fix" / "broken" / "error" / "bug" | `Bug` |
-   | "add" / "build" / "implement" / "support" | `Feature` |
-   | "rename" / "update" / "refactor" / "remove" / a clear concrete verb | `Task` |
+   | "add" / "build" / "implement" / "support" / "rename" / "update" / "refactor" / "remove" / a clear concrete verb | `Task` |
    | "what if" / "maybe" / "idea:" / vague / unsure-of-scope / could-do | `Idea` |
    | "plan to" / "across multiple repos" / "epic:" / multi-piece | `Epic` |
 

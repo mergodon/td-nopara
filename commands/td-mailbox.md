@@ -75,28 +75,51 @@ The outbound tracker Epic itself lives in this repo. Skip it from the inbound wa
 
 Any issue whose body contains that string is the tracker — exclude it from inbound bucketing. It's mailbox infrastructure, not real planning work. (It DOES contribute to the outbound list via its sub-issues — which is the point.)
 
-# Step 4 — First-run backfill check (only if no tracker exists yet)
+# Step 4 — Orphan detection (every run)
 
-If no issue in the inbound query has the tracker sentinel AND outbound returns 0 cross-repo children: the project either has never filed cross-repo, or it filed cross-repo before adopting the tracker model. Run a quick backfill check:
+After the aggregate query, do a quick org-wide search for **orphans** — cross-repo issues this project filed (via the `**From:**` marker) that aren't attached as a sub-issue of any parent in this repo. Orphans happen when an issue is filed via the GitHub web UI, by older tooling, or by routing that skipped the `addSubIssue` step. This check runs **every** `/td-mailbox` invocation, not just first-run.
 
 ```
-gh api graphql -f query='
+gh api graphql -H "GraphQL-Features: sub_issues" -f query='
   query($q: String!) {
     search(query: $q, type: ISSUE, first: 100) {
-      issueCount
-      nodes { ... on Issue { number title url state body repository { nameWithOwner } } }
+      nodes {
+        ... on Issue {
+          number title url state body
+          repository { nameWithOwner }
+          parent {
+            number
+            repository { nameWithOwner }
+          }
+        }
+      }
     }
-  }' -F q="org:<owner> \"<project-name>\" type:issue"
+  }' -F q="org:<owner> \"<project-name>\" type:issue state:open"
 ```
 
-Filter results client-side: keep only issues whose body begins with `**From:** <project-name>` AND `repository.nameWithOwner != "<owner>/<name>"`.
+(Use `gh api graphql` directly — `gh search issues` mishandles colons inside exact-phrase queries.)
 
-If matches exist: tell the user `Found N legacy cross-repo filings without parent linkage. Backfill these now? [y/n]`. On `y`:
-1. Create the outbound tracker Epic (see Step 4a below) — capture its node id.
-2. For each legacy issue: `addSubIssue` (Step 4b mutation shape) to attach it to the tracker.
-3. Re-run the Step 2 inbound+outbound query to get the fresh aggregate.
+An orphan is any result where ALL of:
+- Body begins with `**From:** <project-name>` (canonical sender marker — exclude false-positive name matches).
+- `repository.nameWithOwner != "<owner>/<name>"` (the issue is cross-repo, not in this repo).
+- `parent == null` OR `parent.repository.nameWithOwner != "<owner>/<name>"` (no parent in this repo — either no parent at all, or parented elsewhere).
 
-If matches are zero: no backfill needed; proceed to Step 5.
+If no orphans: skip to Step 5.
+
+If orphans exist, surface:
+```
+Orphan cross-repo filings (in From-marker, not attached to any parent in this repo):
+  <repo>#<N> — <title>
+  <repo>#<N+1> — <title>
+  ...
+Attach to outbound tracker? [yes (all) / per-item / no (skip)]
+```
+
+- **yes** → auto-create tracker if needed (Step 4a), then `addSubIssue` each orphan to the tracker.
+- **per-item** → walk one at a time. For each: `Attach to outbound tracker, attach to existing Epic #N (show this repo's open Epics), or skip?`
+- **no** → leave them as orphans this run; they'll surface again next time (idempotent — no state to track).
+
+After backfill: re-run the Step 2 aggregate query so the rest of the walk reflects the updated state.
 
 ## Step 4a — Create the outbound tracker Epic (only when about to attach the first child)
 
@@ -144,10 +167,9 @@ Error handling:
 **Inbound** — bucket by `issueType.name`, in this order (highest leverage first):
 1. **Epic** — surface sub-issue progress prominently
 2. **Bug**
-3. **Feature**
-4. **Task**
-5. **Idea**
-6. **(untyped)** — issues with no type
+3. **Task**
+4. **Idea**
+5. **(untyped)** — issues with no type
 
 Within each bucket, sort by `updatedAt` descending.
 
@@ -164,7 +186,6 @@ Mailbox: <N inbound> inbound + <M outbound> outbound
 📥 Inbound (this repo) — by Issue Type
   Epic    (X)   <#N — title [Y/Z sub-issues if any]>, ...
   Bug     (X)   <#N — title>, ...
-  Feature (X)   ...
   Task    (X)   ...
   Idea    (X)   ...
   (untyped) (X) ...
@@ -190,7 +211,7 @@ For each issue in priority order:
 **Header:**
 ```
 #<N>  <title>
-  Type: <Epic|Bug|Feature|Task|Idea|untyped>  from: <source-project>  opened <YYYY-MM-DD>
+  Type: <Epic|Bug|Task|Idea|untyped>  from: <source-project>  opened <YYYY-MM-DD>
   <if Epic with sub-issues: [<completed>/<total> sub-issues closed, <percentCompleted>%]>
 ```
 
@@ -213,7 +234,7 @@ Parse `<source-project>` from the `**From:** <name>` marker at the top of the bo
 **Recommendation** (one line, type-aware):
 - **Epic** at 100% sub-issues closed → "All sub-issues closed — close the parent?"
 - **Epic** older than 30 days at 0% → "Stale — still pursuing?"
-- **Bug/Feature/Task** with commits referencing `#<N>` that look like a fix → "Looks resolved — close?"
+- **Bug/Task** with commits referencing `#<N>` that look like a fix → "Looks resolved — close?"
 - Most recent comment from another project → "Awaiting reply — comment?"
 - **Idea** older than 60 days, untouched → "Stale idea — close?"
 - Otherwise → "Pending — leave open?"
@@ -243,7 +264,7 @@ In bucket order (Awaiting reply → Pending action → Recently closed). For eac
 
 **Header:**
 ```
-<repo>#<N>  [<state>]  Type: <Bug|Feature|Task|Idea|Epic|untyped>
+<repo>#<N>  [<state>]  Type: <Bug|Task|Idea|Epic|untyped>
 Title: <title>
 Filed: <createdAt>  Updated: <updatedAt>
 URL: <url>
@@ -254,20 +275,27 @@ Tracked under: <parent issue from this repo, e.g. "#1 Outbound CRs (tracking)" o
 
 **Recent comments:** print the last 5 from `comments.nodes` (already fetched in Step 2). Mark ours (`— <project-name>` sign-off) vs theirs.
 
-**Recommendation** (one line):
-- **Awaiting reply, > 14 days old, no movement** → "Long-pending — gentle ping?"
-- **Awaiting reply, recently created** → "They haven't had time yet — leave?"
+**Recommendation** (one line — pick the first that fits):
+- **Awaiting reply, recently created (< 14 days)** → "They haven't had time yet — leave?"
+- **Awaiting reply, 14–60 days, no movement** → "Long-pending — gentle ping?"
+- **Awaiting reply, > 60 days, no movement** → "Stale — close as not_planned?"
 - **Pending action, ball is with them** → "Acknowledge or check back later?"
 - **Recently closed, last comment is theirs** → "Verify the resolution matched your ask?"
 - **Recently closed, you commented after close** → "Already verified — skip."
 
-**Wait for: `comment` / `verify` / `reopen` / `skip` / `acknowledge` / freeform.**
+**Wait for: `comment` / `verify` / `close` / `reopen` / `skip` / `acknowledge` / freeform.**
 
 **On `comment`:** draft based on discussion + user intent, append `— <project-name>`, confirm, then `gh issue comment <N> --repo <slug> --body "<text>"`.
 
 **On `verify`:** add a closing-verification comment (`Confirmed — works as expected. — <project-name>`) OR skip if the user just wants visual confirmation. No state change unless asked.
 
-**On `reopen`:** confirm twice (destructive — reopens someone else's issue). `gh issue reopen <N> --repo <slug>`. Add a comment explaining why.
+**On `close`:** for our own stale outbound — we're withdrawing the ask. Draft a short comment explaining why (e.g., "Withdrawing — no longer needed; superseded by X. — <project-name>"), confirm, then close with `not planned` reason:
+```
+gh issue close <N> --repo <slug> --reason "not planned" --comment "<drafted text>"
+```
+The `not planned` reason tells GitHub (and the receiver's progress bars) this wasn't an abandoned-because-done close. Don't use `close` without a comment — leaving zero context for the receiver is rude.
+
+**On `reopen`:** confirm twice (destructive — reopens someone else's issue, or reactivates a stale one we closed). `gh issue reopen <N> --repo <slug>`. Add a comment explaining why.
 
 **On `skip` / `acknowledge`:** continue.
 
@@ -276,7 +304,7 @@ Tracked under: <parent issue from this repo, e.g. "#1 Outbound CRs (tracking)" o
 ```
 Mailbox walked: <T> reviewed total.
   Inbound:  <C> closed, <Co> commented on, <S> skipped.
-  Outbound: <Co> commented on, <V> verified, <R> reopened, <S> skipped.
+  Outbound: <Co> commented on, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
 ```
 
 No more cross-pointer line — both directions are in this one walk now.

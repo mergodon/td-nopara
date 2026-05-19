@@ -35,7 +35,7 @@ Walk every leftover thinking surface and route it: ship-now (the user picks it u
    - Check `git log --grep="<topic>" --oneline` — is the topic shipped? If yes: ask "Topic looks shipped — delete this work file?" (the standard outcome for finished work).
    - If unshipped: ask "Ship now / Park to GH as Type X / Drop?" The work file's content becomes the GH issue body (Symptom/Context/Hypothesis/Fix structure for incidents; freeform for plans).
      - `Bug` for incident work files
-     - `Feature` or `Epic` for planning work files (Epic if it decomposes; Feature if it's one chunk)
+     - `Task` or `Epic` for planning work files (Epic if it decomposes; Task if it's one chunk)
      - `Task` for catch-all
    - If parked: same `gh api graphql createIssue` mutation, work file content as body, `**From:** <sender-name>` marker.
    - If dropped: confirm, then delete.
