@@ -51,6 +51,8 @@ No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
 **Inbox stays repo-scoped by default.** "CRs?" / "any incoming?" / warm-up checks run `gh issue list --state open` for the **current repo only**. I do NOT widen to all your repos unless you explicitly ask ("all repos", "global inbox", "everything open", "what's open across the board"). Issues in other repos are their projects' business — not background context to surface here. The `## Cross-repo` registry tells me which repos this project *files into*, not which I should *poll*.
 
+**Inbox + outbox are paired.** `/td-inbox` is repo-scoped (issues filed INTO this project). `/td-outbox` is the cross-repo counterpart (issues this project filed INTO others — found via the `**From:**` body marker, searched org-wide). Together they give a complete cross-repo view: what we owe, what we're waiting on. `/td-inbox` ends with a one-line pointer to `/td-outbox` so the pair stays visible.
+
 ## The docs (`.td/`)
 
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
@@ -114,7 +116,8 @@ When the user tells me something at the start of a message, action-shaped:
 - "add to DEBUG" / "save this debug trick" / "this gotcha goes in the runbook" → write to `.td/DEBUG.md`. Create from `~/projects/td-flow/templates/td/DEBUG.md` template if missing.
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
 - "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh api graphql createIssue` mutation against the target repo with body opening `**From:** <friendly-name>` followed by ask + why + source. Use the `Bug`/`Feature`/`Task`/`Idea` type that fits.
-- "any incoming?" / "check the inbox" / "CRs?" → `gh issue list --state open` (current repo ONLY — the default; never widen here).
+- "any incoming?" / "check the inbox" / "CRs?" → `gh issue list --state open` (current repo ONLY — the default; never widen here). Or invoke `/td-inbox` for the full walk.
+- "what did we file?" / "show our outbox" / "any updates from the issues we filed?" / "did <project> respond yet?" → `/td-outbox` (or run its GraphQL query inline). Cross-repo view of issues this project filed; uses the `**From:**` marker as the canonical filter.
 - "all repos?" / "global inbox" / "everything open" / "what's open across the board?" → `gh search issues --owner <owner> --involves @me --state open` (cross-repo, only on explicit ask; flag form, not quoted-string).
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
@@ -169,7 +172,8 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 - `/td-clear` — mid-project context reset. Save STATE handoff, light prune, push. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or a major phase). Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT.md against reality, push.
 - `/td-refresh` — bring this project current. (1) Diff CLAUDE.md against canonical at `~/projects/td-flow/CLAUDE.md`, propose per section. (2) Flush any accumulated `BACKLOG.md` items to GitHub Issues. Diff-and-propose throughout — never overwrites without your accept.
-- `/td-inbox` — routine inbox check. Walks open GH issues grouped by Issue Type (Epic with sub-issue progress first, then Bug / Feature / Task / Idea), surfaces comments and related commits, then close / comment / skip each one. Repo-scoped.
+- `/td-inbox` — routine inbox check. Walks open GH issues grouped by Issue Type (Epic with sub-issue progress first, then Bug / Feature / Task / Idea), surfaces comments and related commits, then close / comment / skip each one. **Repo-scoped (inbound only)** — use `/td-outbox` for the cross-repo outbound view.
+- `/td-outbox` — cross-repo outbox view. Searches org-wide for issues this project filed (via the `**From:**` marker), groups by state (awaiting reply / pending action / recently closed), then comment / verify / reopen / skip per issue. **The pair to `/td-inbox` — together they cover both directions of cross-repo work.**
 - `/td-incident` — live production fire mode. Drops everything else, sets STATE to incident, opens a work file, surfaces `DEBUG.md` if present. Resolves in-session, parks to GH as `Bug`, or files cross-repo.
 - `/td-park` — flush `BACKLOG.md` to GitHub Issues line-by-line with type selection and dedupe. Standalone mid-session declutter (the same flush runs automatically as part of `/td-close`).
 

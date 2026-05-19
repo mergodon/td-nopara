@@ -128,11 +128,19 @@ For each issue, wait for the user to say one of: `close` / `comment` / `skip` / 
 
 Apply each action *before* moving to the next issue. Don't batch.
 
-# Step 7 — Summary
+# Step 7 — Summary + outbox pointer
 
 ```
 Inbox reviewed: <total> issues. <closed> closed. <commented> commented on. <skipped> left open.
 ```
+
+Then print one extra line as a routine reminder, regardless of inbox size (even if empty):
+
+```
+For issues this project filed into other repos: /td-outbox
+```
+
+This is how the user remembers to also check the outbound side. `/td-inbox` is repo-scoped (inbound only); the outbound view lives in `/td-outbox`.
 
 # Rules
 

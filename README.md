@@ -19,6 +19,7 @@ Symlinks created:
 - `~/.claude/commands/td-close.md`
 - `~/.claude/commands/td-refresh.md`
 - `~/.claude/commands/td-inbox.md`
+- `~/.claude/commands/td-outbox.md`
 - `~/.claude/commands/td-incident.md`
 - `~/.claude/commands/td-park.md`
 - `~/.claude/skills/td-flow`
@@ -34,7 +35,8 @@ To update on any machine: `git pull && ./install.sh`.
 | `/td-clear` | Mid-session checkpoint | Memory scan → light prune → STATE handoff → push. Ready for `/clear`. Fast. |
 | `/td-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
 | `/td-refresh` | When local CLAUDE.md drifts from canonical | Diff-and-propose per section. Never auto-overwrites. |
-| `/td-inbox` | Routine queue review | Walk open GH issues, grouped by Issue Type (Epic with sub-issue progress first). Close / comment / skip each one. |
+| `/td-inbox` | Routine queue review (inbound) | Walk open GH issues filed INTO this repo, grouped by Issue Type (Epic with sub-issue progress first). Close / comment / skip. Ends with a pointer to `/td-outbox`. |
+| `/td-outbox` | Outbound CR check | Walk issues this project filed INTO other repos (cross-repo, via the `**From:**` marker). Group by state: awaiting reply / pending action / recently closed. Comment / verify / reopen / skip. |
 | `/td-incident` | Live production fire | Drop everything else. Focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
 | `/td-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues with type selection + dedupe. Standalone version of `/td-close`'s park step. |
 
@@ -55,7 +57,9 @@ Most work is conversational. Here's what gets routed where:
 "let's plan a big redesign"           → starts a planning work file (later → Epic)
 "add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
 "file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
-"any incoming?" / "check inbox"       → gh issue list for current repo
+"any incoming?" / "check inbox"       → gh issue list for current repo (or /td-inbox)
+"what did we file?" / "show outbox"   → /td-outbox (cross-repo, via **From:** marker)
+"did rgb-api respond yet?"            → /td-outbox or inline GraphQL search
 "ship it"                             → tests pass → commit → push
 "where are we?"                       → summarizes STATE.md
 "let's clear" / about to /clear       → runs /td-clear
@@ -142,7 +146,7 @@ Me:  appends to DEBUG.md (creates from template if missing), commits.
      STATE back to previous topic.
 ```
 
-**Cross-repo request**
+**Cross-repo request (outbound)**
 
 ```
 You: "file a CR to rgb-api: please add a timestamp to the /X endpoint"
@@ -154,6 +158,13 @@ Me:  checks this project's .td/PROJECT.md § Cross-repo for the target repo,
        Type:  Feature
      Confirms with you. Runs `gh api graphql createIssue` against the target.
      Returns the issue URL. The receiving project sees it via /td-inbox.
+[a few days later, this project]
+You: /td-outbox
+Me:  searches org-wide for issues with **From:** <this-project> in body,
+     groups by state. Shows rgb-api#42 as "Awaiting reply (3 days)".
+     [walks the issue: shows latest comments]
+You: "comment back: we can wait one more sprint"
+Me:  drafts comment, signs as <this-project>, confirms, posts.
 ```
 
 **End of work day**
@@ -191,6 +202,8 @@ Projects sometimes need things from other projects. Convention:
 4. Receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
 
 No labels, no status enum, no separate inbox. Open = pending; closed = done.
+
+**Inbox + outbox are paired.** `/td-inbox` shows issues filed INTO this repo (incoming work). `/td-outbox` shows issues this project filed INTO other repos (outgoing work). Both use the `**From:**` body marker as the canonical identifier — independent of which GH account opened the issue. Together they cover both directions of cross-repo work.
 
 Unified view across all your repos: `gh search issues --owner <your-org> --state open` (REPO is the unit of interest; no author filter — works regardless of which GH identity you're using).
 
@@ -237,7 +250,7 @@ Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `
 
 ```
 commands/             slash commands (td-init, td-clear, td-close, td-refresh,
-                                      td-inbox, td-incident, td-park)
+                                      td-inbox, td-outbox, td-incident, td-park)
 templates/            files copied into target projects on /td-init
   CLAUDE.md           the universal contract
   td/PROJECT.md
