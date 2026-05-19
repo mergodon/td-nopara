@@ -45,6 +45,8 @@ Another project's repo is another team's territory, even when the same human wea
 - **When commenting back**, sign as the speaking project: `— <receiver-project-name>`. The thread reads project-A ↔ project-B.
 - **Never address GH usernames in cross-repo prose.** Don't write "@mate asked..." — write "<project-name> asked..." even when the GH metadata shows the username.
 
+**Cross-repo Epics (planning surface).** A parent `Epic` issue can have formal sub-issues in other mergodon repos. Use the `addSubIssue` GraphQL mutation (with the `GraphQL-Features: sub_issues` header) to attach a child issue from `<repo>/<sub-issue-N>` to the parent. The parent's progress bar updates automatically as cross-repo sub-issues close. Pattern: cross-project Epics live in `$TD_REGISTRY` (it's the only repo aware of the whole portfolio); per-project Epics live in the project's own repo. Cross-organization parent-child isn't supported by GitHub — stay within mergodon.
+
 No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
 **Inbox stays repo-scoped by default.** "CRs?" / "any incoming?" / warm-up checks run `gh issue list --state open` for the **current repo only**. I do NOT widen to all your repos unless you explicitly ask ("all repos", "global inbox", "everything open", "what's open across the board"). Issues in other repos are their projects' business — not background context to surface here. The `## Cross-repo` registry tells me which repos this project *files into*, not which I should *poll*.
@@ -104,9 +106,12 @@ When the user tells me something at the start of a message, action-shaped:
 - "we use Laravel/Next/X" / framework-specific gotcha → `.td/WORKWAY.md` § Framework specifics
 - "stack changes to X" / "scope is X" → `.td/PROJECT.md`
 - "remember to X later" / "park this" → append `.td/BACKLOG.md` (session-scoped scratch; flushes to GitHub Issues at `/td-close`).
+- "park this to GH" / "create an issue for X" / "file this as Bug/Idea/Feature/Task" → `gh api graphql createIssue` mutation in current repo with chosen Type ID; body opens `**From:** <this-project>`; dedupe against open issues first; confirm before posting. Direct path — skip BACKLOG, track in GH immediately.
+- "flush the backlog" / "park the backlog to GH" / "empty BACKLOG" → invoke `/td-park` (or run its procedure inline if mid-conversation).
+- "let's plan X" / "start an Epic for X" / "I want to work on a big thing" → create `.td/work/<slug>.md` as planning scratch. When the plan is solid, promote: parent `Epic` via `gh api graphql createIssue` (current repo for per-project; `$TD_REGISTRY` for cross-project that spans multiple repos); concrete pieces as sub-issues via `addSubIssue` mutation (cross-repo within mergodon org supported). Fold-and-delete the work file at promotion.
 - "feedback on td-flow" → append `~/projects/td-flow/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
-- "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh issue create --repo <slug>` with body opening `**From:** <friendly-name>` followed by ask + why + source.
+- "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh api graphql createIssue` mutation against the target repo with body opening `**From:** <friendly-name>` followed by ask + why + source. Use the `Bug`/`Feature`/`Task`/`Idea` type that fits.
 - "any incoming?" / "check the inbox" / "CRs?" → `gh issue list --state open` (current repo ONLY — the default; never widen here).
 - "all repos?" / "global inbox" / "everything open" / "what's open across the board?" → `gh search issues --owner <owner> --involves @me --state open` (cross-repo, only on explicit ask; flag form, not quoted-string).
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
