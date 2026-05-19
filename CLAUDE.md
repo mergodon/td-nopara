@@ -64,6 +64,8 @@ No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
 If something doesn't fit one of those five core files (plus optional DEBUG.md), it probably doesn't need a doc — git or the existing docs cover it.
 
+**Doc hygiene.** The next session loads these docs cold and assumes everything in them is true. So the bar is sharp: **keep what (a) matters for next session, (b) isn't derivable from code or `git log`, (c) we actually know to be true.** Clear speculation, clear placeholders, clear anything the codebase already says authoritatively (the stack list shouldn't duplicate `composer.json`). `/td-clear` applies this lightly to STATE.md at handoff (heads-up on stack drift, no fix). `/td-close` applies it across all docs (mechanical stack diff + per-doc pass).
+
 ## Nudges I do without being asked
 
 - At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Also run `gh issue list --state open` and surface incoming asks (one line, or "(inbox empty)") alongside the STATE summary.
@@ -95,7 +97,7 @@ I watch for these and flag with one line — the user decides:
 - 5+ local commits ahead of `origin/main` → ask if holding for a reason.
 - Root `CLAUDE.md` drifted from canonical and the user didn't say so → ask if Boost/Cursor/etc. overwrote it.
 - Root `CLAUDE.md` differs from canonical at `~/projects/td-flow/CLAUDE.md` (and the user didn't flag a framework overwrite) → flag once: "contract drifted from canonical — `/td-refresh` to review."
-- Stack signals changed (new framework file, removed dependency) and `WORKWAY.md` § Framework specifics not updated → flag.
+- Stack drift (a dep added/removed/major-version bumped that I notice in conversation) → flag, route to `WORKWAY.md` § Framework specifics or PROJECT.md § Stack. Catching this at the moment is best; the mechanical safety net runs at `/td-clear` (heads-up: dep files changed since last STATE) and `/td-close` (full diff of dep files vs PROJECT.md § Stack).
 - I've fixed the same kind of issue 3+ times → ask about root cause.
 - About to commit a file that looks like a secret (`.env`, token, key) → stop and confirm.
 
@@ -169,8 +171,8 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 ## The slash commands
 
 - `/td-init` — bootstrap or migrate a project (one-time per project).
-- `/td-clear` — mid-project context reset. Save STATE handoff, light prune, push. Run before `/clear` when the project continues.
-- `/td-close` — wrap the project (or a major phase). Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT.md against reality, push.
+- `/td-clear` — mid-project context reset. Save STATE handoff, light prune, stack-drift heads-up, push. Run before `/clear` when the project continues.
+- `/td-close` — wrap the project (or a major phase). Park leftover BACKLOG + work files to GitHub Issues, mechanical stack-reality-check vs PROJECT.md, doc hygiene pass across all `.td/` docs, push.
 - `/td-refresh` — bring this project current. (1) Diff CLAUDE.md against canonical at `~/projects/td-flow/CLAUDE.md`, propose per section. (2) Flush any accumulated `BACKLOG.md` items to GitHub Issues. Diff-and-propose throughout — never overwrites without your accept.
 - `/td-inbox` — routine inbox check. Walks open GH issues grouped by Issue Type (Epic with sub-issue progress first, then Bug / Feature / Task / Idea), surfaces comments and related commits, then close / comment / skip each one. **Repo-scoped (inbound only)** — use `/td-outbox` for the cross-repo outbound view.
 - `/td-outbox` — cross-repo outbox view. Searches org-wide for issues this project filed (via the `**From:**` marker), groups by state (awaiting reply / pending action / recently closed), then comment / verify / reopen / skip per issue. **The pair to `/td-inbox` — together they cover both directions of cross-repo work.**

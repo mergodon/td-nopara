@@ -1,37 +1,37 @@
 # State
 
 Project:  td-flow
-Topic:    gh-source-of-truth migration (Issue Types + sub-issues + new commands)
-Phase:    shipped /td-outbox — cross-repo outbound view (8th slash command) (2026-05-19)
+Topic:    handoff hardening (stack-reality-check + doc hygiene at /td-clear and /td-close)
+Phase:    shipped piece 1 of 2 — hygiene + mechanical stack diff (2026-05-19); next: /td-mailbox + sub-issue tracker model
 Blocker:  none
-Last:     2026-05-19 — **Shipped `/td-outbox` — the cross-repo outbound view.** Solves the gap where /td-inbox (repo-scoped, inbound only) didn't surface updates on issues this project filed INTO other repos. Mechanism: org-wide GraphQL search for `<sender-name>` term + client-side filter by `**From:** <sender-name>` body marker (the canonical project-soul identifier; GH's search engine mishandles colons inside exact-phrase queries, so we filter client-side). Output grouped: Awaiting reply / Pending action / Recently closed (last 30 days). Walk per item: comment / verify / reopen / skip — same one-at-a-time pattern as /td-inbox. Cross-repo writes sign as `— <sender-name>`. **/td-inbox now ends with a one-line pointer to /td-outbox** (even when inbox empty) so the pair stays visible across daily routine. CLAUDE.md § Cross-repo gets an "Inbox + outbox are paired" paragraph documenting the model. Routing map adds "what did we file?" / "any updates from elsewhere?" → /td-outbox. README updated: 8-command symlinks list, /td-outbox row in slash commands table, cross-repo scenario extended to show the round-trip (file → outbox → respond). 8 slash commands total now (init/clear/close/refresh/inbox/outbox/incident/park). Earlier today: type heuristic refinement (vague → Idea) + /td-refresh Phase 2 BACKLOG migration (7198401); README rewrite (3031639); gh-source-of-truth migration 1/7 through 7/7. Open follow-ups: land NAMING.md in td-registry; fold-and-delete scratch; opportunistic repo renames.
+Last:     2026-05-19 — **Shipped mechanical stack-reality-check + doc-hygiene pass in `/td-close` and `/td-clear`.** Triggered by an au-dual-track transcript review: `/td-close` had fixed Livewire 3→4 + Sentry-added drift in PROJECT.md at close, but the drift had accumulated silently across many sessions because the "stack signals changed → flag" drift signal in CLAUDE.md was too soft (relied on Claude noticing). Fix: `/td-close` Step 6 is now mechanical (enumerate dep files present — `package.json`/`composer.json`/`pyproject.toml`/`requirements.txt`/`Gemfile`/`go.mod`/`Cargo.toml`; diff top-level deps vs PROJECT.md § Stack; surface one-liners for y/n/edit). Step 7 is the doc-hygiene pass: re-articulates the keep/clear filter and walks each `.td/` doc through it. `/td-clear` got a lightweight version: `git log --since="<STATE.Last>" --name-only -- <dep files>` heads-up (flag, don't fix; full check happens at /td-close), plus a hygiene reminder in the STATE handoff step. CLAUDE.md got a "Doc hygiene" paragraph at the end of § The docs articulating the principle ("the next session loads these docs cold and assumes everything in them is true"), plus the soft drift-signal line replaced with explicit mechanical-safety-net reference. templates/CLAUDE.md mirrored byte-identical.
 
 ## Resume note
 
-td-flow is the minimal, file-based, repo-portable methodology hosted at `mergodon/td-flow` (public). It eats its own dog food — this repo IS a td-flow project. Stable surface: root `CLAUDE.md` contract + 4 `.td/` docs (`PROJECT`, `WORKWAY`, `STATE`, `BACKLOG`) + `work/<topic>.md` scratch + 3 slash commands (`/td-init`, `/td-clear`, `/td-close`). User-specific data (SERVICES.md + future outbound-issue logs) lives in a separate private companion repo discovered via `$TD_REGISTRY`. Everything else is conversational.
+Next piece up: **`/td-mailbox` (merges `/td-inbox` + `/td-outbox`) with sub-issue tracker model for outbound.** Validation completed earlier this session — proved end-to-end that GitHub's `addSubIssue` GraphQL mutation works cross-repo within mergodon org, that the receiver's native `parent` field surfaces source bidirectionally, that `subIssuesSummary` updates on state transitions (eventually consistent, ~seconds), and that one aggregate query against all parents in this repo returns every cross-repo child with comments inline. Validation artifacts (td-flow#1 + td-registry#1) are closed but exist as history.
 
-The full evolution lives in `git log` — read it before assuming current state. v3.1 split `/td-clear` from `/td-close`. v3.2 added drift signals + install.sh pruning. v3.3 added fold-and-delete + "Digging into history". v3.4 made bypassed rituals explicit. v3.5 cleaned BACKLOG/PROJECT. v3.6 shipped td-bus (Turso/libsql + Python CLI). **v3.7 retired td-bus** — too much surface for a solo dev when GH Issues + `gh search issues --owner <your-org> --state open` does the same job with zero infra. **v3.8 split user data into a private companion registry** so the framework can be public as a methodology while user-specific information stays private.
+Design for the mailbox piece:
 
-Cross-repo shape (for cold-start recall):
-- Per-project: `.td/PROJECT.md § Cross-repo` lists repos this project files CRs against. Opt-in — only present when the project has a real cross-repo relationship to declare. No template scaffold.
-- Workflow: check the per-project Cross-repo registry → `gh repo view <slug>` to verify access + read target's README/PROJECT.md for context → `gh issue create --repo <slug>` with body = ask + why + source → discuss in comments → receiver closes via `Closes <slug>#N`.
-- Inbox: `gh issue list --state open` (current repo only by default; cross-repo opt-in via explicit triggers like "all repos", "global inbox", "everything open").
-- Lookup: `SERVICES.md` in `$TD_REGISTRY` resolves friendly names to GH slugs (private; clone or fetch via `gh api`).
-- Etiquette: never commit/push/test in another repo. The only write into another project's territory is via `gh issue create`.
-- Identity-agnostic: REPO is the unit; multiple GH identities across machines are fine and incidental.
+- **Single command `/td-mailbox`.** Replaces both `/td-inbox` and `/td-outbox`. Inbound section reuses current /td-inbox query, with one filter: skip issues whose body contains `<!-- td-mailbox-tracker -->` (the sentinel marking the outbound tracker Epic). Outbound section uses aggregate query: `repository.issues(states:OPEN) { ... subIssues { ... filter where repo != current } ... }` — one round trip, comments inline, exact membership.
+- **Filing rule (CLAUDE.md addition).** Every cross-repo issue filed FROM this project becomes a sub-issue of one parent in this repo: an existing Epic if the work belongs to one, otherwise the **outbound tracker Epic** (auto-created on first orphan filing, body opens with `<!-- td-mailbox-tracker -->` sentinel + a "do not close" note).
+- **The `**From:** <project>` body marker stays.** Different role now — the GitHub-native parent linkage handles sender-side queries; the body marker handles human readability in non-GraphQL surfaces (gh CLI, etc.) and gives the receiver a stable "from project X" signal that's independent of the GH account that opened the issue.
+- **Per-item walk preserved.** Inbound: close/comment/skip. Outbound: comment/verify/reopen/skip. Single end-summary.
+- **Constraint to remember:** one sub-issue can only have one parent (validated). So Epic-attached sub-issues are NOT also attached to the outbound tracker. The aggregate query catches both regardless.
+- **Migration / backfill** at adoption: walk existing open cross-repo issues via the old `**From:** <project>` org-wide search, attach each as sub-issue of the outbound tracker (or relevant Epic). After backfill, /td-mailbox is self-contained.
 
-**Loose ends + next moves:**
+Files to touch in commit 2:
+- ADD `commands/td-mailbox.md`
+- DEL `commands/td-inbox.md`, `commands/td-outbox.md` (install.sh's symlink loop is dynamic — cleanup is automatic on next install)
+- EDIT `CLAUDE.md` (§ Cross-repo replaces "Inbox + outbox are paired" with mailbox + filing rule; § Where things go replaces inbox/outbox triggers with mailbox and augments "file an issue for X" routing to include addSubIssue; § Slash commands swaps the two rows for one)
+- EDIT `templates/CLAUDE.md` (mirror)
+- EDIT `skill/SKILL.md` (description line + slash command list, 8→7)
+- EDIT `README.md` (symlinks list, slash commands table row, examples, "Inbox + outbox are paired" paragraph)
+- EDIT `.td/WORKWAY.md` (8→7 commands list)
+- EDIT `.td/STATE.md` (move to shipped piece 2)
 
-1. **~~Destroy retired Turso DB~~** — DONE 2026-05-17. Bus retirement is now fully closed: framework code removed (v3.7), local creds removed (env vars + ~/.td/bus.env), cloud DB destroyed.
+Open question for piece 2 to decide as we write the command:
+- Backfill: ship the migration script as part of the command (one-shot), or as a one-time conversational walkthrough triggered the first time `/td-mailbox` runs without finding the tracker? Likely the latter — keeps the command file slim.
 
-2. **First real-project validation** of the v3.7+v3.8 framework on a brownfield repo — still unscheduled. Exercises brownfield detection on a fresh project and confirms the rituals fire end-to-end.
-
-3. **First real cross-repo issue in anger — DONE + VALIDATED 2026-05-16.** Four retirement-cleanup issues were filed from `td-nopara` per the v3.7 workflow into affected projects; **all four closed by their projects' Claude sessions within ~1 hour** of filing. Two closed silently via commit; one had a rich migration comment confirming full v3.7 adoption (including adding `## Cross-repo` registry to that project); one had a detailed audit comment confirming nothing to change because that project uses a different docs convention. Bonus signal: cross-repo follow-up CRs were subsequently filed organically between sibling projects — the convention is in real use beyond just the retirement cleanup.
-
-4. **One bug found during validation review**: original unified-inbox query syntax was wrong — quoted-string `gh search issues "user:X involves:@me state:open"` breaks because gh interprets the whole quoted blob as a single search phrase. Fixed to `--owner` flag form; later dropped `--involves @me` entirely (REPO is the unit, not GH identity).
-
-5. **Slash-command enrichment (Piece 2)** — pending: enrich `/td-init` to auto-register new projects in `$TD_REGISTRY`'s `SERVICES.md`, `/td-clear` to surface inbox + outbox in the resume note, `/td-close` to check unresolved issues before wrapping. Triggered by the v3.8 registry split; ready to start whenever — v4.0 surface is now stable + public.
-
-7. **~~Pending external rename~~** `mergodon/rgb-buddy-2` → `mergodon/rgb-ggbuddy` — DONE 2026-05-17. GH rename landed; td-registry SERVICES.md updated (commit `5335fc7` in td-registry). Remaining: the renamed repo itself needs a local-side cleanup pass (git remote, internal doc refs, .td docs if any). Process documented; user will paste prompt into rgb-ggbuddy Claude session.
-
-6. **~~`templates/CLAUDE.md` vs root `CLAUDE.md` drift~~** — DONE 2026-05-18. `templates/CLAUDE.md` synced byte-identical with canonical as part of the `/td-refresh` ship. Going forward, the `/td-refresh` command + the new drift signal will keep downstream project copies in line; the in-repo template gets re-synced by hand when the canonical changes (no scaffolding yet — could be automated later, e.g. symlink `templates/CLAUDE.md` → `../CLAUDE.md`).
+Out of scope for this session (parked):
+- The BACKLOG already had a "Piece 2: slash-command enrichment" item from 2026-05-17 that mentions auto-register in $TD_REGISTRY at /td-init, surfacing inbox/outbox in /td-clear resume note, and checking unresolved issues at /td-close. Today's commits cover SOME of that scope (handoff hardening at clear/close) but not the $TD_REGISTRY auto-register piece — that's still pending.
+- Real-project validation of the v4.0 framework on a brownfield repo — still scheduled but not started.

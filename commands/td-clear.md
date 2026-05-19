@@ -55,7 +55,7 @@ Wait for the answer. If they name something, append it to `.td/BACKLOG.md` as `-
 
 This is a single question — don't prompt for elaboration or turn it into a planning session.
 
-# Step 6 — Light prune (only obvious dead docs)
+# Step 6 — Light prune + stack-drift heads-up
 
 Walk `.td/` for content git already covers:
 
@@ -63,11 +63,25 @@ Walk `.td/` for content git already covers:
 - Resolved blockers in `.td/STATE.md` → clear them out.
 - Backlog items that have shipped → delete the line.
 
+**Stack-drift heads-up (no fix, just flag).** Quick check: `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u` — if anything comes back, surface one line:
+
+```
+[heads-up] <file> changed since last checkpoint — PROJECT.md § Stack may be out of date. /td-close will check mechanically.
+```
+
+Don't fix here — `/td-close` runs the full stack-reality-check. The point is to make the handoff explicit so the next session knows drift may exist.
+
 Don't restructure. Don't second-guess `WORKWAY.md` content. The deeper cleanup is `/td-close`.
 
 # Step 7 — Update STATE.md as a handoff
 
-Rewrite `.td/STATE.md` so a fresh conversation picks up cold. Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
+Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context will load this and assume it's true — so the filter is sharp: **keep what matters and isn't derivable; clear everything else.**
+
+- **Keep** in-flight specifics the next session can't reconstruct: current decision, current blocker, mid-thinking, the gotcha you just hit.
+- **Clear** speculation ("we might want to..."), anything `git log` already says, or claims you haven't actually verified.
+- **Stack-drift heads-up** from Step 6 (if any) belongs at the top of the Resume note so the next session sees it immediately.
+
+Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 
 ```
 Project:  <name>
