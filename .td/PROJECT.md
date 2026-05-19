@@ -22,6 +22,10 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 
 (none — v4.0 shipped; awaiting first real-project `/td-init` + first real outside-fork to surface what the published methodology actually needs)
 
+## Cross-repo
+
+- `mergodon/td-registry` — private companion registry; we file naming-convention updates, SERVICES.md schema requests, NAMING.md edits.
+
 ## Shipped
 
 - v1 (initial scaffold, 10 slash commands, BIG/SMALL split)

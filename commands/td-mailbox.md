@@ -1,20 +1,20 @@
 ---
-description: Unified cross-repo work check — walks inbound issues (filed INTO this repo, grouped by Issue Type) and outbound issues (filed FROM this repo into others, tracked via GitHub sub-issues), one item at a time. Replaces /td-inbox + /td-outbox.
+description: Unified cross-repo work check — walks inbound issues (filed INTO this repo, grouped by Issue Type) and outbound issues (filed FROM this repo into others, scoped by .td/PROJECT.md § Cross-repo and identified by the **From:** body marker), one item at a time. Replaces /td-inbox + /td-outbox.
 ---
 
 You are running the unified mailbox check. The job: walk every cross-repo work item — both directions — and help the user decide one issue at a time. Inbound first (highest leverage), then outbound.
 
-The outbound side uses **GitHub's native sub-issue mechanism**: every cross-repo issue filed FROM this project lives as a sub-issue of some parent in this repo (an existing Epic if it belongs to one, else the auto-created **outbound tracker Epic**). One aggregate query across all parents in this repo returns the canonical outbound set — no org-wide search, no From-marker filtering, exact membership.
+The outbound side uses **minimum-dependency** mechanics: a human-curated list of connected projects (`.td/PROJECT.md § Cross-repo`) bounds the search, and the canonical `**From:** <project>` body marker identifies our own filings. No tracker Epic. No sub-issue linkage required for one-off cross-repo CRs. Epics with cross-repo sub-issues (real planning surface) keep their sub-issue linkage — that's a separate, legitimate use case.
 
 # Step 0 — Verify we're in a td-flow project with GH access
 
 - Confirm `./.td/` exists. If missing: abort, "Not a td-flow project."
 - Verify `gh` is authenticated and has a remote: `gh repo view --json name,owner 2>/dev/null`. If it fails: abort, "No GitHub remote or `gh` not authenticated."
-- Capture the slug as `<owner>/<name>` for use in the queries below.
+- Capture the slug as `<owner>/<name>` for the queries below.
 
 # Step 1 — Identify this project's friendly name
 
-Used to sign comments and closures, and as the body marker value when creating the outbound tracker.
+Used to sign comments and closures, and as the body marker value to filter on.
 
 1. Read `$TD_REGISTRY/SERVICES.md` (local clone first, else `gh api`). Find the row where the slug matches `<owner>/<name>`. Use its Friendly column.
 2. Fall back to the first H1 heading in `.td/PROJECT.md`.
@@ -22,9 +22,7 @@ Used to sign comments and closures, and as the body marker value when creating t
 
 Hold as `<project-name>` for the run.
 
-# Step 2 — Gather inbound + outbound (run both queries; can be parallel)
-
-**Inbound** — every open issue in this repo, grouped later by Issue Type:
+# Step 2 — Inbound query (open issues in this repo)
 
 ```
 gh api graphql -H "GraphQL-Features: sub_issues" -f query='
@@ -32,27 +30,16 @@ gh api graphql -H "GraphQL-Features: sub_issues" -f query='
     repository(owner: $owner, name: $name) {
       issues(first: 50, states: OPEN, orderBy: {field: UPDATED_AT, direction: DESC}) {
         nodes {
-          number
-          title
-          body
-          url
-          createdAt
-          updatedAt
+          number title body url createdAt updatedAt
           author { login }
-          issueType { id name color }
+          issueType { name }
           subIssuesSummary { total completed percentCompleted }
           comments(last: 20) { nodes { author { login } body createdAt } }
           subIssues(first: 20) {
             nodes {
-              number
-              title
-              state
-              url
-              updatedAt
-              author { login }
+              number title state url
               repository { nameWithOwner }
               issueType { name }
-              comments(last: 5) { nodes { author { login } body createdAt } }
             }
           }
         }
@@ -61,108 +48,59 @@ gh api graphql -H "GraphQL-Features: sub_issues" -f query='
   }' -F owner=<owner> -F name=<name>
 ```
 
-This single query gives us **both directions**:
-- The `nodes` array IS the inbound list (after filtering — see Step 3).
-- The `nodes[].subIssues.nodes` array, filtered to entries where `repository.nameWithOwner != "<owner>/<name>"`, IS the outbound list. Each cross-repo child knows its parent (the issue it was nested under).
+This gives the inbound list directly. Epics with cross-repo sub-issues show their children inline (for planning context during the walk).
 
-# Step 3 — Filter the tracker out of the inbound view
+# Step 3 — Read the cross-repo registry
 
-The outbound tracker Epic itself lives in this repo. Skip it from the inbound walk by detecting the body sentinel:
+Read `.td/PROJECT.md § Cross-repo`. It's the human-curated list of repos this project files into (slug + optional one-line context per repo).
 
-```
-<!-- td-mailbox-tracker -->
-```
+- **Section missing or empty:** the project hasn't declared any cross-repo relationships. Outbound is empty. Skip Step 4; in the summary, say `Outbound: no cross-repo registry declared in PROJECT.md § Cross-repo`.
+- **Section present:** parse out the GH slugs (e.g., `mergodon/td-registry`, `mergodon/rgb-ggbuddy`, …). Hold as `<connected-repos>`.
 
-Any issue whose body contains that string is the tracker — exclude it from inbound bucketing. It's mailbox infrastructure, not real planning work. (It DOES contribute to the outbound list via its sub-issues — which is the point.)
+The cross-repo registry IS the scope of outbound. Filings into repos not on this list won't show up — by design. If the project files into a new repo, declaring it here is the onboarding step (one-line edit in PROJECT.md).
 
-# Step 4 — Orphan detection (every run)
+# Step 4 — Outbound query (scoped to connected repos, filtered by From-marker)
 
-After the aggregate query, do a quick org-wide search for **orphans** — cross-repo issues this project filed (via the `**From:**` marker) that aren't attached as a sub-issue of any parent in this repo. Orphans happen when an issue is filed via the GitHub web UI, by older tooling, or by routing that skipped the `addSubIssue` step. This check runs **every** `/td-mailbox` invocation, not just first-run.
+Build a search query bounded by the connected repos:
 
 ```
-gh api graphql -H "GraphQL-Features: sub_issues" -f query='
+q="repo:<connected-repo-1> repo:<connected-repo-2> ... \"<project-name>\" type:issue state:open"
+```
+
+Run it:
+
+```
+gh api graphql -f query='
   query($q: String!) {
     search(query: $q, type: ISSUE, first: 100) {
       nodes {
         ... on Issue {
-          number title url state body
+          number title url state body createdAt updatedAt closedAt
+          author { login }
           repository { nameWithOwner }
-          parent {
-            number
-            repository { nameWithOwner }
-          }
+          issueType { name }
+          comments(last: 5) { nodes { author { login } body createdAt } }
         }
       }
     }
-  }' -F q="org:<owner> \"<project-name>\" type:issue state:open"
+  }' -F q="<bounded-query-string>"
 ```
 
 (Use `gh api graphql` directly — `gh search issues` mishandles colons inside exact-phrase queries.)
 
-An orphan is any result where ALL of:
-- Body begins with `**From:** <project-name>` (canonical sender marker — exclude false-positive name matches).
-- `repository.nameWithOwner != "<owner>/<name>"` (the issue is cross-repo, not in this repo).
-- `parent == null` OR `parent.repository.nameWithOwner != "<owner>/<name>"` (no parent in this repo — either no parent at all, or parented elsewhere).
+For each result, an outbound match is any issue where:
+- Body begins with `**From:** <project-name>\b` (canonical sender marker — excludes false-positive name matches in unrelated bodies).
+- `repository.nameWithOwner` is one of the declared connected repos (the search already bounds this, but verify).
 
-If no orphans: skip to Step 5.
+Keep only matching issues. That set IS the outbound list.
 
-If orphans exist, surface:
-```
-Orphan cross-repo filings (in From-marker, not attached to any parent in this repo):
-  <repo>#<N> — <title>
-  <repo>#<N+1> — <title>
-  ...
-Attach to outbound tracker? [yes (all) / per-item / no (skip)]
-```
+If no matches: outbound is empty; surface a one-line note in the summary.
 
-- **yes** → auto-create tracker if needed (Step 4a), then `addSubIssue` each orphan to the tracker.
-- **per-item** → walk one at a time. For each: `Attach to outbound tracker, attach to existing Epic #N (show this repo's open Epics), or skip?`
-- **no** → leave them as orphans this run; they'll surface again next time (idempotent — no state to track).
+**Search index lag.** GitHub's search index lags newly-created issues by a few seconds — observed up to ~5s in testing. A filing made *right before* `/td-mailbox` may not appear in this run; it'll show on the next. This is acceptable for the normal workflow (you don't usually run mailbox the moment after filing). If the user expects something to appear and it doesn't, suggest re-running after a few seconds, or fetch the specific issue directly via `repository.issue(number: N)`.
 
-After backfill: re-run the Step 2 aggregate query so the rest of the walk reflects the updated state.
+Also fetch closed-recently candidates if you want the "Recently closed (last 30 days)" bucket — re-run the search with `state:closed` and filter by `closedAt > now - 30d`. (Optional — adds one query; skip if the user finds it noisy.)
 
-## Step 4a — Create the outbound tracker Epic (only when about to attach the first child)
-
-Don't create until needed (a child wants to be attached and there's no Epic to put it under). Mutation:
-
-```
-# Need: Epic type id, repo id
-gh api graphql -f query='
-  mutation($repoId: ID!, $typeId: ID!) {
-    createIssue(input: {
-      repositoryId: $repoId,
-      title: "Outbound CRs (tracking)",
-      issueTypeId: $typeId,
-      body: "<!-- td-mailbox-tracker -->\n\nAuto-generated outbound CR tracker. Sub-issues here are cross-repo issues filed from this project that don'\''t belong to a specific Epic. /td-mailbox uses this to assemble the outbound view. Do not close."
-    }) {
-      issue { number title id url }
-    }
-  }' -F repoId=<repo-node-id> -F typeId=<Epic-type-id>
-```
-
-Get the Epic type id via:
-```
-gh api graphql -f query='query { organization(login: "<owner>") { issueTypes(first: 20) { nodes { id name } } } }'
-```
-(filter for `name == "Epic"`).
-
-## Step 4b — Attach a sub-issue (used by backfill and by the conversational "file an issue for X" routing)
-
-```
-gh api graphql -H "GraphQL-Features: sub_issues" -f query='
-  mutation($parent: ID!, $child: ID!) {
-    addSubIssue(input: { issueId: $parent, subIssueId: $child }) {
-      issue { subIssuesSummary { total completed percentCompleted } }
-      subIssue { number title repository { nameWithOwner } }
-    }
-  }' -F parent=<tracker-or-epic-node-id> -F child=<child-issue-node-id>
-```
-
-Error handling:
-- `NOT_FOUND` → the parent or child ID is wrong; surface and stop.
-- `VALIDATION` with "duplicate" / "only one parent" → child is already attached somewhere; safe to ignore for backfill (already tracked).
-
-# Step 5 — Bucket and print the summary
+# Step 5 — Print the summary
 
 **Inbound** — bucket by `issueType.name`, in this order (highest leverage first):
 1. **Epic** — surface sub-issue progress prominently
@@ -173,10 +111,10 @@ Error handling:
 
 Within each bucket, sort by `updatedAt` descending.
 
-**Outbound** — bucket the cross-repo children by intent state. Determine "us" vs "them" by parsed sign-off in comment text (a comment ending with `— <project-name>` is ours).
+**Outbound** — bucket the cross-repo matches by intent state. Determine "us" vs "them" by parsed sign-off in comment text (a comment ending with `— <project-name>` is ours).
 - **Awaiting reply** — `state: OPEN`, last comment is from someone OTHER than us (or no comments yet).
 - **Pending action** — `state: OPEN`, last comment is from us (they need to act).
-- **Recently closed** — `state: CLOSED`, `closedAt` within last 30 days.
+- **Recently closed** — `state: CLOSED`, `closedAt` within last 30 days (only if you ran the optional closed-state query).
 
 Print compact summary:
 
@@ -190,17 +128,17 @@ Mailbox: <N inbound> inbound + <M outbound> outbound
   Idea    (X)   ...
   (untyped) (X) ...
 
-📤 Outbound (filed elsewhere) — by intent state
+📤 Outbound (cross-repo, scoped by .td/PROJECT.md § Cross-repo) — by intent state
   Awaiting reply (X)  <repo#N — title>, ...
   Pending action (X)  ...
   Recently closed (X) ...
 ```
 
-Skip buckets that are empty. If both directions are empty:
+Skip empty buckets. If both directions are empty:
 ```
 Mailbox empty. ✓
   Inbound:  no open issues in this repo
-  Outbound: no cross-repo children under any parent
+  Outbound: no cross-repo filings found (scope: <list connected repos>)
 ```
 And exit.
 
@@ -215,7 +153,7 @@ For each issue in priority order:
   <if Epic with sub-issues: [<completed>/<total> sub-issues closed, <percentCompleted>%]>
 ```
 
-Parse `<source-project>` from the `**From:** <name>` marker at the top of the body. If absent, label `(unmarked)`.
+Parse `<source-project>` from the `**From:** <name>` marker at the top of the body. If absent, label `(unmarked)`. The friendly name from the marker is what to use in conversation — don't bother resolving the slug unless you need to act.
 
 **Body:** print verbatim.
 
@@ -254,13 +192,13 @@ Parse `<source-project>` from the `**From:** <name>` marker at the top of the bo
 
 **On `skip`:** continue.
 
-**On freeform / "create a new issue":** handle conversationally (resolve type, dedupe check, GraphQL create; if cross-repo, also `addSubIssue` to the tracker per Step 4b), then resume the walk where it was.
+**On freeform / "create a new issue":** handle conversationally (resolve type, dedupe check, GraphQL create; if cross-repo, follow the routing rule — declare in PROJECT.md § Cross-repo if new, file with `**From:** <project-name>` body marker, optionally `addSubIssue` to an Epic if it belongs to one), then resume the walk where it was.
 
 Apply each action *before* moving on. Don't batch.
 
 # Step 7 — Walk outbound, one issue at a time
 
-In bucket order (Awaiting reply → Pending action → Recently closed). For each cross-repo child:
+In bucket order (Awaiting reply → Pending action → Recently closed). For each cross-repo issue:
 
 **Header:**
 ```
@@ -268,12 +206,11 @@ In bucket order (Awaiting reply → Pending action → Recently closed). For eac
 Title: <title>
 Filed: <createdAt>  Updated: <updatedAt>
 URL: <url>
-Tracked under: <parent issue from this repo, e.g. "#1 Outbound CRs (tracking)" or "#7 Auth refactor Epic">
 ```
 
 **Body:** print verbatim.
 
-**Recent comments:** print the last 5 from `comments.nodes` (already fetched in Step 2). Mark ours (`— <project-name>` sign-off) vs theirs.
+**Recent comments:** print the last 5 from `comments.nodes` (already fetched in Step 4). Mark ours (`— <project-name>` sign-off) vs theirs.
 
 **Recommendation** (one line — pick the first that fits):
 - **Awaiting reply, recently created (< 14 days)** → "They haven't had time yet — leave?"
@@ -293,7 +230,7 @@ Tracked under: <parent issue from this repo, e.g. "#1 Outbound CRs (tracking)" o
 ```
 gh issue close <N> --repo <slug> --reason "not planned" --comment "<drafted text>"
 ```
-The `not planned` reason tells GitHub (and the receiver's progress bars) this wasn't an abandoned-because-done close. Don't use `close` without a comment — leaving zero context for the receiver is rude.
+The `not planned` reason tells GitHub (and any parent Epic's progress bar, if this was Epic-attached) this wasn't an abandoned-because-done close. Don't use `close` without a comment — leaving zero context for the receiver is rude.
 
 **On `reopen`:** confirm twice (destructive — reopens someone else's issue, or reactivates a stale one we closed). `gh issue reopen <N> --repo <slug>`. Add a comment explaining why.
 
@@ -307,17 +244,15 @@ Mailbox walked: <T> reviewed total.
   Outbound: <Co> commented on, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
 ```
 
-No more cross-pointer line — both directions are in this one walk now.
-
 # Rules
 
-- **Single command for both directions.** Don't suggest the user run a second command for the other side — this IS both.
-- **The `**From:** <project>` body marker stays on every new cross-repo filing.** Sub-issue parent linkage handles sender-side queries; the body marker is the human-readable identifier for `gh issue view` and any non-GraphQL surface, and gives the receiver a stable "from project X" signal regardless of which GH account opened the issue.
+- **Single command for both directions.** Don't suggest a second command for the other side — this IS both.
+- **Outbound scope is the cross-repo registry** in `.td/PROJECT.md § Cross-repo`. Filings into repos not declared there won't show. By design — forces honesty about cross-repo relationships. If you find yourself wanting to widen, the right move is updating PROJECT.md, not bypassing the scope.
+- **The `**From:** <project>` body marker is canonical** — it's the only identifier of "this is ours" on the outbound side, and it's the human-readable source signal on the inbound side. Every cross-repo filing gets it.
+- **Sub-issue linkage stays for real planning Epics.** Epics with cross-repo children show progress in the inbound walk. That's a legit GitHub-native use case. One-off CRs don't need it.
 - **Always sign comments and closures with `— <project-name>`** (project-soul rule). Never address GH usernames in cross-repo prose.
 - **Never auto-close, never auto-post.** Always show drafted text and confirm.
 - **One issue at a time.** No batching.
-- **GraphQL preview headers** required: `GraphQL-Features: sub_issues` for `subIssuesSummary`, `subIssues`, `parent`, `addSubIssue`. Inline in each query/mutation.
-- **If GraphQL errors** (rate limit, auth, schema drift): surface the error and stop. Fall back to `gh issue list --json` for a degraded-mode inbound listing without type grouping if the user insists.
-- **Cross-org outbound is unsupported** — sub-issue linkage is org-scoped. Same scope limit as before; not a regression.
-- **Tracker filtering is by body sentinel**, not by title. Titles get edited.
-- **Backfill happens on first-run only.** Subsequent runs detect the tracker exists (sentinel match) and skip Step 4.
+- **GraphQL preview header** `GraphQL-Features: sub_issues` required for `subIssuesSummary` + `subIssues`. Inline on each query that uses them.
+- **If GraphQL errors** (rate limit, auth, schema drift): surface the error and stop. Fall back to `gh issue list --json` for a degraded-mode inbound listing if the user insists.
+- **Cross-org outbound is unsupported** by sub-issue linkage, but the From-marker search still finds it. So a cross-org CR filed with the marker WILL show in outbound if its repo is declared in PROJECT.md § Cross-repo. (Sub-issue parent linkage just won't work for that one.)
