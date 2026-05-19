@@ -1,10 +1,10 @@
 # State
 
 Project:  td-flow
-Topic:    idle
-Phase:    shipped /td-inbox (5th slash command) + td-registry exception in contract (2026-05-18)
+Topic:    gh-source-of-truth migration (Issue Types + sub-issues + new commands)
+Phase:    1/7 — BACKLOG session-scoped semantics (2026-05-19)
 Blocker:  none
-Last:     2026-05-18 — **Shipped `/td-inbox`** — fifth slash command, routine inbox check. Walks open GH issues in the current repo (repo-scoped per `CLAUDE.md § Cross-repo`), surfaces each issue's body + comments + any commits referencing it (`git log --grep="#N"`), recommends close/comment/skip with a project-soul sign-off (`— <receiver-name>`). One-at-a-time walk, no auto-actions, always confirms drafted text. Outbound issues out of scope (future concern). Also this session: codified the `$TD_REGISTRY` exception in `CLAUDE.md § Cross-repo` — td-registry is a metadata proxy, edit/commit/push directly without asking; applied to update SERVICES.md row 11 (`anzsco-tasmanvisa-com` → `anzscofinder-web` rename landed). Fixed step-numbering bugs Peter introduced in `/td-clear` (two Step 6s) and `/td-close` (missing Step 2), plus a pre-existing typo in `/td-init` (commit step ref). Drafted portfolio naming convention earlier — `.td/work/naming-convention.md` still pending landing in `td-registry/NAMING.md`. Pull from other machine merged cleanly (no content delta). Five commits this session: `f2e4541`, `2ef175e`, `4eb176f`, `9067269`, `6caf33b`, `be277b6` + this one.
+Last:     2026-05-19 — **Commit 1/7 shipped: BACKLOG.md now session-scoped.** Contract change: BACKLOG starts empty each session, fills mid-session via "park this," flushes to GitHub Issues (with appropriate Issue Type) at `/td-close` and ends empty. Mid-session flush available conversationally ("park the backlog to GH"). Updated `CLAUDE.md § The docs`, `§ Drift signals`, `§ Where things go`, plus `templates/CLAUDE.md` mirror and `templates/td/BACKLOG.md` preamble. Drift signal "BACKLOG > 15" now triggers a session-bloat warning, not a /td-clear suggestion. **Plan ahead:** Commit 2/7 = `/td-incident` (new slash command, live-fire mode); 3/7 = `/td-inbox` GraphQL rewrite with Issue Type grouping + sub-issue progress; 4/7 = `/td-park` (standalone BACKLOG flush); 5/7 = `/td-close` adds park-leftovers first step; 6/7 = conversational "park this" + "plan X" handlers (cross-repo sub-issues via td-registry); 7/7 = optional `DEBUG.md`. **Org setup completed:** five Issue Types (`Idea`/`Task`/`Bug`/`Feature`/`Epic`) defined at github.com mergodon org. Pre-build verified via `gh api graphql`.
 
 ## Resume note
 

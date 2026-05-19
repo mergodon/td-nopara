@@ -54,7 +54,7 @@ No labels, no status enum, no separate inbox. Open = pending; closed = done.
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
 - `WORKWAY.md` — how to test locally (and the workaround when I can't), how to UAT, how to ship to production, framework-specific notes. The single source for "how do we do things in this project."
 - `STATE.md` — current phase, current topic, blocker, resume note. Resume note can be as long as needed — that's where planning lives.
-- `BACKLOG.md` — bigger items I noticed but aren't in scope. Append-only.
+- `BACKLOG.md` — session-scoped parking. During work, append items I want to defer (`- YYYY-MM-DD — <item>`). At `/td-close`, BACKLOG flushes to GitHub Issues (with the appropriate type per the org's Issue Types) and the file ends empty. Starts empty each session.
 - `work/<topic>.md` — active work; deleted at close.
 
 If something doesn't fit one of those five files, it probably doesn't need a doc — git or the existing docs cover it.
@@ -86,7 +86,7 @@ I watch for these and flag with one line — the user decides:
 - `STATE.Topic` and `work/<topic>.md` disagree → ask which is right.
 - PROJECT.md "Active scope" item has shipping commits → propose moving to Shipped.
 - WORKWAY test command no longer exists in `package.json`/equivalent → flag.
-- BACKLOG > 15 items → suggest triage at next `/td-clear`.
+- BACKLOG > 15 items mid-session → flag session bloat; suggest flushing to GitHub Issues before `/td-close` (mid-session flush is a single conversational ask — "park the backlog to GH").
 - 5+ local commits ahead of `origin/main` → ask if holding for a reason.
 - Root `CLAUDE.md` drifted from canonical and the user didn't say so → ask if Boost/Cursor/etc. overwrote it.
 - Root `CLAUDE.md` differs from canonical at `~/projects/td-flow/CLAUDE.md` (and the user didn't flag a framework overwrite) → flag once: "contract drifted from canonical — `/td-refresh` to review."
@@ -103,7 +103,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "live URL is X" / "deploy is X" / "logs are at X" → `.td/WORKWAY.md` § Live
 - "we use Laravel/Next/X" / framework-specific gotcha → `.td/WORKWAY.md` § Framework specifics
 - "stack changes to X" / "scope is X" → `.td/PROJECT.md`
-- "remember to X later" / "park this" → append `.td/BACKLOG.md`
+- "remember to X later" / "park this" → append `.td/BACKLOG.md` (session-scoped scratch; flushes to GitHub Issues at `/td-close`).
 - "feedback on td-flow" → append `~/projects/td-flow/FEEDBACK.md`
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
 - "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`, then `gh issue create --repo <slug>` with body opening `**From:** <friendly-name>` followed by ask + why + source.
