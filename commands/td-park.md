@@ -22,10 +22,10 @@ If the working list is empty (or only `(empty)` placeholder): tell the user `BAC
 
 ```
 gh api graphql -f query='
-  query { organization(login: "mergodon") { issueTypes(first: 20) { nodes { id name } } } }'
+  query($owner: String!) { organization(login: $owner) { issueTypes(first: 20) { nodes { id name } } } }' -F owner=<owner>
 ```
 
-Parse the response. Build a map: `Idea` → `<id>`, `Task` → `<id>`, `Bug` → `<id>`, `Epic` → `<id>`. Hold for the run. Don't hard-code IDs — they vary across orgs and can rotate when an Issue Type is renamed.
+Use the `<owner>` captured in Step 0 — don't hardcode any org name. Parse the response. Build a map: `Idea` → `<id>`, `Task` → `<id>`, `Bug` → `<id>`, `Epic` → `<id>`. Hold for the run. Don't hard-code IDs — they vary across orgs and can rotate when an Issue Type is renamed.
 
 (IDs may differ across orgs — always query fresh per run; cache is run-scoped, not session-scoped.)
 

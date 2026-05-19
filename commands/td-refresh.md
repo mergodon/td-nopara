@@ -1,11 +1,12 @@
 ---
-description: Bring this project current with the framework conventions. (1) Diff CLAUDE.md against canonical, propose per section. (2) Flush any accumulated BACKLOG items to GitHub Issues. Diff-and-propose throughout — never overwrites without your accept.
+description: Bring this project current with the framework conventions. (1) Diff CLAUDE.md against canonical, propose per section. (2) Flush any accumulated BACKLOG items to GitHub Issues. (3) Cross-repo registry drift check — diff actual filings against PROJECT.md § Cross-repo, propose add/remove per delta. Diff-and-propose throughout — never overwrites without your accept.
 ---
 
-You are bringing this project up to the current framework conventions. Two phases, both diff-and-propose, both per-item-confirmable, never destructive without explicit user accept:
+You are bringing this project up to the current framework conventions. Three phases, all diff-and-propose, all per-item-confirmable, never destructive without explicit user accept:
 
 - **Phase 1 (Steps 0-6):** Review project `CLAUDE.md` against the canonical at `~/projects/td-flow/CLAUDE.md`. The canonical drifts forward over time; project copies fall behind. Surface every section deviation, propose what to take, apply only what the user accepts.
 - **Phase 2 (Step 7):** If `.td/BACKLOG.md` has accumulated items (left over from before the gh-source-of-truth model, or just from extended work), offer to flush them to GitHub Issues using the `/td-park` procedure.
+- **Phase 3 (Step 8):** Cross-repo registry drift check. `.td/PROJECT.md § Cross-repo` is load-bearing (bounds `/td-mailbox` outbound). Compare actual filings (via org-wide `**From:**` marker search) against the declared list; propose add (we filed into a repo not declared) or remove (declared but never used).
 
 The user owns both surfaces. Your role is to make the deltas reviewable, one item at a time.
 
@@ -89,13 +90,74 @@ The refresh also checks whether `.td/BACKLOG.md` has accumulated items that belo
 
 This is the migration path for projects that pre-date the gh-source-of-truth model. Projects starting on the current model rarely accumulate BACKLOG items across `/td-close` boundaries, so Phase 2 is usually a no-op or a small flush.
 
-# Step 8 — Tell the user
+# Step 8 — Cross-repo registry drift check (Phase 3)
 
-One sentence covering both phases:
+`.td/PROJECT.md § Cross-repo` is load-bearing — it bounds `/td-mailbox`'s outbound query. Stale or missing entries cause real visibility gaps:
+- **Missing entry:** we filed into a repo not declared → that filing won't show up in `/td-mailbox` outbound.
+- **Stale entry:** we declared a repo but never filed into it → noise in the list.
 
-`Refresh complete. <N> CLAUDE.md sections updated. <M> BACKLOG items flushed to GH.`
+Check by comparing actual filings against the declared list.
 
-If Step 7 didn't fire (no BACKLOG items): say `BACKLOG already in sync.` instead of the M number.
+1. Determine this project's friendly name (same procedure as `/td-mailbox` Step 1: first H1 in `.td/PROJECT.md`, fall back to directory basename). Hold as `<project-name>`.
+
+2. Run an **org-wide** `**From:**` marker search (NOT bounded by the declared list — that would defeat the point):
+
+```
+gh api graphql -f query='
+  query($q: String!) {
+    search(query: $q, type: ISSUE, first: 100) {
+      nodes {
+        ... on Issue {
+          number title url body state
+          repository { nameWithOwner }
+        }
+      }
+    }
+  }' -F q="org:<owner> \"<project-name>\" type:issue state:open"
+```
+
+State filter is `state:open` — focus on active connections. A long-closed one-off shouldn't force a declaration.
+
+3. Filter client-side: keep only results where body begins with `**From:** <project-name>\b` AND `repository.nameWithOwner != "<owner>/<name>"` (cross-repo from this project's perspective). Collect unique set of `repository.nameWithOwner` → **observed-repos**.
+
+4. Read `.td/PROJECT.md § Cross-repo`. Parse out the declared GH slugs → **declared-repos**. (If section missing, treat as empty set.)
+
+5. Compute diffs:
+   - **observed but not declared** → filings exist that `/td-mailbox` outbound can't see.
+   - **declared but not observed** → noise (no open filings from us into that repo).
+
+6. Surface per item, one at a time.
+
+For **observed-not-declared**:
+```
+<repo> — <count> open filing(s) found, e.g.:
+  #<N> <title>
+  <more if multiple>
+Declare in .td/PROJECT.md § Cross-repo? (yes / yes-with-context / skip)
+```
+- `yes` → append `- <repo>` to the section (create the section if missing).
+- `yes-with-context` → ask user for one-line description, append `- <repo> — <context>`.
+- `skip` → leave undeclared (the visibility gap persists; you'll be reminded next refresh).
+
+For **declared-not-observed**:
+```
+Declared: <repo>
+No open filings found from <project-name>. Remove from list? (yes / keep)
+```
+- `yes` → remove the line.
+- `keep` → leave (maybe an expected connection that hasn't been used yet, or a one-off you want documented).
+
+7. If both diffs are empty: say `Cross-repo registry in sync.` and continue.
+
+If you made changes: write back `.td/PROJECT.md`. The user reviews the diff at commit time.
+
+# Step 9 — Tell the user
+
+One sentence covering all three phases:
+
+`Refresh complete. <N> CLAUDE.md sections updated. <M> BACKLOG items flushed to GH. <K> Cross-repo entries updated.`
+
+If a phase didn't fire (no deltas, no items): use "in sync" wording for that phase instead of a number.
 
 # Rules
 

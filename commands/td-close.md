@@ -1,5 +1,5 @@
 ---
-description: Wrap the project (or a major phase). Park all leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT.md against reality, push.
+description: Wrap the project (or a major phase). Park all leftover BACKLOG + work files to GitHub Issues, mechanical stack-reality-check vs PROJECT.md, doc hygiene pass across all .td/ docs (including the load-bearing Cross-repo registry), push.
 ---
 
 You are closing the project (or a major phase). The work is done — shipped, live if it has a live, tested. This is the deeper cleanup that `/td-clear` skips: park leftover thinking to GitHub, walk every doc, validate it against current code and `git log`, prune anything redundant, restructure if drift has crept in. End with a clean, minimal `.td/` that an outsider could read in 2 minutes and understand the project.
@@ -35,8 +35,8 @@ Walk every leftover thinking surface and route it: ship-now (the user picks it u
    - Check `git log --grep="<topic>" --oneline` — is the topic shipped? If yes: ask "Topic looks shipped — delete this work file?" (the standard outcome for finished work).
    - If unshipped: ask "Ship now / Park to GH as Type X / Drop?" The work file's content becomes the GH issue body (Symptom/Context/Hypothesis/Fix structure for incidents; freeform for plans).
      - `Bug` for incident work files
-     - `Task` or `Epic` for planning work files (Epic if it decomposes; Task if it's one chunk)
-     - `Task` for catch-all
+     - `Epic` for planning work files that decompose into sub-issues
+     - `Task` for everything else (single-chunk work, catch-all)
    - If parked: same `gh api graphql createIssue` mutation, work file content as body, `**From:** <sender-name>` marker.
    - If dropped: confirm, then delete.
 
@@ -108,6 +108,7 @@ Walk doc by doc, surface decisions as one-liners:
 - **PROJECT.md § Active scope** — anything actually shipped? Move to "Shipped". Anything quietly abandoned? Ask before deleting.
 - **PROJECT.md § What this is / Who for** — re-read against what actually got built. If the one-liner no longer fits, propose a new one and ask.
 - **PROJECT.md § Stack** — drift items from Step 6 already handled. Now check: is anything here just a copy of the dep file? Prune to the human-curated layer.
+- **PROJECT.md § Cross-repo** — load-bearing for `/td-mailbox` outbound. Run the same drift check `/td-refresh` Phase 3 does: org-wide `**From:**` marker search → diff observed vs declared → propose add/remove per delta. Apply confirmed deltas inline. (Or defer: tell the user "Cross-repo drift check available via `/td-refresh` if you want to handle separately.")
 - **WORKWAY.md § Local testing** — does `Test command` still exist in `package.json` / equivalent? Run it. If removed, flag.
 - **WORKWAY.md § Local UAT / Production / Ship** — live URL still up? Smoke command works? Anything that reads as guesswork ("probably deploys via...") → verify or clear.
 - **WORKWAY.md § Framework specifics** — anything for a framework we removed? Prune.
