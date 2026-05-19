@@ -39,15 +39,25 @@ For each line (in BACKLOG order):
 
 1. **Print the line:** `Line N: <text>`
 
-2. **Suggest a Type** based on the line's phrasing:
-   - Starts with "fix" / "broken" / "error" / "bug" → `Bug`
-   - Starts with "add" / "build" / "implement" / "support" → `Feature`
-   - Starts with "rename" / "update" / "refactor" / "remove" → `Task`
-   - Vague exploration ("what if" / "maybe" / "idea:") → `Idea`
-   - Multi-step / cross-cutting language ("plan to", "across multiple repos", "epic:") → `Epic`
-   - When unclear → suggest `Task` as the default
-   
-   Tell the user: `Suggested: Type: <X>. (Accept / change to <other> / it's an Epic / no, just drop / fix it now)`
+2. **Suggest a Type** based on the line's phrasing. Show the trigger phrase explicitly so the user can spot a bad suggestion.
+
+   | Trigger in the line | Suggested Type |
+   |---|---|
+   | "fix" / "broken" / "error" / "bug" | `Bug` |
+   | "add" / "build" / "implement" / "support" | `Feature` |
+   | "rename" / "update" / "refactor" / "remove" / a clear concrete verb | `Task` |
+   | "what if" / "maybe" / "idea:" / vague / unsure-of-scope / could-do | `Idea` |
+   | "plan to" / "across multiple repos" / "epic:" / multi-piece | `Epic` |
+
+   **When the phrasing doesn't clearly fit a category, default to `Idea`** — not `Task`. Vague *is* the signal: `Idea` is the right home for "not sure yet, browse later." Don't force-fit a `Task` just because it's the most generic action type.
+
+   Tell the user: `Suggested: Type: <X> (trigger: "<phrase from line>"). Accept? (or change to <other> / it's an Idea / it's an Epic / drop / fix it now)`
+
+   Examples:
+   - Line "remove unused imports in auth.ts" → trigger "remove", suggest `Task` (concrete verb + specific target).
+   - Line "remove all the legacy stuff somehow" → vague hedge ("somehow"), suggest `Idea`.
+   - Line "checkout 500s on iOS Safari only" → trigger "500s" matches "error", suggest `Bug`.
+   - Line "maybe explore using SSE for live updates" → trigger "maybe explore", suggest `Idea`.
 
 3. **Dedupe check.** Before creating, search open issues for similar content:
    ```

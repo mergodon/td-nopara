@@ -107,7 +107,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "we use Laravel/Next/X" / framework-specific gotcha → `.td/WORKWAY.md` § Framework specifics
 - "stack changes to X" / "scope is X" → `.td/PROJECT.md`
 - "remember to X later" / "park this" → append `.td/BACKLOG.md` (session-scoped scratch; flushes to GitHub Issues at `/td-close`).
-- "park this to GH" / "create an issue for X" / "file this as Bug/Idea/Feature/Task" → `gh api graphql createIssue` mutation in current repo with chosen Type ID; body opens `**From:** <this-project>`; dedupe against open issues first; confirm before posting. Direct path — skip BACKLOG, track in GH immediately.
+- "park this to GH" / "create an issue for X" / "file this as Bug/Idea/Feature/Task" → `gh api graphql createIssue` mutation in current repo. Suggest Type from phrasing (vague defaults to `Idea`, not `Task`); show suggestion + the trigger phrase; dedupe against open issues; confirm before posting. Body opens `**From:** <this-project>`. Direct path — skip BACKLOG, track in GH immediately.
 - "flush the backlog" / "park the backlog to GH" / "empty BACKLOG" → invoke `/td-park` (or run its procedure inline if mid-conversation).
 - "let's plan X" / "start an Epic for X" / "I want to work on a big thing" → create `.td/work/<slug>.md` as planning scratch. When the plan is solid, promote: parent `Epic` via `gh api graphql createIssue` (current repo for per-project; `$TD_REGISTRY` for cross-project that spans multiple repos); concrete pieces as sub-issues via `addSubIssue` mutation (cross-repo within mergodon org supported). Fold-and-delete the work file at promotion.
 - "feedback on td-flow" → append `~/projects/td-flow/FEEDBACK.md`
@@ -168,7 +168,7 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 - `/td-init` — bootstrap or migrate a project (one-time per project).
 - `/td-clear` — mid-project context reset. Save STATE handoff, light prune, push. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or a major phase). Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT.md against reality, push.
-- `/td-refresh` — review and apply deltas between this project's `CLAUDE.md` and canonical at `~/projects/td-flow/CLAUDE.md`. Diff-and-propose: never overwrites; you decide per section.
+- `/td-refresh` — bring this project current. (1) Diff CLAUDE.md against canonical at `~/projects/td-flow/CLAUDE.md`, propose per section. (2) Flush any accumulated `BACKLOG.md` items to GitHub Issues. Diff-and-propose throughout — never overwrites without your accept.
 - `/td-inbox` — routine inbox check. Walks open GH issues grouped by Issue Type (Epic with sub-issue progress first, then Bug / Feature / Task / Idea), surfaces comments and related commits, then close / comment / skip each one. Repo-scoped.
 - `/td-incident` — live production fire mode. Drops everything else, sets STATE to incident, opens a work file, surfaces `DEBUG.md` if present. Resolves in-session, parks to GH as `Bug`, or files cross-repo.
 - `/td-park` — flush `BACKLOG.md` to GitHub Issues line-by-line with type selection and dedupe. Standalone mid-session declutter (the same flush runs automatically as part of `/td-close`).
