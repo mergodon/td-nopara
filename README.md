@@ -185,7 +185,7 @@ GitHub Issues are the source of truth for parked work. At the org level, five Is
 | `Bug` | unexpected problem or broken behavior |
 | `Epic` | bigger work that decomposes into sub-issues |
 
-Epics can have formal sub-issues across repos in the same org. Cross-project Epics typically live in `$TD_REGISTRY` (the only repo aware of the whole portfolio); per-project Epics live in the project's own repo. The parent's progress bar updates automatically as cross-repo sub-issues close.
+Epics can have formal sub-issues across repos in the same org. Per-project Epics live in the project's own repo. The parent's progress bar updates automatically as cross-repo sub-issues close.
 
 `/td-mailbox` reads Issue Types via `gh api graphql` (the `gh` CLI doesn't filter by type natively yet, so we use GraphQL directly).
 
@@ -207,17 +207,7 @@ No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
 Unified view across all your repos: `gh search issues --owner <your-org> --state open` (REPO is the unit of interest; no author filter — works regardless of which GH identity you're using).
 
-### Private registry companion
-
-td-flow keeps user-specific data out of the public framework. Your portfolio (friendly name → GH slug → one-liner) lives in a separate **private** companion repo. Set the env var in your shell rc:
-
-```sh
-export TD_REGISTRY="<your-org>/td-registry"
-```
-
-The framework reads `$TD_REGISTRY` to find your registry. `SERVICES.md` in that repo maps friendly names to slugs. `NAMING.md` (optional) documents your portfolio's naming convention.
-
-**Use friendly project names in cross-repo messages, not GH slugs.** When filing/commenting cross-repo, reference projects by their friendly name (e.g. "filed from `<consumer-app>`"). GH slugs change on rename; friendly names stay stable and identity-agnostic across machines.
+**Use friendly project names in cross-repo messages, not GH slugs.** When filing/commenting cross-repo, reference projects by their friendly name (e.g. "filed from `<consumer-app>`"). Resolution: first H1 in `.td/PROJECT.md`, fall back to directory basename. Keep PROJECT.md's H1 set to the project's friendly name on every td-flow project. GH slugs change on rename; friendly names stay stable and identity-agnostic across machines.
 
 ## Updating an existing td-flow project
 

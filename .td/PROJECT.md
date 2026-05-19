@@ -6,7 +6,7 @@ The **td-flow** framework itself: a minimal, file-based, repo-portable working a
 
 ## Who it's for
 
-Solo developers working with Claude Code. Originally built for one user's portfolio; anyone can fork it and pair it with their own private registry (see § Stack & choices / `$TD_REGISTRY` pattern).
+Solo developers working with Claude Code. Originally built for one user's portfolio; anyone can fork it for their own.
 
 ## Stack & choices
 
@@ -14,17 +14,13 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 - Bash for `install.sh` and the pre-commit hook.
 - AWK for extracting the test command from `WORKWAY.md` § Local testing.
 - Cross-project requests ride on GitHub Issues + `gh` CLI. No custom DB, no schema, no inbox service.
-- **Public methodology + private registry split.** This repo (`mergodon/td-flow`) is public — it holds the methodology, slash commands, templates, install scripts. Anything user/portfolio-specific (friendly-name → GH-slug registry, outbound-issue logs) lives in a separate **private** companion repo discovered via the `$TD_REGISTRY` env var. Forkers create their own private registry repo by the same pattern.
+- **Tracker-free outbound.** Per-project `.td/PROJECT.md § Cross-repo` lists connected repos; `**From:** <project>` body marker on every cross-repo filing identifies the source. `/td-mailbox` does one bounded search across declared repos — no separate registry repo, no tracker Epic, no in-repo tracking infrastructure beyond the human-curated list and the body marker.
 - Cloned to `~/projects/td-flow/` on each machine.
 - Distributed as symlinks into `~/.claude/commands/`, `~/.claude/skills/td-flow`, and `~/.claude/td-templates` via `install.sh`.
 
 ## Active scope
 
-(none — v4.0 shipped; awaiting first real-project `/td-init` + first real outside-fork to surface what the published methodology actually needs)
-
-## Cross-repo
-
-- `mergodon/td-registry` — private companion registry; we file naming-convention updates, SERVICES.md schema requests, NAMING.md edits.
+(none — v4.1 shipped; awaiting first real-project `/td-init` + first real outside-fork to surface what the published methodology actually needs)
 
 ## Shipped
 
@@ -40,6 +36,7 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 - v3.7 (td-bus retired in favor of GitHub Issues + per-project `## Cross-repo` registry in `.td/PROJECT.md`. Deleted bus CLI, schema, slash command, and `install.sh` blocks. Added cross-repo workflow + warm-up `gh issue list` to root + template `CLAUDE.md`. `## Cross-repo` is opt-in per project — no scaffold. Inbox-scope guardrail: current repo by default, cross-repo opt-in via explicit triggers. Identity-agnostic queries — REPO is the unit, not GH user.)
 - v3.8 (public/private split: SERVICES.md (and future user-specific data) moved out of this repo into a private companion registry repo discovered via `$TD_REGISTRY`. The framework repo flipped back to public so the methodology can be shared/forked; user data stays private. Pattern: public framework + per-user private registry.)
 - v4.0 (public-identity milestone: GH repo renamed `mergodon/td-nopara` → `mergodon/td-flow`; local clone path renamed `~/projects/td/` → `~/projects/td-flow/`. Friendly name, project name, GH slug, and local path now all line up. Doc refs reconciled across `td-flow` + `td-registry`; downstream-project reconcile guidance updated in README. No surface change to commands, skill, or contract.)
+- v4.1 (`/td-mailbox` shipped + tracker model proposed-then-reverted in one day; landed on minimum-dependency design: per-project `.td/PROJECT.md § Cross-repo` list bounds the outbound search, `**From:** <project>` body marker identifies our filings, sub-issues stay for real planning Epics. Plus: mechanical stack-reality-check + doc hygiene at `/td-clear` and `/td-close`; close-as-stale recommendation for outbound; `Feature` Issue Type retired; **`$TD_REGISTRY` private companion registry concept retired entirely** — the friendly-name lookup collapsed to PROJECT.md H1 → directory basename, no separate registry repo needed. Net effect across these changes: 8 slash commands → 7, materially simpler model.)
 
 ## Out of scope (for now)
 

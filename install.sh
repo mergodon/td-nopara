@@ -66,23 +66,6 @@ echo
 echo "td-flow installed."
 echo
 
-# Registry-pointer sanity check — warn if $TD_REGISTRY is unset.
-# v3.8 split SERVICES.md into a private companion registry repo
-# discovered via this env var. Without it, cross-repo lookups can't work.
-if [ -z "${TD_REGISTRY:-}" ]; then
-  echo "⚠️  TD_REGISTRY env var is not set."
-  echo "    td-flow uses a separate private registry repo for SERVICES.md +"
-  echo "    future outbound-issue logs. Set in your shell rc (e.g. zshenv):"
-  echo
-  echo "        export TD_REGISTRY=\"<your-org>/td-registry\""
-  echo
-  echo "    See README § \"Private registry companion\" for the full pattern."
-  echo
-else
-  echo "Registry: \$TD_REGISTRY = $TD_REGISTRY"
-  echo
-fi
-
 echo "Try it:"
 echo "  cd ~/projects/some-project"
 echo "  claude"

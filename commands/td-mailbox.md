@@ -16,9 +16,8 @@ The outbound side uses **minimum-dependency** mechanics: a human-curated list of
 
 Used to sign comments and closures, and as the body marker value to filter on.
 
-1. Read `$TD_REGISTRY/SERVICES.md` (local clone first, else `gh api`). Find the row where the slug matches `<owner>/<name>`. Use its Friendly column.
-2. Fall back to the first H1 heading in `.td/PROJECT.md`.
-3. Final fallback: directory basename.
+1. First H1 heading in `.td/PROJECT.md`.
+2. Fall back to directory basename.
 
 Hold as `<project-name>` for the run.
 
@@ -55,7 +54,7 @@ This gives the inbound list directly. Epics with cross-repo sub-issues show thei
 Read `.td/PROJECT.md § Cross-repo`. It's the human-curated list of repos this project files into (slug + optional one-line context per repo).
 
 - **Section missing or empty:** the project hasn't declared any cross-repo relationships. Outbound is empty. Skip Step 4; in the summary, say `Outbound: no cross-repo registry declared in PROJECT.md § Cross-repo`.
-- **Section present:** parse out the GH slugs (e.g., `mergodon/td-registry`, `mergodon/rgb-ggbuddy`, …). Hold as `<connected-repos>`.
+- **Section present:** parse out the GH slugs (e.g., `mergodon/rgb-ggbuddy`, …). Hold as `<connected-repos>`.
 
 The cross-repo registry IS the scope of outbound. Filings into repos not on this list won't show up — by design. If the project files into a new repo, declaring it here is the onboarding step (one-line edit in PROJECT.md).
 

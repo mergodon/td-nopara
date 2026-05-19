@@ -31,7 +31,7 @@ Parse the response. Build a map: `Idea` → `<id>`, `Task` → `<id>`, `Bug` →
 
 # Step 3 — Determine this project's friendly name
 
-Same procedure as `/td-inbox` Step 2: SERVICES.md → PROJECT.md H1 → directory basename. Hold as `<sender-name>` (used as the `**From:**` marker if the issue ends up being a self-park — distinguishes work this project parked vs work others filed).
+Same procedure as `/td-mailbox` Step 1: first H1 heading in `.td/PROJECT.md`, fall back to directory basename. Hold as `<sender-name>` (used as the `**From:**` marker if the issue ends up being a self-park — distinguishes work this project parked vs work others filed).
 
 # Step 4 — For each BACKLOG line, walk
 
