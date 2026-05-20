@@ -4,9 +4,11 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-20)
 Blocker:  none
-Last:     2026-05-20 — closed v4.2.
+Last:     2026-05-20 — shipped /td-close Step 11 (td-flow update check).
 
 ## Resume note
+
+**Post-v4.2 (2026-05-20):** `/td-close` now ends with a read-only td-flow update check (new Step 11) — resolves the framework repo via the `td-close.md` symlink (clone-path-independent), `fetch` + `rev-list main..origin/main`, nudges in the final report if behind, stays silent on up-to-date / offline / error so a successful close is never blocked or noised up. Never auto-pulls — updating is the user's call. "Tell the user" renumbered to Step 12. Verified: resolves correctly, count 0 → silent.
 
 v4.2 shipped: ARCHITECTURE.md is now the sixth canonical `.td/` doc, with hooks into `/td-init` (scaffold), `/td-clear` (drift heads-up), `/td-close` (hygiene pass), `/td-refresh` (Phase 4 existence check), and `/td-incident` (architectural-learning capture at close-out). `/td-mailbox` gained the `start` verb to activate an inbound issue as STATE.Topic with auto `Closes #N` staging. `/td-clear` + `/td-close` are now mailbox-aware (snapshot at handoff, open-Bug/Task gate at wrap — Epics+Ideas don't gate per [[feedback-epic-not-work-unit]]). A same-session simplification pass tightened 9 surfaces without losing capability.
 
@@ -22,10 +24,6 @@ Doc hygiene is mechanical at `/td-clear` (stack-drift heads-up + keep/clear filt
 
 Issue Types in use across the mergodon org: Idea, Task, Bug, Epic (Feature was retired mid-session 2026-05-19).
 
-Open follow-ups live as GitHub Issues (`gh issue list --state open` to see). Currently 4 open after this session's close:
-- #7 Task — context7 step in the rhythm if it surfaces as a missing pattern
-- #8 Task — subagent / parallel-piece path for features with 4+ independent pieces
-- #9 Idea — decide whether ARCHITECTURE.md should be a standard .td/ doc
-- #10 Task — enrich /td-clear (inbox+outbox surface) and /td-close (unresolved-issues check)
+Open follow-ups live as GitHub Issues (`gh issue list --state open` to see). None open right now — #7–#10 all closed (context7 + subagent paths declined as not-planned; ARCHITECTURE.md and the /td-clear+/td-close enrichments shipped in v4.2).
 
 If picking this up later: read this note → read `PROJECT.md` for shape → `git log --oneline -20` for recent arc → `gh issue list --state open` for parked work. If the framework needs a doc refresh from canonical, run `/td-refresh`. If something's actively going to be worked on, `/td-init` is for fresh projects only — this one's already initialized.

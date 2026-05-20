@@ -1,5 +1,5 @@
 ---
-description: Wrap the project (or a major phase). Park all leftover BACKLOG + work files to GitHub Issues, mechanical stack-reality-check vs PROJECT.md, doc hygiene pass across all .td/ docs (including the load-bearing Cross-repo registry), push.
+description: Wrap the project (or a major phase). Park all leftover BACKLOG + work files to GitHub Issues, mechanical stack-reality-check vs PROJECT.md, doc hygiene pass across all .td/ docs (including the load-bearing Cross-repo registry), push. Ends with a read-only td-flow framework-update check.
 ---
 
 You are closing the project (or a major phase). The work is done — shipped, live if it has a live, tested. This is the deeper cleanup that `/td-clear` skips: park leftover thinking to GitHub, walk every doc, validate it against current code and `git log`, prune anything redundant, restructure if drift has crept in. End with a clean, minimal `.td/` that an outsider could read in 2 minutes and understand the project.
@@ -178,13 +178,41 @@ git push origin main
 
 If push is rejected, surface and stop.
 
-# Step 11 — Tell the user
+# Step 11 — Check for td-flow framework updates
 
-Two parts:
+The close succeeded — an infrequent, natural checkpoint to surface whether the td-flow framework itself moved on while this project was being worked. **Read-only**: never `git pull` or re-run `install.sh` from here. Updating is the user's call and another repo's lifecycle (CLAUDE.md § Cross-repo) — surface, don't act.
+
+Resolve the framework repo from this command file — `install.sh` symlinks it out of the repo, so this is clone-path-independent:
+
+```
+TD_REPO=$(cd "$(dirname "$(readlink ~/.claude/commands/td-close.md)")/.." && pwd)
+```
+
+Check `main` against its remote:
+
+```
+git -C "$TD_REPO" fetch --quiet origin 2>/dev/null
+git -C "$TD_REPO" rev-list --count main..origin/main 2>/dev/null
+```
+
+- Count `0`, or any step errors (offline, not symlink-installed, fork relocated): **say nothing.** A successful close is never noised up or blocked by this check.
+- Count `N > 0`: append the nudge to the Step 12 report —
+
+  ```
+  📦 td-flow: N update(s) available — `cd <TD_REPO> && git pull && ./install.sh`
+  ```
+
+  followed by the commit list (`git -C "$TD_REPO" log --oneline main..origin/main`).
+
+Don't run the update. Each project picks up any contract change on its next session via the existing CLAUDE.md drift signal.
+
+# Step 12 — Tell the user
 
 **One sentence summary line:** `Closed. <N> commits pushed. <P> items parked to GitHub. <.td/ prune summary>.`
 
 **One short paragraph:** What got built and shipped, any meaningful decisions made, and the single most important thing to know if someone (or a future session) picks this up later. Not a changelog — git has that. Just the things that aren't obvious from reading the code.
+
+**If Step 11 found updates:** append its 📦 nudge block last, after the paragraph.
 
 # Rules
 
