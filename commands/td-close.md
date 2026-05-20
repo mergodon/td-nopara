@@ -18,7 +18,7 @@ Update existing memory files rather than creating duplicates. If nothing new was
 
 # Step 2 — Confirm intent and audit state
 
-- Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
+- Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/ARCHITECTURE.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
 - `git status --short` — uncommitted? If yes: stop, ask "Commit, stash, or discard?" Wait.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
 - If STATE shows mid-flight: ask the user "wrapping the whole project, or did you mean `/td-clear`?" Wait.
@@ -218,7 +218,7 @@ Don't run the update. Each project picks up any contract change on its next sess
 
 - Working tree clean before pushing. Never push with silently stashed changes.
 - Never force-push. Squashing is for local-only commits.
-- This command IS allowed to delete docs and rewrite STATE/PROJECT/WORKWAY content — that's the point. But never delete `CLAUDE.md`, never delete the canonical doc files (PROJECT/WORKWAY/STATE/BACKLOG remain even when minimal — BACKLOG goes back to `(empty)` placeholder, not deleted).
+- This command IS allowed to delete docs and rewrite STATE/PROJECT/WORKWAY content — that's the point. But never delete `CLAUDE.md`, never delete the standard doc files (PROJECT/WORKWAY/ARCHITECTURE/STATE/BACKLOG remain even when minimal — BACKLOG goes back to `(empty)` placeholder, not deleted).
 - Don't invent values when fixing drift. If reality doesn't tell us, ask.
 - If the user defers any decision, leave it and continue — don't block the close on optional cleanup.
 - **Step 3 (park leftovers) is the first writer-side step** — it creates GitHub issues. After it runs, the project's parked thinking lives on GitHub, not in local docs. Subsequent steps then prune the now-redundant local state.
