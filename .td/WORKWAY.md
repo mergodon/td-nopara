@@ -55,7 +55,7 @@ The "live" environment for this framework is `mergodon/td-flow` on GitHub plus t
 ### Multi-machine sync
 
 - Each machine gets a fresh `git clone https://github.com/mergodon/td-flow ~/projects/td-flow` then `./install.sh`.
-- Updates: `git pull && ./install.sh` (idempotent).
+- Updates: `git pull` then `./install.sh` — `install.sh` is idempotent; re-run it whenever command files are added/renamed, even without a pull (`/td-refresh` Phase 0 does this automatically).
 - No global memory dependency — everything ships through git.
 
 ## Notes

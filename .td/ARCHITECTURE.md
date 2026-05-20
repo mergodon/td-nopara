@@ -52,6 +52,12 @@ ARCHITECTURE.md was added 2026-05-20 as the sixth standard doc (this file). Reas
 
 They contain identical content but represent different roles: **root `CLAUDE.md` governs *this* framework project** (rules that apply while working on td-flow itself); **`templates/CLAUDE.md` is what `/td-init` copies into NEW projects** (the contract for consuming projects). A symlink would fuse them at the structural level forever — losing the option to have framework-self-referential rules in root that don't belong in the template. Cost of the current arrangement: must edit both files in lockstep when adding/changing rules. Mitigated by the doc-hygiene pass at `/td-close` catching drift. **Don't propose symlinking these again** — the conceptual distinction is load-bearing even when content matches.
 
+### Framework self-update: detect at close, act at refresh
+
+`/td-close` Step 11 only *detects* whether the installed framework is behind (`fetch` + `rev-list`, read-only) and nudges — it never pulls or installs. `/td-refresh` Phase 0 is where the framework actually updates: `install.sh` re-runs unconditionally (idempotent), `git pull` runs only on confirmation and only as a fast-forward.
+
+The split is deliberate. A close must never be blocked or noised up by an unrelated framework update, and pulling another repo mid-close touches its lifecycle. `install.sh` is safe to automate because it's idempotent; `git pull` is not (dirty trees, conflicts, non-ff) so it stays confirm-first. **Don't collapse this** — making `/td-close` auto-update, or `/td-refresh` auto-pull without confirmation, reintroduces exactly the failure modes the split avoids.
+
 ## What's load-bearing
 
 - **Friendly-name resolution: PROJECT.md H1 → directory basename.** Every cross-repo flow (filing, comments, signatures) depends on this. Changing the H1 changes the project's identity. If a project renames, every existing `**From:** <old-name>` filing becomes invisible to `/td-mailbox` outbound. Doc the rename in PROJECT.md and re-file if needed.
