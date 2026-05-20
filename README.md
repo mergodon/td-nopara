@@ -53,7 +53,8 @@ Most work is conversational. Here's what gets routed where:
 "park this to GH as Bug"              → creates GH issue directly with Type
 "flush the backlog to GH"             → invokes /td-park
 "let's plan a big redesign"           → starts a planning work file (later → Epic)
-"add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)"file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
+"add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
+"file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
 "any incoming?" / "check inbox"       → gh issue list for current repo (or /td-mailbox)
 "what did we file?" / "show outbox"   → /td-mailbox (the outbound section)
 "did rgb-api respond yet?"            → /td-mailbox or inline subIssues query
@@ -85,7 +86,8 @@ Four standard docs, one optional, plus scratch:
 CLAUDE.md                ← contract at root; user controls
 .td/
   PROJECT.md             ← what / who / stack / scope
-  WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics  STATE.md               ← current phase, current topic, blocker, resume note
+  WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics
+  STATE.md               ← current phase, current topic, blocker, resume note
   BACKLOG.md             ← session-scoped parking; flushes to GH at /td-close
   work/<topic>.md        ← active work scratch; deleted at close
   DEBUG.md  (optional)   ← project-specific troubleshooting reference (created on demand)
@@ -242,7 +244,8 @@ commands/             slash commands (td-init, td-clear, td-close, td-refresh,
 templates/            files copied into target projects on /td-init
   CLAUDE.md           the universal contract
   td/PROJECT.md
-  td/WORKWAY.md       the way-of-work doc with locked sections  td/STATE.md
+  td/WORKWAY.md       the way-of-work doc with locked sections
+  td/STATE.md
   td/BACKLOG.md
   td/DEBUG.md         optional troubleshooting template (not auto-scaffolded)
   td/frameworks/.gitkeep   (overflow dir, rarely needed)

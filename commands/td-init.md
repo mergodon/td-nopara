@@ -17,7 +17,8 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
   - `.td/ENV.md` content → spread across `## Live` and `## Notes` as appropriate
   - `.td/frameworks/*.md` content → `## Framework specifics` (one subsection per framework)
 - Rename `.td/INBOX.md` → `.td/BACKLOG.md` (preserve content, drop `[bug]`/`[idea]` tags).
-- If `.td/flow/<NN>-<name>.md` files exist (v1 piece files): consolidate into `.td/work/<topic>.md` if a flow is in progress; otherwise delete.- Tell the user what got migrated where.
+- If `.td/flow/<NN>-<name>.md` files exist (v1 piece files): consolidate into `.td/work/<topic>.md` if a flow is in progress; otherwise delete.
+- Tell the user what got migrated where.
 - Skip Step 2 (ask for gaps); jump to Step 6 (commit).
 
 **GSD-1 / GSD legacy detected** — `.planning/` exists, OR root `CLAUDE.md` contains HTML markers like `<!-- GSD:project-start -->` or `<!-- GSD:stack-start -->`:
@@ -27,7 +28,8 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
   - Test commands found in CLAUDE.md fenced blocks → `.td/WORKWAY.md` § Local testing.
   - Stack info from CLAUDE.md GSD markers → `.td/PROJECT.md` Stack section.
   - `.planning/research/*` (e.g. STACK.md tables) → `.td/WORKWAY.md` § Framework specifics.
-- Strip GSD HTML markers from CLAUDE.md before overwriting with the canonical contract.- After migration, ask: "Delete `.planning/`? (its content is now in `.td/`)." If yes, `git rm -r .planning/`.
+- Strip GSD HTML markers from CLAUDE.md before overwriting with the canonical contract.
+- After migration, ask: "Delete `.planning/`? (its content is now in `.td/`)." If yes, `git rm -r .planning/`.
 - Tell the user what got migrated.
 
 **Brownfield ad-hoc convention detected** — any of `.claude/agreements/`, `BLOCKS.md` exist (and not GSD):
@@ -91,7 +93,8 @@ Copy templates from `~/.claude/td-templates/` (or `~/projects/td-flow/templates/
 
 - `CLAUDE.md` → root, exactly as the template
 - `.td/PROJECT.md` → fill placeholders
-- `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Live- `.td/STATE.md` → fill placeholders, set `Last:` to today
+- `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Live
+- `.td/STATE.md` → fill placeholders, set `Last:` to today
 - `.td/BACKLOG.md` → as-is
 - `.td/frameworks/.gitkeep` → empty (the dir is for rare overflow; default home for framework awareness is `WORKWAY.md` § Framework specifics)
 - **No `## Cross-repo` scaffold in `PROJECT.md`.** The section is opt-in per project — the user adds it only when there's a real cross-repo relationship to declare. New projects start without it. The convention is documented in root `CLAUDE.md § Cross-repo`.

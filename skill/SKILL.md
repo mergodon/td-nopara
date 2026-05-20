@@ -34,7 +34,8 @@ GitHub is the work memory. Big meaningful pushes. No duplication.
 CLAUDE.md                ← contract at root, user controls it
 .td/
   PROJECT.md             ← what / who / stack / scope
-  WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics  STATE.md               ← current phase, current topic, blocker, resume note
+  WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics
+  STATE.md               ← current phase, current topic, blocker, resume note
   BACKLOG.md             ← session-scoped parking
   work/<topic>.md        ← active work scratch, deleted at close
   DEBUG.md  (optional)   ← troubleshooting reference, created on demand
