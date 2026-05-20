@@ -1,15 +1,13 @@
 ---
-description: Bring this project current with the framework conventions. (0) Sync the framework install — re-run install.sh, offer to pull td-flow if behind. (1) Diff CLAUDE.md against canonical, propose per section. (2) Flush any accumulated BACKLOG items to GitHub Issues. (3) Cross-repo registry drift check — diff actual filings against PROJECT.md § Cross-repo, propose add/remove per delta. (4) Standard-docs existence check — scaffold any canonical .td/ doc the project is missing. Diff-and-propose throughout — never overwrites without your accept.
+description: Bring this project current with the framework conventions. (0) Sync the framework install — re-run install.sh, offer to pull td-flow if behind. (1) Diff CLAUDE.md against canonical, propose per section. (2) Flush any accumulated BACKLOG items to GitHub Issues. (3) Cross-repo registry drift check — diff actual filings against PROJECT.md § Cross-repo, propose add/remove per delta. Diff-and-propose throughout — never overwrites without your accept.
 ---
 
-You are bringing this project up to the current framework conventions. Five phases, all diff-and-propose, all per-item-confirmable, never destructive without explicit user accept:
+You are bringing this project up to the current framework conventions. Four phases, all diff-and-propose, all per-item-confirmable, never destructive without explicit user accept:
 
 - **Phase 0 (Step 0):** Sync the framework itself before comparing against it. Re-run `install.sh` (idempotent — refreshes `~/.claude/` symlinks, prunes stale ones); if the local td-flow repo is behind its remote, offer to pull. Everything after this compares the project against the *installed* framework, so it has to be current first.
 - **Phase 1 (Steps 1-6):** Review project `CLAUDE.md` against the installed canonical (`$TD_REPO/CLAUDE.md`, resolved in Phase 0). The canonical drifts forward over time; project copies fall behind. Surface every section deviation, propose what to take, apply only what the user accepts.
 - **Phase 2 (Step 7):** If `.td/BACKLOG.md` has accumulated items (left over from before the gh-source-of-truth model, or just from extended work), offer to flush them to GitHub Issues using the `/td-park` procedure.
 - **Phase 3 (Step 8):** Cross-repo registry drift check. `.td/PROJECT.md § Cross-repo` is load-bearing (bounds `/td-mailbox` outbound). Compare actual filings (via org-wide `**From:**` marker search) against the declared list; propose add (we filed into a repo not declared) or remove (declared but never used).
-- **Phase 4 (Step 9):** Standard-docs existence check. The standard `.td/` docs are PROJECT/WORKWAY/STATE/BACKLOG, plus optional DEBUG. If a project is missing one (a hand-rolled or partially-migrated setup), offer to scaffold it from template. Existence-only check — never overwrites content.
-
 The user owns both surfaces. Your role is to make the deltas reviewable, one item at a time.
 
 # Step 0 — Sync the framework (Phase 0)
@@ -58,7 +56,7 @@ Phase 0 makes no commit and touches no project files — it only updates the td-
 
 # Step 1 — Quick equality check
 
-Compare the project `CLAUDE.md` against the canonical at `$TD_REPO/CLAUDE.md` (`$TD_REPO` resolved in Step 0). If they match byte-for-byte, tell the user "Phase 1 in sync — no CLAUDE.md deltas." and skip to Step 7 (Phase 2). Phases 2-4 still need to run.
+Compare the project `CLAUDE.md` against the canonical at `$TD_REPO/CLAUDE.md` (`$TD_REPO` resolved in Step 0). If they match byte-for-byte, tell the user "Phase 1 in sync — no CLAUDE.md deltas." and skip to Step 7 (Phase 2). Phases 2-3 still need to run.
 
 # Step 2 — Split into sections
 
@@ -192,43 +190,13 @@ No open filings found from <project-name>. Remove from list? (yes / keep)
 
 If you made changes: write back `.td/PROJECT.md`. The user reviews the diff at commit time.
 
-# Step 9 — Standard-docs existence check (Phase 4)
+# Step 9 — Tell the user
 
-Canonical `.td/` shape: PROJECT/WORKWAY/STATE/BACKLOG plus optional DEBUG. If a project is missing one of the four standard docs — a hand-rolled or partially-migrated setup — offer to scaffold it. Existence-only check; never compares content.
+One sentence covering all four phases:
 
-Check existence for each:
+`Framework synced (<pulled N commits / already current>). Refresh complete — <N> CLAUDE.md sections updated. <M> BACKLOG items flushed to GH. <K> Cross-repo entries updated.`
 
-```
-PROJECT.md   → check ./.td/PROJECT.md exists
-WORKWAY.md   → check ./.td/WORKWAY.md exists
-STATE.md     → check ./.td/STATE.md exists
-BACKLOG.md   → check ./.td/BACKLOG.md exists
-```
-
-For any missing file, surface one at a time:
-
-```
-.td/<doc> not present (canonical .td/ shape). Scaffold from $TD_REPO/templates/td/<doc>?
-(yes / yes-with-stub / not yet)
-```
-
-- `yes` → copy the template verbatim.
-- `yes-with-stub` → copy template + replace section placeholders with explicit `(empty — fill when relevant)` markers, so the file is visibly skeletal rather than looking pre-filled.
-- `not yet` → skip; this phase will re-prompt next refresh.
-
-For DEBUG.md: do NOT prompt — it's opt-in per project (created on demand during `/td-incident` close-out, not scaffolded).
-
-If everything exists: say `Standard docs in sync.` and continue.
-
-If you scaffolded any file: write the new files. The user reviews at commit time.
-
-# Step 10 — Tell the user
-
-One sentence covering all five phases:
-
-`Framework synced (<pulled N commits / already current>). Refresh complete — <N> CLAUDE.md sections updated. <M> BACKLOG items flushed to GH. <K> Cross-repo entries updated. <D> docs added.`
-
-If a phase didn't fire (no deltas, no items, no missing docs): use "in sync" wording for that phase instead of a number.
+If a phase didn't fire (no deltas, no items): use "in sync" wording for that phase instead of a number.
 
 # Rules
 
@@ -236,5 +204,5 @@ If a phase didn't fire (no deltas, no items, no missing docs): use "in sync" wor
 - Never auto-merge sections the user didn't review.
 - Don't propose deltas for whitespace-only differences.
 - If you can't read the canonical (missing, permission), stop and tell the user — don't guess what it should say.
-- **Phase 0** re-runs `install.sh` (idempotent — re-links `~/.claude/` symlinks) and, only with your confirmation and only as a fast-forward, may `git pull` the td-flow repo. It makes no commit and never touches project files. Phases 1-4 touch root `CLAUDE.md` and (in Phase 4) may scaffold missing canonical `.td/` docs from `$TD_REPO/templates/td/`; they never overwrite existing `.td/*` content.
+- **Phase 0** re-runs `install.sh` (idempotent — re-links `~/.claude/` symlinks) and, only with your confirmation and only as a fast-forward, may `git pull` the td-flow repo. It makes no commit and never touches project files. Phases 1-3 touch root `CLAUDE.md`; they never overwrite existing `.td/*` content.
 - The only commit this command makes is Step 6's `docs: refresh CLAUDE.md from canonical`, so the pre-commit `Test command` is exempt.
