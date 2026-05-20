@@ -55,13 +55,26 @@ Wait for the answer. If they name something, append it to `.td/BACKLOG.md` as `-
 
 This is a single question — don't prompt for elaboration or turn it into a planning session.
 
-# Step 6 — Light prune + stack-drift heads-up
+# Step 6 — Light prune + heads-ups for the handoff
 
 Walk `.td/` for content git already covers:
 
 - A `.td/work/<topic>.md` for a topic that's been shipped (its commits are in `git log`) → delete.
 - Resolved blockers in `.td/STATE.md` → clear them out.
 - Backlog items that have shipped → delete the line.
+
+**Mailbox snapshot.** Fetch open issues in this repo and cross-repo filings (same shape as `/td-mailbox` Steps 2+4 — bounded by `.td/PROJECT.md § Cross-repo`, filtered by `**From:** <project-name>` body marker). Only counts + type/state breakdowns needed. Surface as a one-line snapshot to include at the top of the Resume note in Step 7:
+
+```
+[mailbox] 📥 <N> inbound (<type-breakdown>), 📤 <M> outbound (<state-breakdown>)
+```
+
+Examples:
+- `[mailbox] 📥 4 inbound (3 Task, 1 Idea), 📤 0 outbound`
+- `[mailbox] 📥 2 inbound (1 Bug, 1 Task), 📤 3 outbound (2 awaiting reply, 1 pending action)`
+- `[mailbox] empty` — if both directions are zero, just say so.
+
+Skip the outbound segment entirely if `.td/PROJECT.md § Cross-repo` is missing/empty (no scope). Don't speculate or fetch globally.
 
 **Stack-drift heads-up (no fix, just flag).** Quick check: `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u` — if anything comes back, surface one line:
 
@@ -79,7 +92,7 @@ Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context w
 
 - **Keep** in-flight specifics the next session can't reconstruct: current decision, current blocker, mid-thinking, the gotcha you just hit.
 - **Clear** speculation ("we might want to..."), anything `git log` already says, or claims you haven't actually verified.
-- **Stack-drift heads-up** from Step 6 (if any) belongs at the top of the Resume note so the next session sees it immediately.
+- **Heads-ups** from Step 6 (mailbox snapshot, stack-drift if any) belong at the top of the Resume note so the next session sees them immediately. Mailbox snapshot first, stack-drift below it.
 
 Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 

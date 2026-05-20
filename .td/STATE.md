@@ -1,12 +1,14 @@
 # State
 
 Project:  td-flow
-Topic:    mailbox-walk-verbs
-Phase:    working
+Topic:    enrich-clear-close
+Phase:    shipped (awaiting test)
 Blocker:  none
-Last:     2026-05-20 — added `start` (inbound) and `status` (outbound) verbs to /td-mailbox walk; ACTIVE marker on STATE.Topic match.
+Last:     2026-05-20 — shipped /td-clear mailbox-snapshot + /td-close unresolved-gate; Closes #10.
 
 ## Resume note
+
+**Active piece:** #10 shipped (auto-closes on push). /td-clear now writes a `[mailbox]` snapshot at the top of Resume notes; /td-close gates on open Bug/Task (Epics + Ideas don't gate per [[feedback-epic-not-work-unit]]). Awaiting user test — if good, Topic flips to idle.
 
 td-flow is the public, file-based, repo-portable solo-developer framework hosted at `mergodon/td-flow`. It eats its own dog food — this repo IS a td-flow project. Current surface: root `CLAUDE.md` contract + 5 `.td/` docs (PROJECT/WORKWAY/STATE/BACKLOG, optional DEBUG) + `work/<topic>.md` scratch + **7 slash commands** (`/td-init`, `/td-clear`, `/td-close`, `/td-refresh`, `/td-mailbox`, `/td-incident`, `/td-park`). Everything else is conversational.
 

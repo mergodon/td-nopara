@@ -22,6 +22,24 @@ Update existing memory files rather than creating duplicates. If nothing new was
 - `git status --short` — uncommitted? If yes: stop, ask "Commit, stash, or discard?" Wait.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
 - If STATE shows mid-flight: ask the user "wrapping the whole project, or did you mean `/td-clear`?" Wait.
+- **Unresolved-issue gate.** Fetch open issues in this repo (same query as `/td-mailbox` Step 2). Filter to `Bug` + `Task` only — Epics are planning surfaces (track via their Task/Bug children, not the parent itself); Ideas are long-tail by design and don't gate a close. Also fetch awaiting-reply outbound (informational only, no gate — same shape as `/td-mailbox` Step 4).
+
+  If any open Bug or Task exists, surface and ask:
+
+  ```
+  Open work this project still has:
+    Bug   (X)   #<N> — <title>
+    Task  (X)   #<N> — <title>
+
+  Outbound awaiting reply (FYI, doesn't block):
+    <repo>#<N> — <title>
+
+  Continue close? (yes / abort)
+  ```
+
+  Wait. `yes` → proceed to Step 3. `abort` → stop, exit. User can `/td-mailbox` separately to triage, then re-run `/td-close`.
+
+  If no open Bug/Task exists, skip this prompt silently. The outbound FYI alone isn't enough to gate — surface it as a one-liner heads-up and continue.
 
 # Step 3 — Park leftovers to GitHub
 
