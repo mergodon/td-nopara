@@ -17,9 +17,7 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
   - `.td/ENV.md` content → spread across `## Live` and `## Notes` as appropriate
   - `.td/frameworks/*.md` content → `## Framework specifics` (one subsection per framework)
 - Rename `.td/INBOX.md` → `.td/BACKLOG.md` (preserve content, drop `[bug]`/`[idea]` tags).
-- If `.td/flow/<NN>-<name>.md` files exist (v1 piece files): consolidate into `.td/work/<topic>.md` if a flow is in progress; otherwise delete.
-- **ARCHITECTURE.md** isn't part of the v2 shape (it became standard in v4.2). If `.td/ARCHITECTURE.md` doesn't exist, draft one — the drafting procedure in `/td-refresh` Phase 4: read PROJECT/WORKWAY, scan the code tree and stack files, mine `git log` for non-obvious choices, fill sections only as far as the evidence supports, never fabricate. A v2 project has real history — a drafted doc beats an empty template.
-- Tell the user what got migrated where.
+- If `.td/flow/<NN>-<name>.md` files exist (v1 piece files): consolidate into `.td/work/<topic>.md` if a flow is in progress; otherwise delete.- Tell the user what got migrated where.
 - Skip Step 2 (ask for gaps); jump to Step 6 (commit).
 
 **GSD-1 / GSD legacy detected** — `.planning/` exists, OR root `CLAUDE.md` contains HTML markers like `<!-- GSD:project-start -->` or `<!-- GSD:stack-start -->`:
@@ -29,14 +27,11 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
   - Test commands found in CLAUDE.md fenced blocks → `.td/WORKWAY.md` § Local testing.
   - Stack info from CLAUDE.md GSD markers → `.td/PROJECT.md` Stack section.
   - `.planning/research/*` (e.g. STACK.md tables) → `.td/WORKWAY.md` § Framework specifics.
-- Strip GSD HTML markers from CLAUDE.md before overwriting with the canonical contract.
-- GSD has no ARCHITECTURE.md concept. Before deleting `.planning/`, draft `.td/ARCHITECTURE.md` — the drafting procedure in `/td-refresh` Phase 4, sourced from the migrated docs, the code tree, `git log`, and `.planning/research/*` (which often holds genuine rationale). Fill sections only as far as the evidence supports; fold in the real decisions, leave speculation out, never fabricate.
-- After migration, ask: "Delete `.planning/`? (its content is now in `.td/`)." If yes, `git rm -r .planning/`.
+- Strip GSD HTML markers from CLAUDE.md before overwriting with the canonical contract.- After migration, ask: "Delete `.planning/`? (its content is now in `.td/`)." If yes, `git rm -r .planning/`.
 - Tell the user what got migrated.
 
-**Brownfield ad-hoc convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` exist (and not GSD):
+**Brownfield ad-hoc convention detected** — any of `.claude/agreements/`, `BLOCKS.md` exist (and not GSD):
 - Read `.claude/agreements/*.md`. Most agreements are universal td-flow rails (cadence, push-after-commit, run-commands) — they're already in CLAUDE.md and don't need preservation. Project-specific ones (branding, uat-style) → append as items in `WORKWAY.md` § Notes.
-- Read existing `ARCHITECTURE.md` (root or `docs/`). If present, move it to `.td/ARCHITECTURE.md` — it's now a standard td-flow doc. If both root and `docs/` have one, ask which to keep. If neither exists and the project has non-trivial rationale to capture, draft `.td/ARCHITECTURE.md` from the existing code, `git log`, and the docs migrated above — the drafting procedure in `/td-refresh` Phase 4: read PROJECT/WORKWAY, scan the tree and stack files, mine `git log` for non-obvious choices, fill sections only as far as the evidence supports, never fabricate. A brownfield project has real history — a drafted doc beats an empty template.
 - Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, archive it (rename to `BLOCKS-archive.md` or leave as-is — ask the user).
 - Read existing root `CLAUDE.md`. Extract: project description (`## What this is` / similar) → `.td/PROJECT.md`; stack section → `.td/PROJECT.md`; common commands → `WORKWAY.md` § Local testing or § Live as appropriate; everything else → `.td/PROJECT.md` (it's content, not contract).
 - Overwrite root `CLAUDE.md` with the canonical td-flow contract.
@@ -63,7 +58,7 @@ Detect:
    - `tailwind.config.*` → Tailwind
    - `components/ui/` directory → shadcn
 4. **Test commands.** Read scripts from `package.json` or equivalent. Note `test`, `dev`, `build`, `deploy`.
-5. **Existing docs.** `README.md`, root `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`, `BLOCKS.md`, `.cursor/`, `.windsurfrules`.
+5. **Existing docs.** `README.md`, root `CLAUDE.md`, `AGENTS.md`, `BLOCKS.md`, `.cursor/`, `.windsurfrules`.
 6. **Existing td-flow state.** Already handled in Step 0.
 7. **Existing root `CLAUDE.md`** (only relevant if Step 0 didn't already migrate it): if present and not the td-flow contract, save the current content under a heading `## Preserved (pre-td-flow)` inside `.td/WORKWAY.md` § Framework specifics, then overwrite root `CLAUDE.md` with the canonical contract. Tell the user where the preserved content went.
 
@@ -96,9 +91,7 @@ Copy templates from `~/.claude/td-templates/` (or `~/projects/td-flow/templates/
 
 - `CLAUDE.md` → root, exactly as the template
 - `.td/PROJECT.md` → fill placeholders
-- `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Live
-- `.td/ARCHITECTURE.md` → **greenfield only** — a brand-new project has no history to draft from: copy the template as-is, leave sections empty for the project to fill organically; the first non-trivial decision it ships populates § Important decisions. (Migrating projects draft it from real history instead — see the Step 0 paths.)
-- `.td/STATE.md` → fill placeholders, set `Last:` to today
+- `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Live- `.td/STATE.md` → fill placeholders, set `Last:` to today
 - `.td/BACKLOG.md` → as-is
 - `.td/frameworks/.gitkeep` → empty (the dir is for rare overflow; default home for framework awareness is `WORKWAY.md` § Framework specifics)
 - **No `## Cross-repo` scaffold in `PROJECT.md`.** The section is opt-in per project — the user adds it only when there's a real cross-repo relationship to declare. New projects start without it. The convention is documented in root `CLAUDE.md § Cross-repo`.

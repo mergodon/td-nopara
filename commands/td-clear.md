@@ -71,12 +71,11 @@ Walk `.td/` for content git already covers:
 
 Examples: `[mailbox] 📥 4 inbound (3 Task, 1 Idea), 📤 0 outbound` | `[mailbox] empty`. Skip outbound segment if `.td/PROJECT.md § Cross-repo` is missing.
 
-**Drift heads-ups** (only render if a check fires — no noise when clean). Two mechanical checks, no fixes here — `/td-close` runs the full versions:
+**Drift heads-up** (only renders if the check fires — no noise when clean). One mechanical check, no fix here — `/td-close` runs the full version:
 
 - **Stack:** `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u` → if anything, note `<file> changed; PROJECT.md § Stack may be stale`.
-- **Architecture:** if `.td/ARCHITECTURE.md` exists, count code commits since its mtime (`src/**` / `app/**` / `lib/**`) → if 10+ files changed, note `code shifted since ARCHITECTURE.md was last touched; rationale may need a review`.
 
-Both get folded into a single `## Heads-ups` block at the top of the Resume note (Step 7). If both checks come back clean, no `## Heads-ups` block is rendered at all — the next session opens to a clean handoff.
+If it fires, it renders as a `## Heads-ups` block at the top of the Resume note (Step 7). Clean → no block at all, and the next session opens to a clean handoff.
 
 Don't restructure. Don't second-guess `WORKWAY.md` content. Deeper cleanup is `/td-close`.
 

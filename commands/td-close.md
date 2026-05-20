@@ -18,7 +18,7 @@ Update existing memory files rather than creating duplicates. If nothing new was
 
 # Step 2 — Confirm intent and audit state
 
-- Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/ARCHITECTURE.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
+- Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
 - `git status --short` — uncommitted? If yes: stop, ask "Commit, stash, or discard?" Wait.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
 - If STATE shows mid-flight: ask the user "wrapping the whole project, or did you mean `/td-clear`?" Wait.
@@ -126,9 +126,7 @@ Walk doc by doc, surface decisions as one-liners:
 - **PROJECT.md § Active scope** — anything actually shipped? Move to "Shipped". Anything quietly abandoned? Ask before deleting.
 - **PROJECT.md § What this is / Who for** — re-read against what actually got built. If the one-liner no longer fits, propose a new one and ask.
 - **PROJECT.md § Stack** — drift items from Step 6 already handled. Now check: is anything here just a copy of the dep file? Prune to the human-curated layer.
-- **PROJECT.md § Cross-repo** — load-bearing for `/td-mailbox` outbound. Run the same drift check `/td-refresh` Phase 3 does: org-wide `**From:**` marker search → diff observed vs declared → propose add/remove per delta. Apply confirmed deltas inline. (Or defer: tell the user "Cross-repo drift check available via `/td-refresh` if you want to handle separately.")
-- **ARCHITECTURE.md** — if it exists, walk § Important decisions / § What's load-bearing / § Surprises against `git log` since last edit. Surface one line per check: "Anything decided this session worth recording in § Important decisions?" / "Anything shipped that's now load-bearing for downstream code?" / "Any counterintuitive choice in the diff that future-you would misread?" Don't auto-write — prompt + wait. If the doc doesn't exist and the project has shipped non-trivial decisions, surface: "No ARCHITECTURE.md — draft one now from the project's history and code? (draft / blank template / not yet)". On `draft`, build it with the ARCHITECTURE.md drafting procedure in `/td-refresh` Phase 4 — close is the richest moment for it: Steps 3–6 just walked `git log`, the work files, and the stack, so the decisions are already in view. Skip if the project is genuinely small.
-- **WORKWAY.md § Local testing** — does `Test command` still exist in `package.json` / equivalent? Run it. If removed, flag.
+- **PROJECT.md § Cross-repo** — load-bearing for `/td-mailbox` outbound. Run the same drift check `/td-refresh` Phase 3 does: org-wide `**From:**` marker search → diff observed vs declared → propose add/remove per delta. Apply confirmed deltas inline. (Or defer: tell the user "Cross-repo drift check available via `/td-refresh` if you want to handle separately.")- **WORKWAY.md § Local testing** — does `Test command` still exist in `package.json` / equivalent? Run it. If removed, flag.
 - **WORKWAY.md § Local UAT / Live** — live URL still up? Smoke command works? Anything that reads as guesswork ("probably deploys via...") → verify or clear.
 - **WORKWAY.md § Framework specifics** — anything for a framework we removed? Prune.
 - **WORKWAY.md § Notes** — content now in committed code or covered by `git log`? Delete.
@@ -218,7 +216,7 @@ Don't run the update. Each project picks up any contract change on its next sess
 
 - Working tree clean before pushing. Never push with silently stashed changes.
 - Never force-push. Squashing is for local-only commits.
-- This command IS allowed to delete docs and rewrite STATE/PROJECT/WORKWAY content — that's the point. But never delete `CLAUDE.md`, never delete the standard doc files (PROJECT/WORKWAY/ARCHITECTURE/STATE/BACKLOG remain even when minimal — BACKLOG goes back to `(empty)` placeholder, not deleted).
+- This command IS allowed to delete docs and rewrite STATE/PROJECT/WORKWAY content — that's the point. But never delete `CLAUDE.md`, never delete the standard doc files (PROJECT/WORKWAY/STATE/BACKLOG remain even when minimal — BACKLOG goes back to `(empty)` placeholder, not deleted).
 - Don't invent values when fixing drift. If reality doesn't tell us, ask.
 - If the user defers any decision, leave it and continue — don't block the close on optional cleanup.
 - **Step 3 (park leftovers) is the first writer-side step** — it creates GitHub issues. After it runs, the project's parked thinking lives on GitHub, not in local docs. Subsequent steps then prune the now-redundant local state.

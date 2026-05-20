@@ -81,9 +81,8 @@ The incident ends in one of three ways:
 2. Run pre-ship checks per project's `WORKWAY.md § Local testing`. If there's a live URL, smoke after deploy.
 3. Commit: `fix(<area>): <one-line>` with a body that includes Symptom → Root cause → Fix (matching the work file structure).
 4. Push.
-5. **Single capture prompt:** ask **"Anything from this fire worth keeping? (`debug: <text>` / `arch: <text>` / `backlog: <text>` / `no`)"**. Route by prefix — the user just fought a fire, one decision point is enough. Multiple prefixes per response are OK (one per line). What each routes to:
+5. **Single capture prompt:** ask **"Anything from this fire worth keeping? (`debug: <text>` / `backlog: <text>` / `no`)"**. Route by prefix — the user just fought a fire, one decision point is enough. Multiple prefixes per response are OK (one per line). What each routes to:
    - `debug:` → append to `.td/DEBUG.md` under the right section (symptom → diagnostic / gotchas / production commands per content). Create from template if missing. Capture the symptom that took you there + the diagnostic path that worked + any tool-specific tricks.
-   - `arch:` → append to `.td/ARCHITECTURE.md` under § What's load-bearing or § Surprises (judge per content). Create from template if missing. For when the fire revealed *why* the system works the way it does, not *how to debug it again*.
    - `backlog:` → append to `.td/BACKLOG.md` (follow-up work surfaced during the fire — not the fire itself).
    - `no` → continue.
 6. Reset STATE: Topic back to previous (or `idle`); Phase reflects what's now active; `Last:` notes incident closed.
@@ -111,7 +110,7 @@ The incident ends in one of three ways:
 
 One sentence per resolution path:
 
-- (a) `Fixed. Pushed <sha>. <Captured: DEBUG | ARCH | BACKLOG | nothing>. Back to <previous topic | idle>.`
+- (a) `Fixed. Pushed <sha>. <Captured: DEBUG | BACKLOG | nothing>. Back to <previous topic | idle>.`
 - (b) `Parked to GitHub as <repo>#<N> (Type: Bug). Local work file removed.`
 - (c) `Filed cross-repo against <slug>#<N> (Type: Bug). Local work file removed.`
 
@@ -121,5 +120,5 @@ One sentence per resolution path:
 - **Read-only on production by default.** Mutations (restart, purge, rollback, migrate) require explicit user go-ahead per command.
 - **Always confirm before posting** to GH, committing, or pushing.
 - **STATE updates land in the same commit as the fix** (existing `feat:`/`fix:` contract rule).
-- **Capture for DEBUG.md / ARCHITECTURE.md as you go**, not just at close-out. If a useful diagnostic command surfaces or the fire reveals a load-bearing why, ask "save this to DEBUG/ARCH?" right then — small captures during the incident beat trying to reconstruct at the end. The Step 6 close-out prompt is the safety net, not the primary capture moment.
+- **Capture for DEBUG.md as you go**, not just at close-out. If a useful diagnostic command surfaces, ask "save this to DEBUG?" right then — small captures during the incident beat trying to reconstruct at the end. The Step 6 close-out prompt is the safety net, not the primary capture moment.
 - **Incident mode is exclusive.** Don't switch the conversation back to the previous topic until resolution is complete. The user can break this with an explicit "pause the incident."
