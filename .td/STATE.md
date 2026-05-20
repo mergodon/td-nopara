@@ -4,11 +4,11 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-20)
 Blocker:  none
-Last:     2026-05-20 — shipped /td-close Step 11 (td-flow update check).
+Last:     2026-05-20 — shipped /td-refresh Phase 0 (framework sync).
 
 ## Resume note
 
-**Post-v4.2 (2026-05-20):** `/td-close` now ends with a read-only td-flow update check (new Step 11) — resolves the framework repo via the `td-close.md` symlink (clone-path-independent), `fetch` + `rev-list main..origin/main`, nudges in the final report if behind, stays silent on up-to-date / offline / error so a successful close is never blocked or noised up. Never auto-pulls — updating is the user's call. "Tell the user" renumbered to Step 12. Verified: resolves correctly, count 0 → silent.
+**Post-v4.2 (2026-05-20) — framework self-update, two pieces:** (1) `/td-close` Step 11 — read-only check after a successful close; nudges if the td-flow repo is behind origin, never pulls ("Tell the user" → Step 12). (2) `/td-refresh` Phase 0 (new Step 0) — syncs the framework *before* the project refresh: re-runs `install.sh` always (idempotent; catches stale symlinks like the `/td-incident` miss this session), offers a confirm-first `--ff-only` pull if behind. Detect-at-close, act-at-refresh. Both resolve the framework repo via the command symlink (clone-path-independent). Detail in `git log`.
 
 v4.2 shipped: ARCHITECTURE.md is now the sixth canonical `.td/` doc, with hooks into `/td-init` (scaffold), `/td-clear` (drift heads-up), `/td-close` (hygiene pass), `/td-refresh` (Phase 4 existence check), and `/td-incident` (architectural-learning capture at close-out). `/td-mailbox` gained the `start` verb to activate an inbound issue as STATE.Topic with auto `Closes #N` staging. `/td-clear` + `/td-close` are now mailbox-aware (snapshot at handoff, open-Bug/Task gate at wrap — Epics+Ideas don't gate per [[feedback-epic-not-work-unit]]). A same-session simplification pass tightened 9 surfaces without losing capability.
 
