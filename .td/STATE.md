@@ -2,9 +2,9 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    idle
+Phase:    closed (2026-05-21)
 Blocker:  none
-Last:     2026-05-21 — shipped v4.5 + dry-trace sanity-check fixups.
+Last:     2026-05-21 — closed.
 
 ## Resume note
 
@@ -15,11 +15,14 @@ dogfood). Surface: root `CLAUDE.md` contract (mirrored byte-for-byte in
 + optional DEBUG + `work/<topic>.md` scratch, seven slash commands, and
 `install.sh` symlinking it all into `~/.claude/`. Everything else is conversational.
 
-v4.5 (just shipped) replaced the framework's serial "walk one item at a time"
-interaction with a uniform **gather → digest → one decision point → batch
-execute** model across `/td-mailbox`, `/td-park`, `/td-close`, `/td-refresh`.
-`/td-park` is now the single canonical BACKLOG-flush procedure and gained a
-consolidation pass (merge related lines, no blind 1:1 mapping).
+Latest: v4.5 — the batch-decide interaction model. The serial "walk one item at
+a time" pattern is gone from `/td-mailbox`, `/td-park`, `/td-close`, `/td-refresh`;
+all four now gather → present one digest → take decisions in a single pass →
+batch execute. `/td-park` is the single canonical BACKLOG-flush procedure
+(consolidates related lines, no blind 1:1 mapping); `/td-close` Step 3 and
+`/td-refresh` Phase 2 reference it. `PROJECT.md § Shipped` carries the version
+history; `git log` has the detail.
 
-Nothing pending — 0 open issues, BACKLOG empty, no work files.
-`PROJECT.md § Shipped` carries the version history; `git log` has the detail.
+Nothing pending — 0 open issues, BACKLOG empty, no work files. Next session:
+`/td-refresh` syncs a consuming project from canonical, `/td-init` bootstraps a
+fresh one.
