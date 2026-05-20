@@ -2,17 +2,17 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    idle
+Phase:    closed (2026-05-20)
 Blocker:  none
-Last:     2026-05-20 — session shipped: ARCHITECTURE.md as sixth standard doc (#9), /td-mailbox start/status verbs (then status retired), /td-clear+/td-close mailbox-aware (#10), simplify pass across 9 surfaces. Roleplay test passed.
+Last:     2026-05-20 — closed v4.2.
 
 ## Resume note
 
-No active piece.
+v4.2 shipped: ARCHITECTURE.md is now the sixth canonical `.td/` doc, with hooks into `/td-init` (scaffold), `/td-clear` (drift heads-up), `/td-close` (hygiene pass), `/td-refresh` (Phase 4 existence check), and `/td-incident` (architectural-learning capture at close-out). `/td-mailbox` gained the `start` verb to activate an inbound issue as STATE.Topic with auto `Closes #N` staging. `/td-clear` + `/td-close` are now mailbox-aware (snapshot at handoff, open-Bug/Task gate at wrap — Epics+Ideas don't gate per [[feedback-epic-not-work-unit]]). A same-session simplification pass tightened 9 surfaces without losing capability.
 
-This session added the sixth canonical doc (ARCHITECTURE.md) with hooks into /td-init scaffold, /td-clear drift heads-up, /td-close hygiene pass, /td-refresh Phase 4 existence check, /td-incident architectural-learning capture. /td-clear + /td-close gained mailbox awareness (snapshot + open-Bug/Task gate). Then a complexity review pruned 9 surfaces: dropped /td-mailbox outbound `status` verb, consolidated /td-clear heads-ups, single /td-incident close-out capture prompt, fixed /td-refresh Step 1 short-circuit bug, halved CLAUDE.md slash-commands list, restructured CLAUDE.md § Cross-repo for sharper structure.
+Mailbox empty. Open issues: 0. PROJECT.md § Active scope is `(none)` awaiting real-project use of v4.2 conventions. Next session: probably either a different project, or revisiting any of these v4.2 hooks once they've hit a real codebase.
 
-Mailbox: empty (3 self-filed issues from prior session all closed today: #7 not planned, #8 not planned, #9 shipped, #10 shipped). 4 commits ahead in this session — none holding.
+If picking this up later: read PROJECT.md § Shipped for the v4.2 entry (full change list), `git log --oneline -15` for the commit arc, `.td/ARCHITECTURE.md` for the load-bearing whys. Framework is in good shape — no follow-up debt.
 
 td-flow is the public, file-based, repo-portable solo-developer framework hosted at `mergodon/td-flow`. It eats its own dog food — this repo IS a td-flow project. Current surface: root `CLAUDE.md` contract + 5 `.td/` docs (PROJECT/WORKWAY/STATE/BACKLOG, optional DEBUG) + `work/<topic>.md` scratch + **7 slash commands** (`/td-init`, `/td-clear`, `/td-close`, `/td-refresh`, `/td-mailbox`, `/td-incident`, `/td-park`). Everything else is conversational.
 

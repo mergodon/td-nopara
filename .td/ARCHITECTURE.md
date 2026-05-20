@@ -48,6 +48,10 @@ No tracker Epic, no sub-issue linkage required for one-off cross-repo CRs. The b
 
 ARCHITECTURE.md was added 2026-05-20 as the sixth standard doc (this file). Reason: code is the structure, but rationale (the *why* of decisions, the load-bearing parts, the surprises) dies first when context-switches stretch. A new idea can hurt an existing decision if the rationale isn't documented. The doc is rationale-focused, not structural — diagrams stay out.
 
+### `templates/CLAUDE.md` and root `CLAUDE.md` kept conceptually distinct (no symlink)
+
+They contain identical content but represent different roles: **root `CLAUDE.md` governs *this* framework project** (rules that apply while working on td-flow itself); **`templates/CLAUDE.md` is what `/td-init` copies into NEW projects** (the contract for consuming projects). A symlink would fuse them at the structural level forever — losing the option to have framework-self-referential rules in root that don't belong in the template. Cost of the current arrangement: must edit both files in lockstep when adding/changing rules. Mitigated by the doc-hygiene pass at `/td-close` catching drift. **Don't propose symlinking these again** — the conceptual distinction is load-bearing even when content matches.
+
 ## What's load-bearing
 
 - **Friendly-name resolution: PROJECT.md H1 → directory basename.** Every cross-repo flow (filing, comments, signatures) depends on this. Changing the H1 changes the project's identity. If a project renames, every existing `**From:** <old-name>` filing becomes invisible to `/td-mailbox` outbound. Doc the rename in PROJECT.md and re-file if needed.

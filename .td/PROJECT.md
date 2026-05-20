@@ -2,7 +2,7 @@
 
 ## What this is
 
-The **td-flow** framework itself: a minimal, file-based, repo-portable working agreement for solo development. Same shape every project, conversational interface, structured docs in `.td/`, GitHub commits as memory. Three slash commands (`/td-init`, `/td-clear`, `/td-close`) — everything else is conversational.
+The **td-flow** framework itself: a minimal, file-based, repo-portable working agreement for solo development. Same shape every project, conversational interface, structured docs in `.td/`, GitHub commits as memory. Seven slash commands (`/td-init`, `/td-clear`, `/td-close`, `/td-refresh`, `/td-mailbox`, `/td-incident`, `/td-park`) — everything else is conversational.
 
 ## Who it's for
 
@@ -20,7 +20,7 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 
 ## Active scope
 
-(none — v4.1 shipped; awaiting first real-project `/td-init` + first real outside-fork to surface what the published methodology actually needs)
+(none — v4.2 shipped; awaiting first real outside-fork and a real-project hit on the new ARCHITECTURE.md / simplified prompts to surface anything the dogfood missed)
 
 ## Shipped
 
@@ -37,10 +37,11 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 - v3.8 (public/private split: SERVICES.md (and future user-specific data) moved out of this repo into a private companion registry repo discovered via `$TD_REGISTRY`. The framework repo flipped back to public so the methodology can be shared/forked; user data stays private. Pattern: public framework + per-user private registry.)
 - v4.0 (public-identity milestone: GH repo renamed `mergodon/td-nopara` → `mergodon/td-flow`; local clone path renamed `~/projects/td/` → `~/projects/td-flow/`. Friendly name, project name, GH slug, and local path now all line up. Doc refs reconciled across `td-flow` + `td-registry`; downstream-project reconcile guidance updated in README. No surface change to commands, skill, or contract.)
 - v4.1 (`/td-mailbox` shipped + tracker model proposed-then-reverted in one day; landed on minimum-dependency design: per-project `.td/PROJECT.md § Cross-repo` list bounds the outbound search, `**From:** <project>` body marker identifies our filings, sub-issues stay for real planning Epics. Plus: mechanical stack-reality-check + doc hygiene at `/td-clear` and `/td-close`; close-as-stale recommendation for outbound; `Feature` Issue Type retired; **`$TD_REGISTRY` private companion registry concept retired entirely** — the friendly-name lookup collapsed to PROJECT.md H1 → directory basename, no separate registry repo needed. Net effect across these changes: 8 slash commands → 7, materially simpler model.)
+- v4.2 (ARCHITECTURE.md added as sixth standard `.td/` doc — rationale-focused, not structural. Hooks across the lifecycle: `/td-init` scaffolds it, `/td-clear` heads-up on drift, `/td-close` hygiene-pass review, `/td-refresh` Phase 4 existence check, `/td-incident` close-out captures architectural learnings. Plus: `/td-mailbox` gained `start` (inbound) verb to activate an issue as the current Topic with auto `Closes #N` staging; `/td-clear` + `/td-close` gained mailbox awareness (snapshot + open-Bug/Task gate). Then a same-session simplification pass: dropped `/td-mailbox` outbound `status` sub-menu, consolidated `/td-clear` heads-ups into one block, collapsed `/td-incident` close-out's 3 prompts into one prefix-routed capture, fixed `/td-refresh` Step 1 short-circuit bug, halved CLAUDE.md slash-commands list, restructured CLAUDE.md § Cross-repo for sharper structure. Explicit user call: `templates/CLAUDE.md` and root `CLAUDE.md` kept conceptually distinct — no symlink, mirrored edits per session.)
 
 ## Out of scope (for now)
 
-- Research / context7 deep integration in the rhythm — useful, deferred. Currently context7 is a tool I can use ad-hoc; not built into the cycle.
-- Subagents for parallel pieces — useful, deferred. Will revisit when a real project has 4+ truly independent pieces.
+- Research / context7 deep integration in the rhythm — **decided against** 2026-05-20 (closed #7 as not-planned). The MCP is already wired up and ad-hoc use is already documented in CLAUDE.md. A formal "research phase" would add ceremony for every piece — anti the three-lines-beats-abstraction instinct.
+- Subagents for implementation fan-out — **decided against** 2026-05-20 (closed #8 as not-planned). The Agent tool exists in the harness and research fan-out (Explore agents) is already documented; implementation fan-out can't be made fully safe (contract leaks, semantic conflicts past file-level isolation, partial-failure rollback). Coordination cost outweighs speedup for a solo dev where speed isn't the bottleneck. Revisit only with a real concrete case.
 - npm package / CLI / Electron studio (the gsd-2 mistake). Never.
 - Automated test suite for the framework itself — explicitly dropped 2026-05-05. We validate project-by-project as we use td-flow on real projects. Drift signals + "Before I commit a piece" ritual are the self-validation.
