@@ -174,17 +174,19 @@ Parse `<source-project>` from the `**From:** <name>` marker at the top of the bo
 
 **Recommendation** (one line, type-aware — first match wins):
 - **N == <active-issue>** → "Your current Topic — comment with progress, or close if shipped?"
-- **Epic** at 100% sub-issues closed → "All sub-issues closed — close the parent?"
-- **Epic** older than 30 days at 0% → "Stale — still pursuing?"
+- **Epic** — report-only, never a "start it" nudge. An Epic is a high-level planning surface; its open child issues are the actionable work, not the parent. First match wins within this group:
+  - 100% sub-issues closed → "All children done — close the parent?"
+  - older than 30 days at 0% → "Stale plan — still pursuing?"
+  - otherwise → "Planning surface — <completed>/<total> children done; pick it up via the open children."
 - **Bug/Task** with commits referencing `#<N>` that look like a fix → "Looks resolved — close?"
 - Most recent comment from another project → "Awaiting reply — comment?"
 - **Idea** older than 60 days, untouched → "Stale idea — close?"
-- **Bug/Task/Epic** with no commits referencing it and not active → "Concrete piece — start it, or leave open?"
+- **Bug/Task** with no commits referencing it and not active → "Concrete piece — start it, or leave open?"
 - Otherwise → "Pending — leave open?"
 
-**Wait for: `start` / `comment` / `close` / `skip` / freeform.**
+**Wait for: `start` / `comment` / `close` / `skip` / freeform.** For an **Epic**, drop `start` from the offered verbs — an Epic is picked up through its child issues, never activated as a Topic itself; offer `comment` / `close` / `skip` / freeform.
 
-**On `start`:** activate this issue as the current piece of work.
+**On `start`:** activate this issue as the current piece of work. If the issue is an **Epic**, don't activate it — an Epic isn't a single piece of work; offer to `start` one of its open child issues instead, and walk that one.
 1. Propose a kebab-case `<slug>` derived from the title (3–5 words, lowercase ASCII). Confirm with user.
 2. Ask: "Multi-step (planning surface → `.td/work/<slug>.md`) or single-piece (just STATE Resume note)?" If the issue body is shaped as one clear edit, default to single-piece.
 3. Update `.td/STATE.md`:
@@ -268,6 +270,7 @@ Mailbox walked: <T> reviewed total.
 - **Outbound scope is the cross-repo registry** in `.td/PROJECT.md § Cross-repo`. Filings into repos not declared there won't show. By design — forces honesty about cross-repo relationships. If you find yourself wanting to widen, the right move is updating PROJECT.md, not bypassing the scope.
 - **The `**From:** <project>` body marker is canonical** — it's the only identifier of "this is ours" on the outbound side, and it's the human-readable source signal on the inbound side. Every cross-repo filing gets it.
 - **Sub-issue linkage stays for real planning Epics.** Epics with cross-repo children show progress in the inbound walk. That's a legit GitHub-native use case. One-off CRs don't need it.
+- **Epics are reported, not actioned.** An Epic is a high-level planning surface — the actionable work is its child Bug/Task issues. `/td-mailbox` shows an Epic's state and sub-issue progress for planning context; it never nudges `start` on a parent Epic. (Same stance as `/td-close` Step 2, which gates a close only on Bug/Task.)
 - **Always sign comments and closures with `— <project-name>`** (project-soul rule). Never address GH usernames in cross-repo prose.
 - **Never auto-close, never auto-post.** Always show drafted text and confirm.
 - **One issue at a time.** No batching.

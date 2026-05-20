@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-20)
 Blocker:  none
-Last:     2026-05-20 — shipped: ARCHITECTURE.md drafted from project reality (git log + code + docs) at /td-refresh Phase 4, brownfield /td-init, and /td-close — no longer blank-scaffolded.
+Last:     2026-05-20 — shipped: /td-mailbox reports Epics as planning surfaces (no "start it" nudge on a parent Epic).
 
 ## Resume note
 
@@ -16,4 +16,6 @@ Post-close (2026-05-20): a doc-review roleplay pass found and fixed 15 drifts. R
 
 Enhancement (2026-05-20): ARCHITECTURE.md is now **drafted from project reality**, not blank-scaffolded. `/td-refresh` Phase 4 (Step 9), the brownfield `/td-init` migration paths (v2 / GSD / ad-hoc), and `/td-close`'s doc-hygiene pass all offer a `draft` option that reads PROJECT/WORKWAY + the code tree + `git log`, then fills the ARCHITECTURE.md template only as far as the evidence supports — `git log`-mined Important decisions, sections with no evidence left as explicit markers, never fabricated. Canonical procedure lives in `/td-refresh` Phase 4 § Drafting procedure; `/td-init` and `/td-close` reference it. Triggered by maintainer feedback that the old scaffold just handed back an empty file. Greenfield `/td-init` still copies a blank template — a brand-new project has no history to draft from.
 
-Nothing pending — 0 open issues, BACKLOG empty, no work files. To pick up: PROJECT.md for shape, `git log --oneline -15` for the recent arc, ARCHITECTURE.md for the load-bearing whys. This repo is already initialized — `/td-init` is for fresh projects; `/td-refresh` syncs from canonical.
+Also (2026-05-20): `/td-mailbox` Step 6 no longer nudges `start` on an Epic — Epics are reported as high-level planning surfaces (state + sub-issue progress); their child Bug/Task issues are the actionable items. Aligns with `/td-close` Step 2's Bug/Task-only gate.
+
+Open question under discussion (2026-05-20): whether ARCHITECTURE.md stays an auto-scaffolded standard doc or demotes to opt-in (the DEBUG.md pattern). No decision yet. Otherwise nothing pending — 0 open issues, BACKLOG empty, no work files. To pick up: PROJECT.md for shape, `git log --oneline -15` for the recent arc, ARCHITECTURE.md for the load-bearing whys. This repo is already initialized — `/td-init` is for fresh projects; `/td-refresh` syncs from canonical.
