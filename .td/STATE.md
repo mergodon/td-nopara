@@ -1,10 +1,10 @@
 # State
 
 Project:  td-flow
-Topic:    idle
-Phase:    closed (2026-05-20)
+Topic:    mailbox-walk-verbs
+Phase:    working
 Blocker:  none
-Last:     2026-05-20 — closed.
+Last:     2026-05-20 — added `start` (inbound) and `status` (outbound) verbs to /td-mailbox walk; ACTIVE marker on STATE.Topic match.
 
 ## Resume note
 

@@ -12,14 +12,16 @@ The outbound side uses **minimum-dependency** mechanics: a human-curated list of
 - Verify `gh` is authenticated and has a remote: `gh repo view --json name,owner 2>/dev/null`. If it fails: abort, "No GitHub remote or `gh` not authenticated."
 - Capture the slug as `<owner>/<name>` for the queries below.
 
-# Step 1 — Identify this project's friendly name
+# Step 1 — Identify this project's friendly name + active Topic
 
-Used to sign comments and closures, and as the body marker value to filter on.
+Friendly name — used to sign comments and closures, and as the body marker value to filter on:
 
 1. First H1 heading in `.td/PROJECT.md`.
 2. Fall back to directory basename.
 
 Hold as `<project-name>` for the run.
+
+Also read `.td/STATE.md` and parse the `Topic:` line. If it's not `idle` and matches a `Closes #<N>` reference in the Resume note (or a `.td/work/<slug>.md` exists referencing an inbound issue), hold the matched issue number as `<active-issue>`. Surfaces as an `[● ACTIVE]` marker in the walk and the summary header — so the very first thing /td-mailbox tells you is what's already in flight before you start picking up new things.
 
 # Step 2 — Inbound query (open issues in this repo)
 
@@ -119,6 +121,7 @@ Print compact summary:
 
 ```
 Mailbox: <N inbound> inbound + <M outbound> outbound
+<if <active-issue> set: "  ● Active: #<N> <title> (STATE.Topic)">
 
 📥 Inbound (this repo) — by Issue Type
   Epic    (X)   <#N — title [Y/Z sub-issues if any]>, ...
@@ -149,6 +152,7 @@ For each issue in priority order:
 ```
 #<N>  <title>
   Type: <Epic|Bug|Task|Idea|untyped>  from: <source-project>  opened <YYYY-MM-DD>
+  <if N == <active-issue>: "  ● ACTIVE — your current STATE.Topic">
   <if Epic with sub-issues: [<completed>/<total> sub-issues closed, <percentCompleted>%]>
 ```
 
@@ -168,15 +172,29 @@ Parse `<source-project>` from the `**From:** <name>` marker at the top of the bo
   └─ <repo>#<N> [open|closed] <title>
 ```
 
-**Recommendation** (one line, type-aware):
+**Recommendation** (one line, type-aware — first match wins):
+- **N == <active-issue>** → "Your current Topic — comment with progress, or close if shipped?"
 - **Epic** at 100% sub-issues closed → "All sub-issues closed — close the parent?"
 - **Epic** older than 30 days at 0% → "Stale — still pursuing?"
 - **Bug/Task** with commits referencing `#<N>` that look like a fix → "Looks resolved — close?"
 - Most recent comment from another project → "Awaiting reply — comment?"
 - **Idea** older than 60 days, untouched → "Stale idea — close?"
+- **Bug/Task/Epic** with no commits referencing it and not active → "Concrete piece — start it, or leave open?"
 - Otherwise → "Pending — leave open?"
 
-**Wait for: `close` / `comment` / `skip` / freeform.**
+**Wait for: `start` / `comment` / `close` / `skip` / freeform.**
+
+**On `start`:** activate this issue as the current piece of work.
+1. Propose a kebab-case `<slug>` derived from the title (3–5 words, lowercase ASCII). Confirm with user.
+2. Ask: "Multi-step (planning surface → `.td/work/<slug>.md`) or single-piece (just STATE Resume note)?" If the issue body is shaped as one clear edit, default to single-piece.
+3. Update `.td/STATE.md`:
+   - `Topic: <slug>`
+   - `Phase: planning` (multi-step) or `working` (single-piece)
+   - `Last: YYYY-MM-DD — picked up #<N> from mailbox`
+   - Append/replace Resume note line: `Active piece: #<N> <title> — Closes #<N> on ship.`
+4. If multi-step: create `.td/work/<slug>.md` with a short header (`# <title>`, link to `#<N>`, the issue body folded in as initial context).
+5. Tell user: `STATE.Topic is now <slug>. First commit on this piece must include "Closes #<N>" so GitHub auto-closes the issue when it ships.`
+6. Ask: "Continue walking the mailbox, or break out to start working on #<N> now?" — wait. If `break out`, stop the walk and resume normal conversation. If `continue`, proceed.
 
 **On `close`:**
 1. Ask "Closing comment? (yes / no)". Wait.
@@ -219,7 +237,17 @@ URL: <url>
 - **Recently closed, last comment is theirs** → "Verify the resolution matched your ask?"
 - **Recently closed, you commented after close** → "Already verified — skip."
 
-**Wait for: `comment` / `verify` / `close` / `reopen` / `skip` / `acknowledge` / freeform.**
+**Wait for: `status` / `comment` / `verify` / `close` / `reopen` / `skip` / `acknowledge` / freeform.**
+
+**On `status`:** the "let me look closer before deciding" verb. For when you want a deeper read on where this stands before picking an action.
+1. Re-fetch the issue (in case of staleness since the walk started): `gh issue view <N> --repo <slug> --json state,updatedAt,comments`.
+2. Print:
+   - Current state
+   - Days since last activity (computed from `updatedAt`)
+   - Who has the ball — `us` (last comment sign-off ends with `— <project-name>`) or `them`
+   - Last 5 comments verbatim, marked `[us]` / `[them]` per sign-off
+3. Suggest a next action one-liner — `chase` (gentle nudge comment), `update` (post status from our side), `verify`, `withdraw` (close as stale), or `leave`.
+4. Re-prompt the same menu (`status / comment / verify / close / reopen / skip`) — user picks. `chase` and `update` route to `comment` with appropriate drafted text; `withdraw` routes to `close` (not_planned reason).
 
 **On `comment`:** draft based on discussion + user intent, append `— <project-name>`, confirm, then `gh issue comment <N> --repo <slug> --body "<text>"`.
 
@@ -239,8 +267,9 @@ The `not planned` reason tells GitHub (and any parent Epic's progress bar, if th
 
 ```
 Mailbox walked: <T> reviewed total.
-  Inbound:  <C> closed, <Co> commented on, <S> skipped.
-  Outbound: <Co> commented on, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
+  Inbound:  <St> started, <C> closed, <Co> commented on, <S> skipped.
+  Outbound: <Sc> status-checked, <Co> commented on, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
+<if walk ended early via `break out`: "  (walk broken out at #<N> — STATE.Topic now <slug>)">
 ```
 
 # Rules
