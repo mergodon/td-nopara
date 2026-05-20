@@ -23,35 +23,37 @@ When I need to research something (a library, an API, framework gotchas), I use 
 
 ## Cross-repo
 
-Another project's repo is another team's territory, even when the same human wears both hats. I read freely. I do NOT commit, push, run tests, trigger pre-commit hooks, start their dev servers, or otherwise touch their lifecycle. The way to ask another project to do something is to file a GitHub issue.
+Another project's repo is another team's territory, even when the same human wears both hats. I read freely. I do NOT commit, push, run tests, trigger pre-commit hooks, start dev servers, or otherwise touch their lifecycle. The way to ask another project to do something is to file a GitHub issue.
 
-`.td/PROJECT.md § Cross-repo` is the per-project registry of repos this project legitimately files against. The section is opt-in — only present when the project has a real cross-repo relationship to declare. It IS the outbound scope for `/td-mailbox` (load-bearing). To file:
+Two pieces of human-curated state, no external tracker:
 
-1. Check `.td/PROJECT.md § Cross-repo`. If the target isn't listed, ask the user before filing — it's a real cross-repo relationship that needs declaring (one-line edit).
-2. `gh repo view <slug>` to verify access. Read its README (and `.td/PROJECT.md` if it's a td-flow project) for enough context to write a meaningful body.
-3. `gh issue create --repo <slug> --title "..." --body "..."`. Body opens `**From:** <friendly-name>` then ask + why.
-4. Discuss in `gh issue comment <id> --repo <slug>`. The receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
+1. **`.td/PROJECT.md § Cross-repo`** — per-project registry of repos this project files into. Opt-in (only present when there's a real relationship to declare). **IS the outbound scope for `/td-mailbox`** — load-bearing.
+2. **`**From:** <friendly-name>` body marker** — every cross-repo filing's body opens with this. Canonical "this is ours" identifier for `/td-mailbox` outbound; canonical "who sent this" signal for inbound walks.
 
-**Naming convention.** Slug = friendly name = local dir = package name; kebab-case lowercase ASCII; role suffix (`-web`, `-api`, `-app`, `-ext`, `-script`, `-cli`, etc.); family prefix when there are siblings; deploy URL is metadata, not part of the slug.
+**Friendly-name resolution:** first H1 in `.td/PROJECT.md`, fall back to local directory basename. Keep PROJECT.md's H1 set per project. GH slugs change on rename, GH identities vary by machine — friendly names stay stable across sessions. **Exception:** `Closes <slug>#N` in commit messages keeps the full GH slug — that's GitHub's mechanical auto-close syntax, not a message.
 
-**Use friendly project names in messages, not GH slugs or identities.** When filing or commenting cross-repo (issue titles, bodies, comments — the human-readable text), reference projects by their **friendly name** (e.g., `Filed from <consumer-app>`), not by GH slug (`<your-org>/<consumer-app>`) and not by GH user identity. Friendly name resolution: **first H1 heading in `.td/PROJECT.md`, fall back to local directory basename.** Keep PROJECT.md's H1 set to the project's friendly name on every td-flow project. **Why:** GH slugs change on rename, GH identities vary by machine, friendly names stay stable and read clearly across sessions. **Exception:** `Closes <slug>#N` in commit messages keeps the full GH slug — that syntax is GitHub's mechanical auto-close, not a message.
+**Speak as the project, not the GH user.** When filing/commenting cross-repo (titles, bodies, comments), reference projects by friendly name — not GH slug, not username. Sign comments `— <project-name>`. The thread reads project-A ↔ project-B even though GitHub stores user metadata.
 
-**Speak to the project, not the GH user.** GitHub's data model puts a user behind every issue and comment, but for td-flow the speaker is always the **project** — the GH account is incidental delivery. Frame cross-repo dialogue as project-to-project:
+### Filing workflow
 
-- **When filing**, the issue body opens with `**From:** <friendly-name>` (resolved via PROJECT.md H1 → directory basename) so the receiver can identify the source project mechanically, regardless of which GH account opened it. Follow with the ask, the why.
-- **When reading** open issues in the receiver's inbox, list them as `<source-project>: <ask>`, parsed from the `**From:**` marker. If a body has no marker, surface it as `(unmarked) — <ask>` and treat it as a direct ask, not from a project.
-- **When commenting back**, sign as the speaking project: `— <receiver-project-name>`. The thread reads project-A ↔ project-B.
-- **Never address GH usernames in cross-repo prose.** Don't write "@mate asked..." — write "<project-name> asked..." even when the GH metadata shows the username.
+1. Check `.td/PROJECT.md § Cross-repo`. If target isn't listed, ask the user — one-line edit to declare it.
+2. `gh repo view <slug>` for access + context. Read README (and `.td/PROJECT.md` if it's a td-flow project).
+3. `gh issue create --repo <slug>` with body opening `**From:** <friendly-name>` then ask + why.
+4. Discuss via `gh issue comment --repo <slug>`. Receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
 
-**Cross-repo Epics (planning surface).** A parent `Epic` issue can have formal sub-issues in other mergodon repos. Use the `addSubIssue` GraphQL mutation (with the `GraphQL-Features: sub_issues` header) to attach a child issue from `<repo>/<sub-issue-N>` to the parent. The parent's progress bar updates automatically as cross-repo sub-issues close. Pattern: per-project Epics live in the project's own repo. Cross-organization parent-child isn't supported by GitHub — stay within mergodon.
+### Naming convention
 
-No labels, no status enum, no separate inbox. Open = pending; closed = done.
+Slug = friendly name = local dir = package name. Kebab-case lowercase ASCII. Role suffix (`-web`, `-api`, `-app`, `-ext`, `-script`, `-cli`). Family prefix when there are siblings. Deploy URL is metadata, not part of the slug.
 
-**Inbox stays repo-scoped by default.** "CRs?" / "any incoming?" / warm-up checks run `gh issue list --state open` for the **current repo only**. I do NOT widen to all your repos unless you explicitly ask ("all repos", "global inbox", "everything open", "what's open across the board"). Issues in other repos are their projects' business — not background context to surface here. The `## Cross-repo` registry tells me which repos this project *files into*, not which I should *poll*.
+### Epics with cross-repo children
 
-**`/td-mailbox` is the unified cross-repo view.** One command walks both directions: inbound (issues filed INTO this repo, grouped by Issue Type) and outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and identified by the `**From:** <project>` body marker). Per-item walk: close/comment/skip for inbound, comment/verify/close-stale/reopen/skip for outbound. Single end-summary, no separate inbox vs outbox commands.
+A parent `Epic` can have sub-issues in other mergodon repos via the `addSubIssue` GraphQL mutation (with `GraphQL-Features: sub_issues` header). Parent's progress bar auto-updates as cross-repo sub-issues close. Per-project Epics live in the project's own repo. Cross-organization parent-child isn't supported by GitHub — stay within mergodon.
 
-**Outbound is minimum-dependency.** No tracker Epic, no sub-issue linkage required for one-off cross-repo CRs. The mechanism is two pieces: (1) the per-project `.td/PROJECT.md § Cross-repo` list bounds the search to connected repos; (2) the `**From:** <project>` body marker — which goes on every cross-repo filing — identifies our own filings client-side. The combination gives an exact outbound set without any in-repo tracking infrastructure. Sub-issue linkage stays for **real planning Epics** with cross-repo children — that's a legit GitHub-native use case (progress bar, native UI), separate from the outbound tracking problem.
+### Inbox scope
+
+**Repo-scoped by default.** "CRs?" / "any incoming?" runs `gh issue list --state open` for the current repo only. Cross-repo widening requires explicit ask ("all repos", "global inbox") or invoking `/td-mailbox` (which walks both directions in one pass — inbound + outbound). `## Cross-repo` registry tells me which repos this project *files into*, not which to *poll*.
+
+No labels, no status enum. Open = pending; closed = done.
 
 ## The docs (`.td/`)
 
@@ -172,12 +174,14 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 
 ## The slash commands
 
+Seven commands, each with a distinct trigger. Full procedure lives in `commands/<name>.md` — the one-liners below are the trigger map.
+
 - `/td-init` — bootstrap or migrate a project (one-time per project).
-- `/td-clear` — mid-project context reset. Save STATE handoff, light prune, stack-drift heads-up, push. Run before `/clear` when the project continues.
-- `/td-close` — wrap the project (or a major phase). Park leftover BACKLOG + work files to GitHub Issues, mechanical stack-reality-check vs PROJECT.md, doc hygiene pass across all `.td/` docs, push.
-- `/td-refresh` — bring this project current. (1) Diff CLAUDE.md against canonical at `~/projects/td-flow/CLAUDE.md`, propose per section. (2) Flush any accumulated `BACKLOG.md` items to GitHub Issues. (3) Cross-repo registry drift check: org-wide `**From:**` marker search vs `.td/PROJECT.md § Cross-repo`, propose add/remove per delta. Diff-and-propose throughout — never overwrites without your accept.
-- `/td-mailbox` — unified cross-repo work check. Walks both directions in one pass: inbound (open GH issues filed INTO this repo, grouped by Issue Type with Epic sub-issue progress) and outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:** <project>` body marker — no tracker Epic, minimum-dependency mechanics). One-at-a-time walk: close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. Single end-summary.
-- `/td-incident` — live production fire mode. Drops everything else, sets STATE to incident, opens a work file, surfaces `DEBUG.md` if present. Resolves in-session, parks to GH as `Bug`, or files cross-repo.
-- `/td-park` — flush `BACKLOG.md` to GitHub Issues line-by-line with type selection and dedupe. Standalone mid-session declutter (the same flush runs automatically as part of `/td-close`).
+- `/td-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
+- `/td-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
+- `/td-refresh` — bring project current with the framework conventions (4 phases, diff-and-propose throughout).
+- `/td-mailbox` — unified cross-repo work walk (inbound + outbound, one item at a time).
+- `/td-incident` — live production fire mode. Drops everything else.
+- `/td-park` — mid-session `BACKLOG.md` → GitHub Issues flush.
 
 Everything else — including shipping individual pieces — is conversational.

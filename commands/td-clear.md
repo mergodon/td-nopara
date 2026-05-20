@@ -55,7 +55,7 @@ Wait for the answer. If they name something, append it to `.td/BACKLOG.md` as `-
 
 This is a single question — don't prompt for elaboration or turn it into a planning session.
 
-# Step 6 — Light prune + heads-ups for the handoff
+# Step 6 — Light prune + handoff signals
 
 Walk `.td/` for content git already covers:
 
@@ -63,42 +63,22 @@ Walk `.td/` for content git already covers:
 - Resolved blockers in `.td/STATE.md` → clear them out.
 - Backlog items that have shipped → delete the line.
 
-**Mailbox snapshot.** Fetch open issues in this repo and cross-repo filings (same shape as `/td-mailbox` Steps 2+4 — bounded by `.td/PROJECT.md § Cross-repo`, filtered by `**From:** <project-name>` body marker). Only counts + type/state breakdowns needed. Surface as a one-line snapshot to include at the top of the Resume note in Step 7:
+**Mailbox snapshot** (status read, always renders unless mailbox is empty). Fetch open issues in this repo and cross-repo filings (same shape as `/td-mailbox` Steps 2+4). Format:
 
 ```
 [mailbox] 📥 <N> inbound (<type-breakdown>), 📤 <M> outbound (<state-breakdown>)
 ```
 
-Examples:
-- `[mailbox] 📥 4 inbound (3 Task, 1 Idea), 📤 0 outbound`
-- `[mailbox] 📥 2 inbound (1 Bug, 1 Task), 📤 3 outbound (2 awaiting reply, 1 pending action)`
-- `[mailbox] empty` — if both directions are zero, just say so.
+Examples: `[mailbox] 📥 4 inbound (3 Task, 1 Idea), 📤 0 outbound` | `[mailbox] empty`. Skip outbound segment if `.td/PROJECT.md § Cross-repo` is missing.
 
-Skip the outbound segment entirely if `.td/PROJECT.md § Cross-repo` is missing/empty (no scope). Don't speculate or fetch globally.
+**Drift heads-ups** (only render if a check fires — no noise when clean). Two mechanical checks, no fixes here — `/td-close` runs the full versions:
 
-**Stack-drift heads-up (no fix, just flag).** Quick check: `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u` — if anything comes back, surface one line:
+- **Stack:** `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u` → if anything, note `<file> changed; PROJECT.md § Stack may be stale`.
+- **Architecture:** if `.td/ARCHITECTURE.md` exists, count code commits since its mtime (`src/**` / `app/**` / `lib/**`) → if 10+ files changed, note `code shifted since ARCHITECTURE.md was last touched; rationale may need a review`.
 
-```
-[heads-up] <file> changed since last checkpoint — PROJECT.md § Stack may be out of date. /td-close will check mechanically.
-```
+Both get folded into a single `## Heads-ups` block at the top of the Resume note (Step 7). If both checks come back clean, no `## Heads-ups` block is rendered at all — the next session opens to a clean handoff.
 
-Don't fix here — `/td-close` runs the full stack-reality-check. The point is to make the handoff explicit so the next session knows drift may exist.
-
-**Architecture-drift heads-up (no fix, just flag).** If `.td/ARCHITECTURE.md` exists, compare its file mtime against recent code commits. Rough check:
-
-```
-git log --since="$(git log -1 --format=%cI .td/ARCHITECTURE.md)" --name-only -- 'src/**' 'app/**' 'lib/**' 2>/dev/null | wc -l
-```
-
-If significant code shipped since the architecture doc was last touched (heuristic: 10+ files changed across the relevant code roots), surface:
-
-```
-[heads-up] code shipped since .td/ARCHITECTURE.md was last updated — rationale may need a review. /td-close will prompt mechanically.
-```
-
-Don't fix here. The doc captures *rationale*, not file structure, so it doesn't need to update with every commit — just when a decision worth recording has been made. The point is to make the handoff explicit.
-
-Don't restructure. Don't second-guess `WORKWAY.md` content. The deeper cleanup is `/td-close`.
+Don't restructure. Don't second-guess `WORKWAY.md` content. Deeper cleanup is `/td-close`.
 
 # Step 7 — Update STATE.md as a handoff
 
@@ -106,7 +86,8 @@ Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context w
 
 - **Keep** in-flight specifics the next session can't reconstruct: current decision, current blocker, mid-thinking, the gotcha you just hit.
 - **Clear** speculation ("we might want to..."), anything `git log` already says, or claims you haven't actually verified.
-- **Heads-ups** from Step 6 (mailbox snapshot, stack-drift, architecture-drift if any) belong at the top of the Resume note so the next session sees them immediately. Mailbox snapshot first, then drift heads-ups below.
+- **Mailbox snapshot** from Step 6 always renders at the very top of the Resume note (status read, not noise).
+- **Heads-ups block** renders below the snapshot ONLY if a check fired in Step 6 — empty means no block at all, not an empty heading.
 
 Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 

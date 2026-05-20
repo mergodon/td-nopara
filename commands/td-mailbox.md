@@ -237,17 +237,7 @@ URL: <url>
 - **Recently closed, last comment is theirs** → "Verify the resolution matched your ask?"
 - **Recently closed, you commented after close** → "Already verified — skip."
 
-**Wait for: `status` / `comment` / `verify` / `close` / `reopen` / `skip` / `acknowledge` / freeform.**
-
-**On `status`:** the "let me look closer before deciding" verb. For when you want a deeper read on where this stands before picking an action.
-1. Re-fetch the issue (in case of staleness since the walk started): `gh issue view <N> --repo <slug> --json state,updatedAt,comments`.
-2. Print:
-   - Current state
-   - Days since last activity (computed from `updatedAt`)
-   - Who has the ball — `us` (last comment sign-off ends with `— <project-name>`) or `them`
-   - Last 5 comments verbatim, marked `[us]` / `[them]` per sign-off
-3. Suggest a next action one-liner — `chase` (gentle nudge comment), `update` (post status from our side), `verify`, `withdraw` (close as stale), or `leave`.
-4. Re-prompt the same menu (`status / comment / verify / close / reopen / skip`) — user picks. `chase` and `update` route to `comment` with appropriate drafted text; `withdraw` routes to `close` (not_planned reason).
+**Wait for: `comment` / `verify` / `close` / `reopen` / `skip` / `acknowledge` / freeform.**
 
 **On `comment`:** draft based on discussion + user intent, append `— <project-name>`, confirm, then `gh issue comment <N> --repo <slug> --body "<text>"`.
 
@@ -268,7 +258,7 @@ The `not planned` reason tells GitHub (and any parent Epic's progress bar, if th
 ```
 Mailbox walked: <T> reviewed total.
   Inbound:  <St> started, <C> closed, <Co> commented on, <S> skipped.
-  Outbound: <Sc> status-checked, <Co> commented on, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
+  Outbound: <Co> commented on, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
 <if walk ended early via `break out`: "  (walk broken out at #<N> — STATE.Topic now <slug>)">
 ```
 

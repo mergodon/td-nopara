@@ -1,14 +1,14 @@
 # State
 
 Project:  td-flow
-Topic:    architecture-md-standard
-Phase:    shipped (awaiting test)
+Topic:    simplify-pass
+Phase:    shipped (awaiting roleplay test)
 Blocker:  none
-Last:     2026-05-20 — shipped ARCHITECTURE.md as sixth standard doc + scaffold + 4 slash-command hooks + dogfood; Closes #9.
+Last:     2026-05-20 — simplified 9 items per the complexity review: dropped /td-mailbox status verb, consolidated /td-clear heads-ups, single /td-incident close-out prompt, fixed /td-refresh Step 1 exit, trimmed CLAUDE.md slash-commands list + cross-repo section (both copies), tighter From-marker + friendly-name. Symlinking templates/CLAUDE.md → root declined (kept conceptually distinct).
 
 ## Resume note
 
-**Active piece:** #9 shipped. ARCHITECTURE.md added to canonical six. Template + CLAUDE.md (both root + templates/) + scaffold in /td-init + heads-up in /td-clear + hygiene in /td-close + Phase 4 existence check in /td-refresh + architectural-learning hook in /td-incident close-out + dogfood (this repo's own .td/ARCHITECTURE.md). Awaiting user test — if good, Topic flips to idle.
+**Active piece:** Simplify pass shipped. -18 net lines but surface meaningfully cleaner: dropped a sub-menu (`status`), collapsed 3 heads-ups into 1 block, collapsed 3 close-out prompts into 1, halved the slash-commands list section, restructured cross-repo section. Roleplay test pending — see commit body for before/after walkthroughs.
 
 td-flow is the public, file-based, repo-portable solo-developer framework hosted at `mergodon/td-flow`. It eats its own dog food — this repo IS a td-flow project. Current surface: root `CLAUDE.md` contract + 5 `.td/` docs (PROJECT/WORKWAY/STATE/BACKLOG, optional DEBUG) + `work/<topic>.md` scratch + **7 slash commands** (`/td-init`, `/td-clear`, `/td-close`, `/td-refresh`, `/td-mailbox`, `/td-incident`, `/td-park`). Everything else is conversational.
 

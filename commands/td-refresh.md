@@ -18,7 +18,7 @@ The user owns both surfaces. Your role is to make the deltas reviewable, one ite
 
 # Step 1 — Quick equality check
 
-Compare the two files. If they match byte-for-byte, tell the user "Already in sync — no deltas to review." and exit.
+Compare the two files. If they match byte-for-byte, tell the user "Phase 1 in sync — no CLAUDE.md deltas." and skip to Step 7 (Phase 2). Phases 2-4 still need to run.
 
 # Step 2 — Split into sections
 
