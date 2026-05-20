@@ -1,5 +1,5 @@
 ---
-description: Bring this project current with the framework conventions. (0) Sync the framework install — re-run install.sh, offer to pull td-flow if behind. (1) Diff CLAUDE.md against canonical, propose per section. (2) Flush any accumulated BACKLOG items to GitHub Issues. (3) Cross-repo registry drift check — diff actual filings against PROJECT.md § Cross-repo, propose add/remove per delta. (4) Standard-docs existence check — scaffold any canonical .td/ doc the project is missing. Diff-and-propose throughout — never overwrites without your accept.
+description: Bring this project current with the framework conventions. (0) Sync the framework install — re-run install.sh, offer to pull td-flow if behind. (1) Diff CLAUDE.md against canonical, propose per section. (2) Flush any accumulated BACKLOG items to GitHub Issues. (3) Cross-repo registry drift check — diff actual filings against PROJECT.md § Cross-repo, propose add/remove per delta. (4) Standard-docs existence check — add any missing canonical .td/ doc, drafting ARCHITECTURE.md from the project's own history rather than leaving it blank. Diff-and-propose throughout — never overwrites without your accept.
 ---
 
 You are bringing this project up to the current framework conventions. Five phases, all diff-and-propose, all per-item-confirmable, never destructive without explicit user accept:
@@ -8,7 +8,7 @@ You are bringing this project up to the current framework conventions. Five phas
 - **Phase 1 (Steps 1-6):** Review project `CLAUDE.md` against the installed canonical (`$TD_REPO/CLAUDE.md`, resolved in Phase 0). The canonical drifts forward over time; project copies fall behind. Surface every section deviation, propose what to take, apply only what the user accepts.
 - **Phase 2 (Step 7):** If `.td/BACKLOG.md` has accumulated items (left over from before the gh-source-of-truth model, or just from extended work), offer to flush them to GitHub Issues using the `/td-park` procedure.
 - **Phase 3 (Step 8):** Cross-repo registry drift check. `.td/PROJECT.md § Cross-repo` is load-bearing (bounds `/td-mailbox` outbound). Compare actual filings (via org-wide `**From:**` marker search) against the declared list; propose add (we filed into a repo not declared) or remove (declared but never used).
-- **Phase 4 (Step 9):** Standard-docs existence check. The standard `.td/` docs are PROJECT/WORKWAY/ARCHITECTURE/STATE/BACKLOG, plus optional DEBUG. If a project predates a newer doc (e.g. ARCHITECTURE.md added later), offer to scaffold from template. Existence-only check — never overwrites content.
+- **Phase 4 (Step 9):** Standard-docs existence check. The standard `.td/` docs are PROJECT/WORKWAY/ARCHITECTURE/STATE/BACKLOG, plus optional DEBUG. If a project predates a newer doc (most often ARCHITECTURE.md — standard since v4.2), offer to add it. For ARCHITECTURE.md specifically, draft a real first version from the project's `git log`, code, and existing docs rather than copying a blank template. Existence-only check — never overwrites an existing doc's content.
 
 The user owns both surfaces. Your role is to make the deltas reviewable, one item at a time.
 
@@ -194,9 +194,9 @@ If you made changes: write back `.td/PROJECT.md`. The user reviews the diff at c
 
 # Step 9 — Standard-docs existence check (Phase 4)
 
-Canonical `.td/` shape: PROJECT/WORKWAY/ARCHITECTURE/STATE/BACKLOG plus optional DEBUG. Projects that predate a doc addition (e.g. ARCHITECTURE.md became standard later) are missing the file. This phase only checks **existence** — never compares content (architecture rationale is project-specific, no canonical content to diff against).
+Canonical `.td/` shape: PROJECT/WORKWAY/ARCHITECTURE/STATE/BACKLOG plus optional DEBUG. Projects that predate a doc addition are missing the file — in practice that's almost always ARCHITECTURE.md (standard since v4.2); a td-flow project missing PROJECT.md or WORKWAY.md barely qualifies as one.
 
-For each canonical doc in `.td/`:
+Check existence for each canonical doc in `.td/`:
 
 ```
 PROJECT.md       → check ./.td/PROJECT.md exists
@@ -206,7 +206,7 @@ STATE.md         → check ./.td/STATE.md exists
 BACKLOG.md       → check ./.td/BACKLOG.md exists
 ```
 
-For any missing file, surface one at a time:
+ARCHITECTURE.md gets its own treatment (below). For any **other** missing doc, surface one at a time:
 
 ```
 .td/<doc> not present (canonical .td/ shape). Scaffold from $TD_REPO/templates/td/<doc>?
@@ -217,17 +217,63 @@ For any missing file, surface one at a time:
 - `yes-with-stub` → copy template + replace section placeholders with explicit `(empty — fill when relevant)` markers, so the file is visibly skeletal rather than looking pre-filled.
 - `not yet` → skip; this phase will re-prompt next refresh.
 
+These docs hold answers only the user has (test commands, active scope, current phase) — there's nothing to draft from project reality, so a template copy is the right scaffold.
+
+## Missing ARCHITECTURE.md — draft it, don't blank-scaffold
+
+ARCHITECTURE.md captures the project's **why** — system shape, the load-bearing decisions, the surprises. Most of that *why* is already on disk: in `git log`, the code tree, and PROJECT/WORKWAY. Copying a blank template just hands the work back to the user. So offer to draft a real first version from what the project already is.
+
+Surface:
+
+```
+.td/ARCHITECTURE.md not present (standard since v4.2). Draft it from the project's
+history and code? (draft / blank template / not yet)
+```
+
+- `not yet` → skip; re-prompts next refresh.
+- `blank template` → copy `$TD_REPO/templates/td/ARCHITECTURE.md` verbatim — for when the user would rather fill it themselves.
+- `draft` → build a real first draft with the procedure below.
+
+### Drafting procedure
+
+Read, in order:
+
+1. `.td/PROJECT.md` — what this is, stack, active scope, shipped history.
+2. `.td/WORKWAY.md` — § Framework specifics, deploy method, testing quirks.
+3. The top-level directory tree + the stack/config files present (`package.json`, `composer.json`, `wrangler.toml`, `next.config.*`, …).
+4. `git log --oneline` (full), then `git show <sha>` on the commits that signal a *non-obvious choice* — reverts, and wording like "instead of" / "replaced" / "retired" / "decided against" / "dropped".
+
+Fill the `templates/td/ARCHITECTURE.md` sections **only as far as the evidence supports**:
+
+- **System shape** — one paragraph from PROJECT.md § Stack + the config files. Almost always fillable.
+- **Key components** — top-level modules from the tree, one line each. Skip if the tree is small enough that listing it just duplicates `ls` (the template says so).
+- **Important decisions** — one entry per non-obvious choice found in `git log`: what was chosen, what it replaced, the trade-off. Cite the commit (`see <sha>`). This section is what git history feeds best.
+- **What's load-bearing** — only couplings actually visible in the code ("touch X, also update Y"). No evidence → leave the marker.
+- **Surprises** — only counterintuitive things actually evidenced. No evidence → leave the marker.
+
+**Never fabricate.** ARCHITECTURE.md's bar is "we actually know it to be true" (root `CLAUDE.md` § Doc hygiene). A drafted decision with an invented rationale is worse than an empty section — the next session will trust it. If evidence is thin, the section stays an explicit `(empty — fill when relevant)` marker. The draft is exactly as full as `git log` + code + docs justify, no more.
+
+Write `.td/ARCHITECTURE.md`, then report what you drew on and what you left empty, e.g.:
+
+```
+Drafted ARCHITECTURE.md — System shape + Key components + 4 Important decisions
+mined from git log (commits abc1234, def5678, …). Left § What's load-bearing and
+§ Surprises as markers — no clear evidence. Review before you commit.
+```
+
+## Wrap-up
+
 For DEBUG.md: do NOT prompt — it's opt-in per project (created on demand during `/td-incident` close-out, not scaffolded).
 
 If everything exists: say `Standard docs in sync.` and continue.
 
-If you scaffolded any file: write the new files. The user reviews at commit time.
+If you added any file (scaffolded or drafted): write it. The user reviews at commit time — Phase 4 makes no commit of its own.
 
 # Step 10 — Tell the user
 
 One sentence covering all five phases:
 
-`Framework synced (<pulled N commits / already current>). Refresh complete — <N> CLAUDE.md sections updated. <M> BACKLOG items flushed to GH. <K> Cross-repo entries updated. <D> docs scaffolded.`
+`Framework synced (<pulled N commits / already current>). Refresh complete — <N> CLAUDE.md sections updated. <M> BACKLOG items flushed to GH. <K> Cross-repo entries updated. <D> docs added.`
 
 If a phase didn't fire (no deltas, no items, no missing docs): use "in sync" wording for that phase instead of a number.
 
@@ -237,5 +283,5 @@ If a phase didn't fire (no deltas, no items, no missing docs): use "in sync" wor
 - Never auto-merge sections the user didn't review.
 - Don't propose deltas for whitespace-only differences.
 - If you can't read the canonical (missing, permission), stop and tell the user — don't guess what it should say.
-- **Phase 0** re-runs `install.sh` (idempotent — re-links `~/.claude/` symlinks) and, only with your confirmation and only as a fast-forward, may `git pull` the td-flow repo. It makes no commit and never touches project files. Phases 1-4 touch root `CLAUDE.md` and (in Phase 4) may scaffold missing canonical `.td/` docs from `$TD_REPO/templates/td/`; they never overwrite existing `.td/*` content.
+- **Phase 0** re-runs `install.sh` (idempotent — re-links `~/.claude/` symlinks) and, only with your confirmation and only as a fast-forward, may `git pull` the td-flow repo. It makes no commit and never touches project files. Phases 1-4 touch root `CLAUDE.md` and (in Phase 4) may add missing canonical `.td/` docs — scaffolded from `$TD_REPO/templates/td/`, or, for ARCHITECTURE.md, drafted from the project's history; they never overwrite existing `.td/*` content.
 - The only commit this command makes is Step 6's `docs: refresh CLAUDE.md from canonical`, so the pre-commit `Test command` is exempt.
