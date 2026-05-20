@@ -5,7 +5,7 @@ description: Solo-developer project framework. Conversational interface, structu
 
 # td-flow
 
-Same shape every project. Conversational interface. Five docs. Seven slash commands.
+Same shape every project. Conversational interface. Five standard docs. Seven slash commands.
 
 The contract — including the "Who does what" matrix, the routing map ("where things go"), nudges, drift signals, and commit conventions — lives in root `CLAUDE.md`. This skill exists to surface the rhythm when context is heavy or `CLAUDE.md` isn't loaded yet. **Read root `CLAUDE.md` for anything specific.**
 
@@ -22,7 +22,7 @@ The contract — including the "Who does what" matrix, the routing map ("where t
 1. **Plan** — single-shot or multi-step. Multi-step plans live in `.td/work/<topic>.md`.
 2. **Park** — out-of-scope items I notice → `.td/BACKLOG.md`.
 3. **Work** — implement.
-4. **Test** — follow `.td/WORKWAY.md` (Local testing → Local UAT → Production / Ship).
+4. **Test** — follow `.td/WORKWAY.md` (Local testing → Local UAT → Live).
 5. **Ship** — push to `origin/main` when green.
 6. **Close** — review, validate, prune redundant docs, push.
 
@@ -34,10 +34,12 @@ GitHub is the work memory. Big meaningful pushes. No duplication.
 CLAUDE.md                ← contract at root, user controls it
 .td/
   PROJECT.md             ← what / who / stack / scope
-  WORKWAY.md             ← Local testing + Local UAT + Production/Ship + Framework specifics
+  WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics
+  ARCHITECTURE.md        ← project-specific rationale: the load-bearing whys
   STATE.md               ← current phase, current topic, blocker, resume note
-  BACKLOG.md             ← parked bigger items
-  work/<topic>.md        ← active work, deleted at close
+  BACKLOG.md             ← session-scoped parking
+  work/<topic>.md        ← active work scratch, deleted at close
+  DEBUG.md  (optional)   ← troubleshooting reference, created on demand
 .env.example             ← committed
 .env                     ← gitignored
 .git/hooks/pre-commit    ← runs Test command from WORKWAY.md § Local testing
@@ -58,6 +60,6 @@ CLAUDE.md                ← contract at root, user controls it
 
 Shipping individual pieces is conversational: tests pass → commit → push to `origin/main`. No slash command.
 
-Migration: `/td-init` detects existing td-flow v1/v2, GSD-style legacy planning conventions, or brownfield repos with ad-hoc patterns (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` and similar) and maps them to v3 without re-asking.
+Migration: `/td-init` detects existing td-flow v1/v2, GSD-style legacy planning conventions, or brownfield repos with ad-hoc patterns (`.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` and similar) and maps them to the current shape without re-asking.
 
 For the routing map, nudges, drift signals, and commit conventions — read root `CLAUDE.md`.

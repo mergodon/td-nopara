@@ -48,12 +48,13 @@ Most work is conversational. Here's what gets routed where:
 "let's add a search bar"              → starts the rhythm
 "fix X"                               → starts the rhythm on a fix
 "test command is npm test"            → .td/WORKWAY.md § Local testing
-"live URL is myapp.pages.dev"         → .td/WORKWAY.md § Production / Ship
+"live URL is myapp.pages.dev"         → .td/WORKWAY.md § Live
 "remember to debounce later"          → appends .td/BACKLOG.md
 "park this to GH as Bug"              → creates GH issue directly with Type
 "flush the backlog to GH"             → invokes /td-park
 "let's plan a big redesign"           → starts a planning work file (later → Epic)
 "add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
+"we chose X because..."               → .td/ARCHITECTURE.md (the load-bearing why)
 "file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
 "any incoming?" / "check inbox"       → gh issue list for current repo (or /td-mailbox)
 "what did we file?" / "show outbox"   → /td-mailbox (the outbound section)
@@ -71,7 +72,7 @@ Most work is conversational. Here's what gets routed where:
 1. Plan      — single-shot OR multi-step in .td/work/<topic>.md
 2. Park      — out-of-scope items → .td/BACKLOG.md (flushes to GitHub at /td-close)
 3. Work      — implement
-4. Test      — follow .td/WORKWAY.md (Local testing → Local UAT → Production / Ship)
+4. Test      — follow .td/WORKWAY.md (Local testing → Local UAT → Live)
 5. Ship      — commit + push to origin/main when green
 6. Close     — review, validate, prune redundant docs, park leftovers to GH, push
 ```
@@ -80,16 +81,17 @@ A session can cover any subset. `STATE.md` tracks where you are; the next sessio
 
 ## The docs
 
-Five core, one optional:
+Five standard docs, one optional, plus scratch:
 
 ```
 CLAUDE.md                ← contract at root; user controls
 .td/
   PROJECT.md             ← what / who / stack / scope
-  WORKWAY.md             ← Local testing + Local UAT + Production/Ship + Framework specifics
+  WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics
+  ARCHITECTURE.md        ← project-specific rationale: the load-bearing whys
   STATE.md               ← current phase, current topic, blocker, resume note
   BACKLOG.md             ← session-scoped parking; flushes to GH at /td-close
-  work/<topic>.md        ← active work; deleted at close
+  work/<topic>.md        ← active work scratch; deleted at close
   DEBUG.md  (optional)   ← project-specific troubleshooting reference (created on demand)
 ```
 
@@ -176,7 +178,7 @@ Full project wrap:   /td-close   → park leftovers to GH, code sanity, doc audi
 
 ## Issue Types and Epics
 
-GitHub Issues are the source of truth for parked work. At the org level, five Issue Types organize the queue:
+GitHub Issues are the source of truth for parked work. At the org level, four Issue Types organize the queue:
 
 | Type | When |
 |---|---|
@@ -245,13 +247,13 @@ templates/            files copied into target projects on /td-init
   CLAUDE.md           the universal contract
   td/PROJECT.md
   td/WORKWAY.md       the way-of-work doc with locked sections
+  td/ARCHITECTURE.md  project-specific rationale (the load-bearing whys)
   td/STATE.md
   td/BACKLOG.md
   td/DEBUG.md         optional troubleshooting template (not auto-scaffolded)
   td/frameworks/.gitkeep   (overflow dir, rarely needed)
   .gitignore
   .env.example
-  FEEDBACK.md         template for framework-level feedback
   <name>/             saved starter templates (e.g. cloudflare-static-assets)
 skill/SKILL.md        skill definition (symlinked into ~/.claude/skills/td-flow)
 hooks/pre-commit      test-on-commit hook installed by /td-init
@@ -269,9 +271,9 @@ FEEDBACK.md           feedback about td-flow itself, captured from any project
 - Cleanup is part of the work — fix incidental drift in the same commit.
 - Present results — assumptions, fixes, decisions visible. No opaque "done."
 
-## Not in scope (yet)
+## Not in scope
 
-- Research / context7 deep integration in the rhythm.
-- Subagents for parallel pieces.
-- Outbound-issue tracking (issues this project filed into other repos).
-- Anything that turns this into a CLI or npm package.
+- Research / context7 as a formal rhythm phase — decided against; ad-hoc context7 use is already the norm.
+- Subagents for implementation fan-out — decided against; coordination cost outweighs the speedup for a solo dev.
+- An automated test suite for the framework itself — we validate by dogfooding on real projects.
+- Anything that turns this into a CLI or npm package. Never.

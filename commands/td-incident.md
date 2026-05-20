@@ -94,7 +94,7 @@ The incident ends in one of three ways:
 1. Create a GH issue in the current repo with Issue Type = `Bug`:
    - Title: the one-liner
    - Body: contents of the work file (Symptom, Context, Hypothesis, what was tried)
-   - Use `gh api graphql` to create with `Bug` type attached (the org's Bug type ID is cached in this skill or queried once per run).
+   - Use `gh api graphql` to create with `Bug` type attached (query the org's Issue Type IDs once per run — same as `/td-park` Step 2 — never hardcode them).
 2. Update `STATE.Last` to note the incident parked to GH `#N`.
 3. Delete the local work file (the GH issue is now the source of truth).
 4. Commit + push STATE update.

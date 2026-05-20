@@ -8,17 +8,17 @@ Three layers, no compiled code:
 
 1. **Source of truth** — this git repo at `~/projects/td-flow/`. Public on GitHub (`mergodon/td-flow`).
 2. **Distribution** — `install.sh` symlinks `commands/*.md` → `~/.claude/commands/`, `skill/` → `~/.claude/skills/td-flow`, `templates/` → `~/.claude/td-templates`. Idempotent, runs on every pull.
-3. **Per-project artifacts** — each consuming project carries root `CLAUDE.md` (copy of canonical) + `.td/` directory with the six canonical docs. Nothing in `.td/` is generated; it's all human-curated markdown.
+3. **Per-project artifacts** — each consuming project carries root `CLAUDE.md` (copy of canonical) + `.td/` directory with the five standard docs (PROJECT, WORKWAY, ARCHITECTURE, STATE, BACKLOG), optional DEBUG, and `work/<topic>.md` scratch. Nothing in `.td/` is generated; it's all human-curated markdown.
 
-`hooks/pre-commit` is symlinked into each consuming project's `.git/hooks/` to enforce pre-ship checks. AWK extracts the Test command from WORKWAY.md.
+`hooks/pre-commit` is copied into each consuming project's `.git/hooks/` by `/td-init` to enforce pre-ship checks. AWK extracts the Test command from WORKWAY.md.
 
 ## Key components
 
 - **`CLAUDE.md`** (root) — the contract. Same content as `templates/CLAUDE.md`; both must update in lockstep.
 - **`commands/`** — seven slash command markdown files (`td-init`, `td-clear`, `td-close`, `td-refresh`, `td-mailbox`, `td-incident`, `td-park`). Each is the procedure Claude follows when invoked.
 - **`skill/SKILL.md`** — a thin pointer that signals to Claude Code "this directory has td-flow; load context on demand."
-- **`templates/td/`** — starting shape for `/td-init` to copy: PROJECT, WORKWAY, ARCHITECTURE, STATE, BACKLOG, DEBUG.
-- **`hooks/pre-commit`** — symlinked into consuming projects, runs the Test command from WORKWAY.md before any `feat:`/`fix:` commit lands.
+- **`templates/td/`** — the standard docs `/td-init` scaffolds: PROJECT, WORKWAY, ARCHITECTURE, STATE, BACKLOG. (DEBUG.md ships in this dir too but is created on demand, not copied at init.)
+- **`hooks/pre-commit`** — copied into consuming projects by `/td-init`, runs the Test command from WORKWAY.md before any `feat:`/`fix:` commit lands.
 - **`install.sh`** — idempotent symlink installer. Prunes stale symlinks (catches retired commands).
 
 ## Important decisions
@@ -44,9 +44,9 @@ The framework repo (`mergodon/td-flow`) is public so it can be forked. User-spec
 
 No tracker Epic, no sub-issue linkage required for one-off cross-repo CRs. The body marker + per-project registry is the entire mechanism. Sub-issue linkage stays for *real* planning Epics with cross-repo children — that's a legit GitHub-native use case (progress bar, native UI), separate from the outbound tracking problem.
 
-### Six canonical docs (not five)
+### ARCHITECTURE.md as a standard doc
 
-ARCHITECTURE.md was added 2026-05-20 as the sixth standard doc (this file). Reason: code is the structure, but rationale (the *why* of decisions, the load-bearing parts, the surprises) dies first when context-switches stretch. A new idea can hurt an existing decision if the rationale isn't documented. The doc is rationale-focused, not structural — diagrams stay out.
+ARCHITECTURE.md was added 2026-05-20 as a standard `.td/` doc (this file), alongside PROJECT/WORKWAY/STATE/BACKLOG. Reason: code is the structure, but rationale (the *why* of decisions, the load-bearing parts, the surprises) dies first when context-switches stretch. A new idea can hurt an existing decision if the rationale isn't documented. The doc is rationale-focused, not structural — diagrams stay out.
 
 ### `templates/CLAUDE.md` and root `CLAUDE.md` kept conceptually distinct (no symlink)
 
@@ -86,7 +86,7 @@ Claude Code's built-in `/init` generates a codebase-snapshot CLAUDE.md and overw
 
 ## When to update this doc
 
-- After a significant architectural shift (new doc joins the canonical six, new layer in the distribution model, retirement of a major subsystem).
+- After a significant architectural shift (a new doc joins the standard set, new layer in the distribution model, retirement of a major subsystem).
 - At `/td-close` — the doc hygiene pass prompts review.
 - After `/td-incident` if a fire surfaces something load-bearing not yet documented.
 - When a "new idea" risks breaking an existing decision — add the existing decision to § Important decisions before the new idea ships.

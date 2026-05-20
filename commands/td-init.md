@@ -11,10 +11,10 @@ The argument may be `--template <name>` to start from a saved template at `~/pro
 If any of these are present, we're migrating, not bootstrapping. Don't re-ask the user for things existing files already answer.
 
 **td-flow v2 detected** — `.td/TESTING.md` and/or `.td/ENV.md` exist:
-- Read `.td/TESTING.md` and `.td/ENV.md`. Map their values into the v3 `WORKWAY.md` template:
+- Read `.td/TESTING.md` and `.td/ENV.md`. Map their values into the current `WORKWAY.md` template:
   - `## Local testing` block in TESTING → `## Local testing` in WORKWAY (Test command, Dev server, Local URL, Pre-ship checklist)
-  - `## Live testing` block in TESTING → `## Production / Ship` in WORKWAY (Live URL, Deploy, Smoke command, Logs) and `## Local UAT` if any manual checks were captured
-  - `.td/ENV.md` content → spread across `## Production / Ship` and `## Notes` as appropriate
+  - `## Live testing` block in TESTING → `## Live` in WORKWAY (Live URL, Deploy, Smoke command, Logs) and `## Local UAT` if any manual checks were captured
+  - `.td/ENV.md` content → spread across `## Live` and `## Notes` as appropriate
   - `.td/frameworks/*.md` content → `## Framework specifics` (one subsection per framework)
 - Rename `.td/INBOX.md` → `.td/BACKLOG.md` (preserve content, drop `[bug]`/`[idea]` tags).
 - If `.td/flow/<NN>-<name>.md` files exist (v1 piece files): consolidate into `.td/work/<topic>.md` if a flow is in progress; otherwise delete.
@@ -22,7 +22,7 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
 - Skip Step 2 (ask for gaps); jump to Step 6 (commit).
 
 **GSD-1 / GSD legacy detected** — `.planning/` exists, OR root `CLAUDE.md` contains HTML markers like `<!-- GSD:project-start -->` or `<!-- GSD:stack-start -->`:
-- Read `.planning/` content (PROJECT.md, STATE.md, roadmap.md, etc. — GSD's old structure). Map values into the v3 docs:
+- Read `.planning/` content (PROJECT.md, STATE.md, roadmap.md, etc. — GSD's old structure). Map values into the current `.td/` docs:
   - `.planning/PROJECT.md` "What this is" + "Core Value" + "Requirements" → `.td/PROJECT.md`.
   - `.planning/STATE.md` content → `.td/STATE.md` § Resume note (prose).
   - Test commands found in CLAUDE.md fenced blocks → `.td/WORKWAY.md` § Local testing.
@@ -36,13 +36,13 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
 - Read `.claude/agreements/*.md`. Most agreements are universal td-flow rails (cadence, push-after-commit, run-commands) — they're already in CLAUDE.md and don't need preservation. Project-specific ones (branding, uat-style) → append as items in `WORKWAY.md` § Notes.
 - Read existing `ARCHITECTURE.md` (root or `docs/`). If present, move it to `.td/ARCHITECTURE.md` — it's now a standard td-flow doc. If both root and `docs/` have one, ask which to keep. If neither exists but the project has non-trivial rationale to capture, fall back to scaffolding from `~/projects/td-flow/templates/td/ARCHITECTURE.md` like a greenfield project.
 - Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, archive it (rename to `BLOCKS-archive.md` or leave as-is — ask the user).
-- Read existing root `CLAUDE.md`. Extract: project description (`## What this is` / similar) → `.td/PROJECT.md`; stack section → `.td/PROJECT.md`; common commands → `WORKWAY.md` § Local testing or § Production / Ship as appropriate; everything else → `.td/PROJECT.md` (it's content, not contract).
+- Read existing root `CLAUDE.md`. Extract: project description (`## What this is` / similar) → `.td/PROJECT.md`; stack section → `.td/PROJECT.md`; common commands → `WORKWAY.md` § Local testing or § Live as appropriate; everything else → `.td/PROJECT.md` (it's content, not contract).
 - Overwrite root `CLAUDE.md` with the canonical td-flow contract.
 - Read existing `.gitignore`, `package.json` etc. for stack signals (still run Step 1 detection for things not in existing docs).
 - Tell the user what got migrated where, then jump to Step 4 (framework specifics — fill any gaps not covered by existing docs).
 
-**Already td-flow v3** — `.td/PROJECT.md` AND `.td/WORKWAY.md` exist:
-- Abort: "Project already initialized as td-flow v3. Remove `.td/` to re-init."
+**Already a td-flow project** — `.td/PROJECT.md` AND `.td/WORKWAY.md` exist:
+- Abort: "Project already initialized as td-flow. Remove `.td/` to re-init."
 
 If none of the above match: proceed with normal Step 1.
 
@@ -84,7 +84,7 @@ Group by destination so the user knows where each answer lands. Skip any answere
 - Can I exercise the UI / endpoints myself, or does the user run it manually? (e.g. Tampermonkey userscripts → user; Laravel API → I can curl).
 - One sentence on what UAT looks like.
 
-**For WORKWAY.md § Production / Ship:**
+**For WORKWAY.md § Live:**
 - Live URL (or "none" if not deployed)?
 - Deploy method (e.g. "auto on push", `npm run deploy`, "manual")?
 
@@ -94,7 +94,7 @@ Copy templates from `~/.claude/td-templates/` (or `~/projects/td-flow/templates/
 
 - `CLAUDE.md` → root, exactly as the template
 - `.td/PROJECT.md` → fill placeholders
-- `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Production / Ship
+- `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Live
 - `.td/ARCHITECTURE.md` → copy template as-is; leave sections empty for the project to fill organically. The first non-trivial decision the project ships should populate § Important decisions.
 - `.td/STATE.md` → fill placeholders, set `Last:` to today
 - `.td/BACKLOG.md` → as-is

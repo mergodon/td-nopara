@@ -104,7 +104,7 @@ If `<S>` > 0 and the user shipped one mid-walk, surface a reminder: "You shipped
 # Rules
 
 - **Never auto-create.** Always confirm Type + dedupe candidate before the mutation.
-- **Always include the `**From:**` marker** in the issue body — same project-soul rule from cross-repo. Even self-parks deserve the marker so the receiver (next session's `/td-inbox`) sees `From: <this-project>` and knows the source.
+- **Always include the `**From:**` marker** in the issue body — same project-soul rule from cross-repo. Even self-parks deserve the marker so the receiver (next session's `/td-mailbox` inbound walk) sees `From: <this-project>` and knows the source.
 - **GraphQL mutation requires the `sub_issues` header** for issue creation while in preview (even though sub_issues aren't used here, the header keeps the API surface consistent across our commands).
 - **Don't touch BACKLOG.md until the walk completes** — if the user interrupts mid-walk (Ctrl-C, error), nothing is lost. Only the final rewrite mutates the file.
 - **Don't commit BACKLOG.md** — `/td-park` is doc-hygiene; the user can commit the cleaned BACKLOG alongside other work when ready. (Exception: at `/td-close`, the close command commits.)

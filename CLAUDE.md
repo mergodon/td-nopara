@@ -38,7 +38,7 @@ Two pieces of human-curated state, no external tracker:
 
 1. Check `.td/PROJECT.md § Cross-repo`. If target isn't listed, ask the user — one-line edit to declare it.
 2. `gh repo view <slug>` for access + context. Read README (and `.td/PROJECT.md` if it's a td-flow project).
-3. `gh issue create --repo <slug>` with body opening `**From:** <friendly-name>` then ask + why.
+3. `gh api graphql` `createIssue` mutation against `<slug>` with the fitting Issue Type — body opens `**From:** <friendly-name>`, then ask + why. (`gh issue create` can't set an Issue Type; use the mutation, same as `/td-park` and `/td-mailbox`.)
 4. Discuss via `gh issue comment --repo <slug>`. Receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
 
 ### Naming convention
@@ -65,7 +65,7 @@ No labels, no status enum. Open = pending; closed = done.
 - `work/<topic>.md` — active work; deleted at close.
 - `DEBUG.md` *(optional)* — project-specific troubleshooting reference. Tooling URLs, symptom→diagnostic paths, gotchas, production debug commands. Read only when something's on fire. Created on demand (typically during a `/td-incident` close-out when a non-obvious diagnostic surfaced), not scaffolded at `/td-init`. Same opt-in pattern as `PROJECT.md § Cross-repo`. Template structure at `~/projects/td-flow/templates/td/DEBUG.md`.
 
-If something doesn't fit one of those six core files (plus optional DEBUG.md), it probably doesn't need a doc — git or the existing docs cover it.
+If something doesn't fit one of those docs, it probably doesn't need a doc — git or the existing docs cover it.
 
 **Doc hygiene.** The next session loads these docs cold and assumes everything in them is true. So the bar is sharp: **keep what (a) matters for next session, (b) isn't derivable from code or `git log`, (c) we actually know to be true.** Clear speculation, clear placeholders, clear anything the codebase already says authoritatively (the stack list shouldn't duplicate `composer.json`). `/td-clear` applies this lightly to STATE.md at handoff (heads-up on stack drift, no fix). `/td-close` applies it across all docs (mechanical stack diff + per-doc pass).
 
@@ -179,7 +179,7 @@ Seven commands, each with a distinct trigger. Full procedure lives in `commands/
 - `/td-init` — bootstrap or migrate a project (one-time per project).
 - `/td-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
-- `/td-refresh` — bring project current with the framework conventions (4 phases, diff-and-propose throughout).
+- `/td-refresh` — bring project current with the framework conventions (5 phases, diff-and-propose throughout).
 - `/td-mailbox` — unified cross-repo work walk (inbound + outbound, one item at a time).
 - `/td-incident` — live production fire mode. Drops everything else.
 - `/td-park` — mid-session `BACKLOG.md` → GitHub Issues flush.

@@ -71,7 +71,7 @@ echo "  cd ~/projects/some-project"
 echo "  claude"
 echo "  /td-init           # bootstrap td-flow"
 echo
-echo "Cross-project requests use GitHub issues (\`gh issue create --repo <slug>\`)."
+echo "Cross-project requests ride on GitHub issues — see CLAUDE.md § Cross-repo."
 echo "Add a \`## Cross-repo\` section to .td/PROJECT.md per project — see CLAUDE.md § Cross-repo."
 echo
 echo "To update later: pull this repo, then re-run ./install.sh"
