@@ -8,7 +8,7 @@ You are bringing this project up to the current framework conventions. Four phas
 - **Phase 1 (Steps 1-6):** Review project `CLAUDE.md` against the installed canonical (`$TD_REPO/CLAUDE.md`, resolved in Phase 0). The canonical drifts forward over time; project copies fall behind. Surface every section deviation, propose what to take, apply only what the user accepts.
 - **Phase 2 (Step 7):** If `.td/BACKLOG.md` has accumulated items (left over from before the gh-source-of-truth model, or just from extended work), offer to flush them to GitHub Issues using the `/td-park` procedure.
 - **Phase 3 (Step 8):** Cross-repo registry drift check. `.td/PROJECT.md § Cross-repo` is load-bearing (bounds `/td-mailbox` outbound). Compare actual filings (via org-wide `**From:**` marker search) against the declared list; propose add (we filed into a repo not declared) or remove (declared but never used).
-The user owns both surfaces. Your role is to make the deltas reviewable, one item at a time.
+The user owns both surfaces. Your role is to make the deltas reviewable as one digest per phase — gather, present the whole set, take decisions in a single pass.
 
 # Step 0 — Sync the framework (Phase 0)
 
@@ -86,22 +86,26 @@ N sections genuinely-diverged:  <heading-list>
 
 If everything came out clean after whitespace normalization, say "Differences are whitespace-only — no semantic deltas." and exit without changes.
 
-# Step 5 — Walk the non-clean sections
+# Step 5 — Digest the non-clean sections, decide in one pass
 
-For each non-clean section, in document order, present:
+Build one digest of every non-clean section, in document order:
 
-1. The heading.
-2. The category.
-3. The diff — pick the right format for the size: inline prose for tiny tweaks, `diff` style for larger blocks.
-4. A recommendation:
-   - **canonical-newer** → recommend "take canonical."
-   - **local-has-additions** → recommend "keep local," explain why you think it's intentional drift.
-   - **genuinely-diverged** → no default; ask the user.
-5. Wait for one of: `take canonical` / `keep local` / `show me both` / `skip for now` / a freeform instruction.
+```
+CLAUDE.md — <N> sections need review
 
-Apply choices as you go. Don't batch — apply each accepted change before moving to the next section so the working file always reflects the user's current accepted state.
+  1. § <heading>   [canonical-newer]      → take canonical
+       <compact diff or one-line summary>
+  2. § <heading>   [local-has-additions]  → keep local — looks like intentional drift (<why>)
+  3. § <heading>   [genuinely-diverged]   → needs your eye, no default
+       <compact diff>
 
-If the user says "take all canonical sections" or similar bulk accept, confirm once, then apply all `canonical-newer` sections in one pass. Still walk `genuinely-diverged` and `local-has-additions` individually — bulk-accept doesn't apply to ambiguous categories.
+Reply with decisions — e.g. "take 1, keep 2, take 3", "take all canonical",
+or "show me 3" for the full both-sides diff of any section.
+```
+
+Recommendation per category: **canonical-newer** → "take canonical"; **local-has-additions** → "keep local" (explain why it looks like intentional project drift); **genuinely-diverged** → no default, flag for the user's eye. Pick the diff format by size — inline prose for tiny tweaks, `diff` style for larger blocks; for a big section, summarize in the digest and let the user `show me <N>` for the full both-sides view.
+
+Wait for the user's single reply, then apply all accepted section changes to `CLAUDE.md` in one pass. `take all canonical` accepts every `canonical-newer` section at once. A `show me N` request renders that section's full both-sides diff, after which the digest still stands — keep taking decisions until the user has ruled on every non-clean section.
 
 # Step 6 — Commit (only if something changed)
 
@@ -124,7 +128,7 @@ The refresh also checks whether `.td/BACKLOG.md` has accumulated items that belo
 2. **If item count is 0:** skip silently, jump to Step 8.
 3. **Otherwise:** tell the user `BACKLOG has N items. Flush them to GitHub Issues as part of the refresh? (yes / no / show me)` and wait.
 4. **On `show me`:** print each item with line number, then re-ask.
-5. **On `yes`:** invoke the `/td-park` procedure inline — walk each line, suggest Type with the vague-defaults-to-`Idea` heuristic, show the trigger phrase, dedupe against open issues, then per line: sync to GH with the chosen type / drop / skip. Apply each before moving on. Rewrite `BACKLOG.md` at the end with only skipped lines.
+5. **On `yes`:** run the canonical `/td-park` procedure (its Steps 4–9): consolidate related lines into a proposed issue set, present the digest (Type + dedupe per issue), take the user's decisions in one pass, batch-create. Rewrite `BACKLOG.md` with only skipped lines.
 6. **On `no`:** skip. BACKLOG stays untouched.
 
 This is the migration path for projects that pre-date the gh-source-of-truth model. Projects starting on the current model rarely accumulate BACKLOG items across `/td-close` boundaries, so Phase 2 is usually a no-op or a small flush.
@@ -165,26 +169,23 @@ State filter is `state:open` — focus on active connections. A long-closed one-
    - **observed but not declared** → filings exist that `/td-mailbox` outbound can't see.
    - **declared but not observed** → noise (no open filings from us into that repo).
 
-6. Surface per item, one at a time.
+6. Surface all drift items as ONE digest, take decisions in a single reply:
 
-For **observed-not-declared**:
 ```
-<repo> — <count> open filing(s) found, e.g.:
-  #<N> <title>
-  <more if multiple>
-Declare in .td/PROJECT.md § Cross-repo? (yes / yes-with-context / skip)
-```
-- `yes` → append `- <repo>` to the section (create the section if missing).
-- `yes-with-context` → ask user for one-line description, append `- <repo> — <context>`.
-- `skip` → leave undeclared (the visibility gap persists; you'll be reminded next refresh).
+Cross-repo registry drift — <N> item(s)
 
-For **declared-not-observed**:
+  observed but not declared (filings /td-mailbox outbound can't see):
+    1. <repo> — <count> open filing(s): #<N> <title><, …>   → declare?
+  declared but not observed (noise — no open filings into it):
+    2. <repo>   → remove from list?
+
+Reply, e.g. "declare 1 with context, remove 2" — or "declare 1, keep 2".
 ```
-Declared: <repo>
-No open filings found from <project-name>. Remove from list? (yes / keep)
-```
-- `yes` → remove the line.
-- `keep` → leave (maybe an expected connection that hasn't been used yet, or a one-off you want documented).
+
+Apply the batch:
+- **declare** → append `- <repo>` to `PROJECT.md § Cross-repo` (create the section if missing). `declare with context` → ask for the one-line description, append `- <repo> — <context>`.
+- **remove** → delete that line.
+- **skip / keep** → leave as-is. (An observed-not-declared skip leaves the visibility gap — you'll be reminded next refresh. A declared-not-observed keep is fine for an expected connection not yet used, or a one-off worth documenting.)
 
 7. If both diffs are empty: say `Cross-repo registry in sync.` and continue.
 

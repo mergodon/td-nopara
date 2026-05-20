@@ -1,10 +1,10 @@
 ---
-description: Flush BACKLOG.md to GitHub Issues (with appropriate type) line-by-line. Standalone mid-session declutter — no /td-close ceremony.
+description: Flush BACKLOG.md to GitHub Issues — consolidate related lines first, then create the issues in one batched pass. Standalone mid-session declutter — no /td-close ceremony.
 ---
 
-You are flushing `.td/BACKLOG.md` to GitHub Issues. Walk each line, suggest a type, dedupe against existing open issues, and either ship the work now, sync the line to GH with the chosen type, or drop it. After the walk, BACKLOG lines that were synced/dropped are removed; lines the user said "skip" on stay.
+You are flushing `.td/BACKLOG.md` to GitHub Issues. Read every line, consolidate lines that describe the same work, then present the whole proposed issue set as ONE digest — the user reviews and adjusts in a single pass, and you create the batch. No line-by-line interrogation, no blind 1:1 line→issue mapping.
 
-This command is the standalone version of the BACKLOG-flush step that also runs as part of `/td-close`. Use it mid-session when BACKLOG bloats and you want to declutter without the full close ceremony.
+This is the **canonical BACKLOG-flush procedure**. `/td-close` Step 3 and `/td-refresh` Phase 2 both run it — they point here rather than re-describing it.
 
 # Step 0 — Verify
 
@@ -33,13 +33,26 @@ Use the `<owner>` captured in Step 0 — don't hardcode any org name. Parse the 
 
 Same procedure as `/td-mailbox` Step 1: first H1 heading in `.td/PROJECT.md`, fall back to directory basename. Hold as `<sender-name>` (used as the `**From:**` marker if the issue ends up being a self-park — distinguishes work this project parked vs work others filed).
 
-# Step 4 — For each BACKLOG line, walk
+# Step 4 — Consolidate
 
-For each line (in BACKLOG order):
+Before mapping anything to issues, look at all the lines **together** and group them. A BACKLOG accumulated across a work session is rarely a clean 1:1 list — it has duplicates, near-duplicates, and clusters of small things that are really one piece of work. Don't map blindly.
 
-1. **Print the line:** `Line N: <text>`
+Cluster the lines into a proposed **issue set**:
 
-2. **Suggest a Type** based on the line's phrasing. Show the trigger phrase explicitly so the user can spot a bad suggestion.
+- **Duplicate / near-duplicate lines** — the same item captured twice (often on different days) → one issue.
+- **Facets of one piece** — several small lines that touch the same area or add up to one coherent chunk of work (e.g. three small cleanups in the same module) → one issue, the source lines folded into its body as a checklist.
+- **A line that's actually several issues** — rare, but if one line bundles unrelated asks, propose splitting it.
+- **Standalone lines** — most lines stay as their own issue.
+
+Every merge must be **visible and vetoable** — the digest (Step 5) shows which source lines feed each proposed issue, so the user can unmerge anything grouped wrong. Never silently fold two lines together.
+
+Hold the proposed issue set: each entry is `{ title, source-line(s), folded body }`.
+
+# Step 5 — Suggest types, dedupe, build the digest
+
+For each proposed issue:
+
+1. **Suggest a Type** from the phrasing of its source line(s):
 
    | Trigger in the line | Suggested Type |
    |---|---|
@@ -48,65 +61,82 @@ For each line (in BACKLOG order):
    | "what if" / "maybe" / "idea:" / vague / unsure-of-scope / could-do | `Idea` |
    | "plan to" / "across multiple repos" / "epic:" / multi-piece | `Epic` |
 
-   **When the phrasing doesn't clearly fit a category, default to `Idea`** — not `Task`. Vague *is* the signal: `Idea` is the right home for "not sure yet, browse later." Don't force-fit a `Task` just because it's the most generic action type.
+   When the phrasing doesn't clearly fit a category, default to `Idea` — not `Task`. Vague *is* the signal: `Idea` is the right home for "not sure yet, browse later." A grouped issue (several lines folded in) usually reads as `Task` (one concrete chunk) or `Epic` (decomposes into sub-issues).
 
-   Tell the user: `Suggested: Type: <X> (trigger: "<phrase from line>"). Accept? (or change to <other> / it's an Idea / it's an Epic / drop / fix it now)`
-
-   Examples:
-   - Line "remove unused imports in auth.ts" → trigger "remove", suggest `Task` (concrete verb + specific target).
-   - Line "remove all the legacy stuff somehow" → vague hedge ("somehow"), suggest `Idea`.
-   - Line "checkout 500s on iOS Safari only" → trigger "500s" matches "error", suggest `Bug`.
-   - Line "maybe explore using SSE for live updates" → trigger "maybe explore", suggest `Idea`.
-
-3. **Dedupe check.** Before creating, search open issues for similar content:
+2. **Dedupe check** against existing open issues:
    ```
-   gh issue list --state open --search "<2-3 key words from the line>"
+   gh issue list --state open --search "<2-3 key words>"
    ```
-   If results: show them as candidates, ask: "Looks similar to #<N> <title>. Update that one (add a comment) or create a new one?"
-   
-   If user picks "update": run `gh issue comment <N> --body "<additional context from the BACKLOG line> — <sender-name>"`, then continue.
+   If a similar issue exists, note it as a candidate in the digest — the user may want to comment on the existing one instead of creating a new issue.
 
-4. **Apply the user's choice:**
-
-   - **Ship now** → drop the slash command flow; pick up the work conversationally. (User is saying "this is the next piece" — start the rhythm on this line.)
-   
-   - **Sync to GH with Type X** → create the issue via GraphQL:
-     ```
-     gh api graphql -H "GraphQL-Features: sub_issues" -f query='
-       mutation($repoId: ID!, $title: String!, $body: String!, $typeId: ID!) {
-         createIssue(input: { repositoryId: $repoId, title: $title, body: $body, issueTypeId: $typeId }) {
-           issue { number url }
-         }
-       }' -F repoId=<repo-node-id> -F title="<line text>" -F body="**From:** <sender-name>\n\n<line text + any context>" -F typeId="<cached type ID>"
-     ```
-     Get the `<repo-node-id>` once per run from `gh api graphql -f query='query { repository(owner: "<owner>", name: "<name>") { id } }'`.
-     
-     Print: `Created <repo>#<N> (Type: X)`.
-     
-     Remove the BACKLOG line from the working list.
-   
-   - **Drop** → ask "Sure? This deletes the line without preserving it." If confirmed, remove from working list. (If the user expresses hesitation, default to "sync as Idea" instead — softer than dropping.)
-   
-   - **Skip** → leave the line in BACKLOG (stays for next flush attempt).
-
-# Step 5 — Rewrite BACKLOG.md
-
-After the walk, rewrite `.td/BACKLOG.md` containing only the lines the user marked "skip." If all lines were synced/dropped/shipped, the body becomes `(empty)` (with the preamble preserved).
-
-# Step 6 — Tell the user
+Then print the **digest** — the whole proposed set as one lettered list:
 
 ```
-Flushed: <total walked> lines. <N> synced to GH. <D> dropped. <S> shipped (rhythm started). <K> skipped (still in BACKLOG).
+BACKLOG: <L> lines → <I> proposed issues<if merges: " (<M> merges)">
+
+  A. <Type>  <title>
+       ← line(s) <n>[, <n>…]<if merged: "  (<one-line why merged>)">
+       <if dedupe hit: "dedupe: similar to open #<N> <title> — comment there instead?">
+  B. …
+
+Reply to adjust — retype any ("B→Task"), unmerge ("split D"), merge more
+("merge A+C"), drop, "ship A now", or "skip line <n>" to leave a line in
+BACKLOG. Otherwise I create A–<last> as shown.
 ```
 
-If `<S>` > 0 and the user shipped one mid-walk, surface a reminder: "You shipped <line>; remaining BACKLOG lines weren't walked. Run `/td-park` again when ready to continue, or commit-and-resume."
+Skip the dedupe line for issues with no candidate. Skip the merge-count note if there were no merges.
+
+# Step 6 — One decision point
+
+Wait for the user's single reply. They may:
+
+- **Accept as-is** ("go", "looks good", "create them") → proceed to Step 7 with the proposed set.
+- **Adjust** — retype, unmerge, merge further, drop an issue, reword a title. Apply all adjustments to the proposed set. If the changes are large, re-print the corrected digest once for a final confirm; if small, just proceed.
+- **Ship now** ("ship A now") — drop the flush; pick up that issue's work conversationally (the user is saying "this is the next piece"). The other proposed issues are NOT created — re-run `/td-park` when ready. Note this in the summary.
+- **Skip a line** — that BACKLOG line stays; it's excluded from the created set.
+
+Don't walk the issues one at a time. One digest, one reply, then act.
+
+# Step 7 — Execute the batch
+
+For every confirmed issue in the set, create it via GraphQL:
+
+```
+gh api graphql -H "GraphQL-Features: sub_issues" -f query='
+  mutation($repoId: ID!, $title: String!, $body: String!, $typeId: ID!) {
+    createIssue(input: { repositoryId: $repoId, title: $title, body: $body, issueTypeId: $typeId }) {
+      issue { number url }
+    }
+  }' -F repoId=<repo-node-id> -F title="<title>" -F body="**From:** <sender-name>\n\n<folded body>" -F typeId="<cached type ID>"
+```
+
+Get `<repo-node-id>` once per run: `gh api graphql -f query='query { repository(owner: "<owner>", name: "<name>") { id } }'`.
+
+The body opens with the `**From:** <sender-name>` marker, then the source content — for a merged issue, fold the source lines into a short checklist so nothing is lost.
+
+For a "comment on existing #N instead" decision: `gh issue comment <N> --body "<context from the line(s)> — <sender-name>"`.
+
+Print each result: `Created <repo>#<N> (Type: X)` or `Commented on #<N>`.
+
+# Step 8 — Rewrite BACKLOG.md
+
+After the batch, rewrite `.td/BACKLOG.md` containing only the lines the user marked "skip" (plus any lines a "ship now" interruption never reached). If every line was synced/dropped/shipped, the body becomes `(empty)` (preamble preserved).
+
+# Step 9 — Tell the user
+
+```
+Flushed: <L> lines → <N> issues created<if merges: ", <M> merges">. <D> dropped. <C> commented onto existing. <S> shipped (rhythm started). <K> skipped (still in BACKLOG).
+```
+
+If `<S>` > 0: "You shipped <issue>; the rest of the set wasn't created. Run `/td-park` again when ready."
 
 # Rules
 
-- **Never auto-create.** Always confirm Type + dedupe candidate before the mutation.
+- **Never auto-create.** The digest + one confirmation gates the whole batch. Within that, no per-issue interrogation.
+- **Every merge is visible.** The digest always shows which source lines feed each issue. Never silently fold lines together — the user can unmerge anything.
 - **Always include the `**From:**` marker** in the issue body — same project-soul rule from cross-repo. Even self-parks deserve the marker so the receiver (next session's `/td-mailbox` inbound walk) sees `From: <this-project>` and knows the source.
 - **GraphQL mutation requires the `sub_issues` header** for issue creation while in preview (even though sub_issues aren't used here, the header keeps the API surface consistent across our commands).
-- **Don't touch BACKLOG.md until the walk completes** — if the user interrupts mid-walk (Ctrl-C, error), nothing is lost. Only the final rewrite mutates the file.
+- **Don't touch BACKLOG.md until the batch completes** — if the user interrupts (Ctrl-C, error), nothing is lost. Only the final rewrite mutates the file.
 - **Don't commit BACKLOG.md** — `/td-park` is doc-hygiene; the user can commit the cleaned BACKLOG alongside other work when ready. (Exception: at `/td-close`, the close command commits.)
-- **If a "ship now" interrupts the walk**, set STATE.Topic to that line's content + start the rhythm. Other BACKLOG lines wait for next invocation.
-- **Optional filter argument:** `/td-park ideas` walks only lines that match the Idea heuristic. `/td-park bugs` walks only Bug-shaped lines. Useful for triaging by type when BACKLOG is heavy.
+- **If a "ship now" interrupts**, set STATE.Topic to that issue + start the rhythm. The rest of the set waits for the next invocation.
+- **Optional filter argument:** `/td-park ideas` flushes only Idea-shaped lines; `/td-park bugs` only Bug-shaped lines. Useful for triaging by type when BACKLOG is heavy.

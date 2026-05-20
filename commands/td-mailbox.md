@@ -1,8 +1,8 @@
 ---
-description: Unified cross-repo work check — walks inbound issues (filed INTO this repo, grouped by Issue Type) and outbound issues (filed FROM this repo into others, scoped by .td/PROJECT.md § Cross-repo and identified by the **From:** body marker), one item at a time. Replaces /td-inbox + /td-outbox.
+description: Unified cross-repo work check — gathers inbound issues (filed INTO this repo, grouped by Issue Type) and outbound issues (filed FROM this repo into others, scoped by .td/PROJECT.md § Cross-repo and identified by the **From:** body marker), presents both directions as one batched digest with a recommended action each, and executes your decisions in a single pass. Replaces /td-inbox + /td-outbox.
 ---
 
-You are running the unified mailbox check. The job: walk every cross-repo work item — both directions — and help the user decide one issue at a time. Inbound first (highest leverage), then outbound.
+You are running the unified mailbox check. The job: gather every cross-repo work item — both directions — present them as ONE digest with a recommended action each, take the user's decisions in a single pass, then execute the batch. No walking issues one at a time.
 
 The outbound side uses **minimum-dependency** mechanics: a human-curated list of connected projects (`.td/PROJECT.md § Cross-repo`) bounds the search, and the canonical `**From:** <project>` body marker identifies our own filings. No tracker Epic. No sub-issue linkage required for one-off cross-repo CRs. Epics with cross-repo sub-issues (real planning surface) keep their sub-issue linkage — that's a separate, legitimate use case.
 
@@ -21,7 +21,7 @@ Friendly name — used to sign comments and closures, and as the body marker val
 
 Hold as `<project-name>` for the run.
 
-Also read `.td/STATE.md` and parse the `Topic:` line. If it's not `idle` and matches a `Closes #<N>` reference in the Resume note (or a `.td/work/<slug>.md` exists referencing an inbound issue), hold the matched issue number as `<active-issue>`. Surfaces as an `[● ACTIVE]` marker in the walk and the summary header — so the very first thing /td-mailbox tells you is what's already in flight before you start picking up new things.
+Also read `.td/STATE.md` and parse the `Topic:` line. If it's not `idle` and matches a `Closes #<N>` reference in the Resume note (or a `.td/work/<slug>.md` exists referencing an inbound issue), hold the matched issue number as `<active-issue>`. It surfaces as an `[● ACTIVE]` marker in the digest header — so the very first thing /td-mailbox tells you is what's already in flight before you start picking up new things.
 
 # Step 2 — Inbound query (open issues in this repo)
 
@@ -49,13 +49,15 @@ gh api graphql -H "GraphQL-Features: sub_issues" -f query='
   }' -F owner=<owner> -F name=<name>
 ```
 
-This gives the inbound list directly. Epics with cross-repo sub-issues show their children inline (for planning context during the walk).
+This gives the inbound list directly. Epics with cross-repo sub-issues show their children inline (for planning context).
+
+Then, for each inbound issue, gather related commits — `git log --grep="#<N>" --oneline -10`. Hold the results: they drive the digest recommendation ("looks resolved — close?") and render in the `show N` drill-down.
 
 # Step 3 — Read the cross-repo registry
 
 Read `.td/PROJECT.md § Cross-repo`. It's the human-curated list of repos this project files into (slug + optional one-line context per repo).
 
-- **Section missing or empty:** the project hasn't declared any cross-repo relationships. Outbound is empty. Skip Step 4; in the summary, say `Outbound: no cross-repo registry declared in PROJECT.md § Cross-repo`.
+- **Section missing or empty:** the project hasn't declared any cross-repo relationships. Outbound is empty. Skip Step 4; in the digest, say `Outbound: no cross-repo registry declared in PROJECT.md § Cross-repo`.
 - **Section present:** parse out the GH slugs (e.g., `mergodon/rgb-ggbuddy`, …). Hold as `<connected-repos>`.
 
 The cross-repo registry IS the scope of outbound. Filings into repos not on this list won't show up — by design. If the project files into a new repo, declaring it here is the onboarding step (one-line edit in PROJECT.md).
@@ -93,50 +95,73 @@ For each result, an outbound match is any issue where:
 - Body begins with `**From:** <project-name>\b` (canonical sender marker — excludes false-positive name matches in unrelated bodies).
 - `repository.nameWithOwner` is one of the declared connected repos (the search already bounds this, but verify).
 
-Keep only matching issues. That set IS the outbound list.
+Keep only matching issues. That set IS the outbound list. If no matches: outbound is empty; note it in the digest.
 
-If no matches: outbound is empty; surface a one-line note in the summary.
+**Search index lag.** GitHub's search index lags newly-created issues by a few seconds — observed up to ~5s in testing. A filing made *right before* `/td-mailbox` may not appear in this run; it'll show on the next. If the user expects something to appear and it doesn't, suggest re-running after a few seconds, or fetch the specific issue directly via `repository.issue(number: N)`.
 
-**Search index lag.** GitHub's search index lags newly-created issues by a few seconds — observed up to ~5s in testing. A filing made *right before* `/td-mailbox` may not appear in this run; it'll show on the next. This is acceptable for the normal workflow (you don't usually run mailbox the moment after filing). If the user expects something to appear and it doesn't, suggest re-running after a few seconds, or fetch the specific issue directly via `repository.issue(number: N)`.
+Also fetch closed-recently candidates for the "Recently closed (last 30 days)" bucket — re-run the search with `state:closed` and filter by `closedAt > now - 30d`. (Optional — adds one query; skip if the user finds it noisy.)
 
-Also fetch closed-recently candidates if you want the "Recently closed (last 30 days)" bucket — re-run the search with `state:closed` and filter by `closedAt > now - 30d`. (Optional — adds one query; skip if the user finds it noisy.)
+# Step 5 — Build the digest
 
-# Step 5 — Print the summary
+Bucket each direction, then print everything as ONE numbered list.
 
-**Inbound** — bucket by `issueType.name`, in this order (highest leverage first):
+**Inbound** — bucket by `issueType.name`, in this order (highest leverage first), `updatedAt` descending within each:
 1. **Epic** — surface sub-issue progress prominently
 2. **Bug**
 3. **Task**
 4. **Idea**
-5. **(untyped)** — issues with no type
-
-Within each bucket, sort by `updatedAt` descending.
+5. **(untyped)**
 
 **Outbound** — bucket the cross-repo matches by intent state. Determine "us" vs "them" by parsed sign-off in comment text (a comment ending with `— <project-name>` is ours).
-- **Awaiting reply** — `state: OPEN`, last comment is from someone OTHER than us (or no comments yet).
+- **Awaiting reply** — `state: OPEN`, last comment from someone OTHER than us (or no comments yet).
 - **Pending action** — `state: OPEN`, last comment is from us (they need to act).
 - **Recently closed** — `state: CLOSED`, `closedAt` within last 30 days (only if you ran the optional closed-state query).
 
-Print compact summary:
+**Recommendation per item** (one line — first match wins).
+
+Inbound:
+- **N == `<active-issue>`** → "your current Topic — comment progress, or close if shipped?"
+- **Epic** — report-only, never a "start it" nudge. An Epic is a planning surface; its open children are the actionable work. First match wins:
+  - 100% sub-issues closed → "all children done — close the parent?"
+  - older than 30 days at 0% → "stale plan — still pursuing?"
+  - otherwise → "planning surface — <completed>/<total> children done; pick it up via the open children."
+- **Bug/Task** with commits referencing `#<N>` that look like a fix → "looks resolved — close?"
+- Most recent comment from another project → "awaiting reply — comment?"
+- **Idea** older than 60 days, untouched → "stale idea — close?"
+- **Bug/Task** with no commits referencing it and not active → "concrete piece — start it, or leave open?"
+- Otherwise → "pending — leave open?"
+
+Outbound:
+- **Awaiting reply, recently created (< 14 days)** → "they haven't had time yet — leave?"
+- **Awaiting reply, 14–60 days, no movement** → "long-pending — gentle ping?"
+- **Awaiting reply, > 60 days, no movement** → "stale — close as not_planned?"
+- **Pending action, ball with them** → "acknowledge or check back later?"
+- **Recently closed, last comment theirs** → "verify the resolution matched your ask?"
+- **Recently closed, you commented after close** → "already verified — skip."
+
+Number items continuously across both directions (so "close 3" is unambiguous). Print:
 
 ```
-Mailbox: <N inbound> inbound + <M outbound> outbound
+Mailbox: <N> inbound + <M> outbound
 <if <active-issue> set: "  ● Active: #<N> <title> (STATE.Topic)">
 
 📥 Inbound (this repo) — by Issue Type
-  Epic    (X)   <#N — title [Y/Z sub-issues if any]>, ...
-  Bug     (X)   <#N — title>, ...
-  Task    (X)   ...
-  Idea    (X)   ...
-  (untyped) (X) ...
+  1. #<N>  <Type>  <title>   from <source-project>   <age>  <if Epic: [<c>/<t> closed, <pct>%]>
+         → <recommendation>
+  2. …
 
-📤 Outbound (cross-repo, scoped by .td/PROJECT.md § Cross-repo) — by intent state
-  Awaiting reply (X)  <repo#N — title>, ...
-  Pending action (X)  ...
-  Recently closed (X) ...
+📤 Outbound (cross-repo — scoped by .td/PROJECT.md § Cross-repo) — by intent state
+  K. <repo>#<N>  <Type>  <title>   <bucket>   <age>
+         → <recommendation>
+  …
+
+Reply with decisions in one line — e.g. "close 1 3, comment 2, ping 5,
+verify 6, skip rest". `show N` expands any item's full body + comments.
 ```
 
-Skip empty buckets. If both directions are empty:
+`<source-project>` comes from the `**From:** <name>` marker at the top of the inbound body; if absent, label `(unmarked)`.
+
+If both directions are empty:
 ```
 Mailbox empty. ✓
   Inbound:  no open issues in this repo
@@ -144,136 +169,91 @@ Mailbox empty. ✓
 ```
 And exit.
 
-# Step 6 — Walk inbound, one issue at a time
+# Step 6 — One decision point
 
-For each issue in priority order:
+Wait for the user's single reply. They reference item numbers and an action each. Valid actions:
+- **Inbound:** `start` / `comment` / `close` / `skip`
+- **Outbound:** `comment` / `ping` / `verify` / `close` / `reopen` / `acknowledge` / `skip`
+- **`show N`** — expand item N before deciding (Step 7), then the digest stands again.
+- **freeform** — e.g. "create a new issue for X", or a per-item instruction. Handle conversationally, then return to the digest.
+
+Anything not named is treated as `skip`. Don't walk the items one at a time — one digest, one reply, then Step 8.
+
+# Step 7 — Drill-down on `show N`
+
+When the user asks to see an item in full, render it verbose, then return to the digest (the decision point still stands — re-state "your decisions?").
 
 **Header:**
 ```
-#<N>  <title>
-  Type: <Epic|Bug|Task|Idea|untyped>  from: <source-project>  opened <YYYY-MM-DD>
+#<N> (or <repo>#<N>)  <title>
+  Type: <…>  from: <source-project>  opened <YYYY-MM-DD>  [<state> if outbound]
   <if N == <active-issue>: "  ● ACTIVE — your current STATE.Topic">
-  <if Epic with sub-issues: [<completed>/<total> sub-issues closed, <percentCompleted>%]>
+  <if Epic with sub-issues: [<completed>/<total> closed, <pct>%]>
 ```
-
-Parse `<source-project>` from the `**From:** <name>` marker at the top of the body. If absent, label `(unmarked)`. The friendly name from the marker is what to use in conversation — don't bother resolving the slug unless you need to act.
 
 **Body:** print verbatim.
+**Comments:** print inline from the fetched comments — `[YYYY-MM-DD] <author or parsed source-project>: <body>`. Mark ours (`— <project-name>` sign-off) vs theirs.
+**Related commits** (inbound): the `git log --grep` results from Step 2.
+**Sub-issues** (Epics): list each `└─ <repo>#<N> [open|closed] <title>`.
 
-**Comments:** print inline from the comments already fetched in Step 2:
+The user can `show` several items before giving decisions. No action is taken in this step.
+
+# Step 8 — Execute the batch
+
+Process the user's decisions as a batch, not a walk.
+
+**1. Resolve all drafts first.** For every action that needs text — inbound `comment`, inbound `close` with a closing comment, outbound `comment`/`ping`, outbound `verify`, outbound `close` (a withdrawal note) — draft the text now, each signed `— <project-name>`. Show ALL drafts together and confirm once:
+
 ```
-[YYYY-MM-DD] <author or parsed source-project>: <comment body>
+About to post:
+  #2  comment:  "<draft>"
+  #5  ping:     "<draft>"
+  #6  verify:   "<draft>"
+  rgb-web#22 close: "<withdrawal draft>"
+Post all? (yes / edit N / drop N)
 ```
 
-**Related commits:** `git log --grep="#<N>" --oneline -10`. Surface any.
+**2. Run the state-changing actions** once confirmed:
+- **Inbound `close`** — `gh issue close <N> --comment "<text>"` (or `gh issue close <N>` if the user chose no comment).
+- **Inbound `comment`** — `gh issue comment <N> --body "<text>"`.
+- **Outbound `comment` / `ping`** — `gh issue comment <N> --repo <slug> --body "<text>"`.
+- **Outbound `verify`** — add a closing-verification comment (`Confirmed — works as expected. — <project-name>`), or skip the comment if the user only wanted a visual check. No state change unless asked.
+- **Outbound `close`** (withdrawing our own stale ask) — `gh issue close <N> --repo <slug> --reason "not planned" --comment "<withdrawal text>"`. The `not planned` reason tells GitHub (and any parent Epic's progress bar) this wasn't an abandoned-because-done close. Never close without a comment — zero context for the receiver is rude.
+- **Outbound `reopen`** — destructive (reopens someone else's issue, or reactivates a stale one we closed): confirm a second time, then `gh issue reopen <N> --repo <slug>` plus a comment explaining why.
+- **`acknowledge` / `skip`** — no-op.
 
-**For Epics:** also surface sub-issues (from `subIssues.nodes` in Step 2). List each as:
-```
-  └─ <repo>#<N> [open|closed] <title>
-```
+**3. Handle `start` last** (at most one per batch — a Topic is singular). If the user said `start` on an **Epic**, don't activate it — an Epic isn't a single piece of work; offer to `start` one of its open child issues instead. To activate an issue:
 
-**Recommendation** (one line, type-aware — first match wins):
-- **N == <active-issue>** → "Your current Topic — comment with progress, or close if shipped?"
-- **Epic** — report-only, never a "start it" nudge. An Epic is a high-level planning surface; its open child issues are the actionable work, not the parent. First match wins within this group:
-  - 100% sub-issues closed → "All children done — close the parent?"
-  - older than 30 days at 0% → "Stale plan — still pursuing?"
-  - otherwise → "Planning surface — <completed>/<total> children done; pick it up via the open children."
-- **Bug/Task** with commits referencing `#<N>` that look like a fix → "Looks resolved — close?"
-- Most recent comment from another project → "Awaiting reply — comment?"
-- **Idea** older than 60 days, untouched → "Stale idea — close?"
-- **Bug/Task** with no commits referencing it and not active → "Concrete piece — start it, or leave open?"
-- Otherwise → "Pending — leave open?"
-
-**Wait for: `start` / `comment` / `close` / `skip` / freeform.** For an **Epic**, drop `start` from the offered verbs — an Epic is picked up through its child issues, never activated as a Topic itself; offer `comment` / `close` / `skip` / freeform.
-
-**On `start`:** activate this issue as the current piece of work. If the issue is an **Epic**, don't activate it — an Epic isn't a single piece of work; offer to `start` one of its open child issues instead, and walk that one.
-1. Propose a kebab-case `<slug>` derived from the title (3–5 words, lowercase ASCII). Confirm with user.
-2. Ask: "Multi-step (planning surface → `.td/work/<slug>.md`) or single-piece (just STATE Resume note)?" If the issue body is shaped as one clear edit, default to single-piece.
+1. Propose a kebab-case `<slug>` from the title (3–5 words, lowercase ASCII). Confirm with the user.
+2. Ask: "Multi-step (planning surface → `.td/work/<slug>.md`) or single-piece (just STATE Resume note)?" If the issue body is one clear edit, default to single-piece.
 3. Update `.td/STATE.md`:
    - `Topic: <slug>`
    - `Phase: planning` (multi-step) or `working` (single-piece)
    - `Last: YYYY-MM-DD — picked up #<N> from mailbox`
    - Append/replace Resume note line: `Active piece: #<N> <title> — Closes #<N> on ship.`
 4. If multi-step: create `.td/work/<slug>.md` with a short header (`# <title>`, link to `#<N>`, the issue body folded in as initial context).
-5. Tell user: `STATE.Topic is now <slug>. First commit on this piece must include "Closes #<N>" so GitHub auto-closes the issue when it ships.`
-6. Ask: "Continue walking the mailbox, or break out to start working on #<N> now?" — wait. If `break out`, stop the walk and resume normal conversation. If `continue`, proceed.
+5. Tell the user: `STATE.Topic is now <slug>. First commit on this piece must include "Closes #<N>" so GitHub auto-closes the issue when it ships.`
+6. Ask: "Break out to work on #<N> now, or anything else in the mailbox?" — wait.
 
-**On `close`:**
-1. Ask "Closing comment? (yes / no)". Wait.
-2. If yes: draft a short closing comment, append `— <project-name>`, confirm.
-3. Run:
-   - With comment: `gh issue close <N> --comment "<text>"`
-   - Without: `gh issue close <N>`
-
-**On `comment`:**
-1. Draft based on discussion + user intent (ask for the gist if not obvious), append `— <project-name>`, confirm.
-2. Run: `gh issue comment <N> --body "<text>"`
-
-**On `skip`:** continue.
-
-**On freeform / "create a new issue":** handle conversationally (resolve type, dedupe check, GraphQL create; if cross-repo, follow the routing rule — declare in PROJECT.md § Cross-repo if new, file with `**From:** <project-name>` body marker, optionally `addSubIssue` to an Epic if it belongs to one), then resume the walk where it was.
-
-Apply each action *before* moving on. Don't batch.
-
-# Step 7 — Walk outbound, one issue at a time
-
-In bucket order (Awaiting reply → Pending action → Recently closed). For each cross-repo issue:
-
-**Header:**
-```
-<repo>#<N>  [<state>]  Type: <Bug|Task|Idea|Epic|untyped>
-Title: <title>
-Filed: <createdAt>  Updated: <updatedAt>
-URL: <url>
-```
-
-**Body:** print verbatim.
-
-**Recent comments:** print the last 5 from `comments.nodes` (already fetched in Step 4). Mark ours (`— <project-name>` sign-off) vs theirs.
-
-**Recommendation** (one line — pick the first that fits):
-- **Awaiting reply, recently created (< 14 days)** → "They haven't had time yet — leave?"
-- **Awaiting reply, 14–60 days, no movement** → "Long-pending — gentle ping?"
-- **Awaiting reply, > 60 days, no movement** → "Stale — close as not_planned?"
-- **Pending action, ball is with them** → "Acknowledge or check back later?"
-- **Recently closed, last comment is theirs** → "Verify the resolution matched your ask?"
-- **Recently closed, you commented after close** → "Already verified — skip."
-
-**Wait for: `comment` / `verify` / `close` / `reopen` / `skip` / `acknowledge` / freeform.**
-
-**On `comment`:** draft based on discussion + user intent, append `— <project-name>`, confirm, then `gh issue comment <N> --repo <slug> --body "<text>"`.
-
-**On `verify`:** add a closing-verification comment (`Confirmed — works as expected. — <project-name>`) OR skip if the user just wants visual confirmation. No state change unless asked.
-
-**On `close`:** for our own stale outbound — we're withdrawing the ask. Draft a short comment explaining why (e.g., "Withdrawing — no longer needed; superseded by X. — <project-name>"), confirm, then close with `not planned` reason:
-```
-gh issue close <N> --repo <slug> --reason "not planned" --comment "<drafted text>"
-```
-The `not planned` reason tells GitHub (and any parent Epic's progress bar, if this was Epic-attached) this wasn't an abandoned-because-done close. Don't use `close` without a comment — leaving zero context for the receiver is rude.
-
-**On `reopen`:** confirm twice (destructive — reopens someone else's issue, or reactivates a stale one we closed). `gh issue reopen <N> --repo <slug>`. Add a comment explaining why.
-
-**On `skip` / `acknowledge`:** continue.
-
-# Step 8 — Single end-summary
+# Step 9 — Single end-summary
 
 ```
 Mailbox walked: <T> reviewed total.
   Inbound:  <St> started, <C> closed, <Co> commented on, <S> skipped.
-  Outbound: <Co> commented on, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
-<if walk ended early via `break out`: "  (walk broken out at #<N> — STATE.Topic now <slug>)">
+  Outbound: <Co> commented/pinged, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
+<if a `start` happened: "  ● STATE.Topic now <slug> (#<N>)">
 ```
 
 # Rules
 
 - **Single command for both directions.** Don't suggest a second command for the other side — this IS both.
+- **One digest, one decision point.** Gather everything, present it once, take decisions in a single pass, execute the batch. No issue-by-issue walking.
 - **Outbound scope is the cross-repo registry** in `.td/PROJECT.md § Cross-repo`. Filings into repos not declared there won't show. By design — forces honesty about cross-repo relationships. If you find yourself wanting to widen, the right move is updating PROJECT.md, not bypassing the scope.
-- **The `**From:** <project>` body marker is canonical** — it's the only identifier of "this is ours" on the outbound side, and it's the human-readable source signal on the inbound side. Every cross-repo filing gets it.
-- **Sub-issue linkage stays for real planning Epics.** Epics with cross-repo children show progress in the inbound walk. That's a legit GitHub-native use case. One-off CRs don't need it.
+- **The `**From:** <project>` body marker is canonical** — the only identifier of "this is ours" on the outbound side, and the human-readable source signal on the inbound side. Every cross-repo filing gets it.
+- **Sub-issue linkage stays for real planning Epics.** Epics with cross-repo children show progress in the digest. That's a legit GitHub-native use case. One-off CRs don't need it.
 - **Epics are reported, not actioned.** An Epic is a high-level planning surface — the actionable work is its child Bug/Task issues. `/td-mailbox` shows an Epic's state and sub-issue progress for planning context; it never nudges `start` on a parent Epic. (Same stance as `/td-close` Step 2, which gates a close only on Bug/Task.)
 - **Always sign comments and closures with `— <project-name>`** (project-soul rule). Never address GH usernames in cross-repo prose.
-- **Never auto-close, never auto-post.** Always show drafted text and confirm.
-- **One issue at a time.** No batching.
+- **Never auto-close, never auto-post.** All drafted text is shown and confirmed once before the batch runs.
 - **GraphQL preview header** `GraphQL-Features: sub_issues` required for `subIssuesSummary` + `subIssues`. Inline on each query that uses them.
 - **If GraphQL errors** (rate limit, auth, schema drift): surface the error and stop. Fall back to `gh issue list --json` for a degraded-mode inbound listing if the user insists.
 - **Cross-org outbound is unsupported** by sub-issue linkage, but the From-marker search still finds it. So a cross-org CR filed with the marker WILL show in outbound if its repo is declared in PROJECT.md § Cross-repo. (Sub-issue parent linkage just won't work for that one.)

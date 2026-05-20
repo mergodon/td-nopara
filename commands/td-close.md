@@ -43,20 +43,22 @@ Update existing memory files rather than creating duplicates. If nothing new was
 
 # Step 3 — Park leftovers to GitHub
 
-Walk every leftover thinking surface and route it: ship-now (the user picks it up as the next piece — close aborts and the rhythm resumes), sync to GitHub Issues (with Type), or drop.
+Two leftover-thinking surfaces to clear — BACKLOG lines and `.td/work/` files. Present each as a digest, take decisions in one pass, execute the batch. Don't walk items one at a time.
 
-**Two sources to walk, in order:**
+**1. `.td/BACKLOG.md`** — run the **canonical BACKLOG-flush procedure**: `/td-park` Steps 4–9 (consolidate related lines → digest with Type + dedupe per proposed issue → one decision point → batch-create). Don't re-derive it here — that procedure already consolidates instead of blind 1:1 line→issue mapping. The Issue Type IDs, repo node ID, and friendly name it needs are gathered the same way as in `/td-park` Steps 2–3.
 
-1. **`.td/BACKLOG.md` line-by-line** — same procedure as `/td-park` Step 4 (type suggestion from phrasing, dedupe against open issues, sync via `gh api graphql createIssue` with the chosen Type ID and `**From:** <sender-name>` marker).
+**2. `.td/work/<topic>.md` files** — gather all work files, then present one digest:
+   - For each: `git log --grep="<topic>" --oneline` — shipped or not?
+   - Recommendation per file: shipped → "delete (work done)"; unshipped → "ship now / park as <Type> / drop", where Type is `Bug` for incident files, `Epic` for planning files that decompose into sub-issues, `Task` otherwise.
 
-2. **`.td/work/<topic>.md` files** — for each work file:
-   - Check `git log --grep="<topic>" --oneline` — is the topic shipped? If yes: ask "Topic looks shipped — delete this work file?" (the standard outcome for finished work).
-   - If unshipped: ask "Ship now / Park to GH as Type X / Drop?" The work file's content becomes the GH issue body (Symptom/Context/Hypothesis/Fix structure for incidents; freeform for plans).
-     - `Bug` for incident work files
-     - `Epic` for planning work files that decompose into sub-issues
-     - `Task` for everything else (single-chunk work, catch-all)
-   - If parked: same `gh api graphql createIssue` mutation, work file content as body, `**From:** <sender-name>` marker.
-   - If dropped: confirm, then delete.
+   ```
+   .td/work/ — <N> file(s)
+     1. incident-foo.md   shipped (3 commits)   → delete
+     2. plan-bar.md       unshipped             → park as Epic, or ship now?
+   Reply with decisions, e.g. "delete 1, park 2 as Epic".
+   ```
+
+   One decision point, then execute the batch: parked files → `gh api graphql createIssue` (work file content as body, `**From:** <sender-name>` marker); shipped/dropped files → delete; "ship now" → close aborts, the rhythm resumes on that file.
 
 After this step:
 - `.td/BACKLOG.md` is empty (`(empty)` placeholder restored).
@@ -108,7 +110,7 @@ Read `PROJECT.md § Stack` and `WORKWAY.md § Framework specifics`. Surface each
 [stack drift] PROJECT.md: "Tailwind"  →  no tailwindcss in package.json. Remove from PROJECT.md? (y/n)
 ```
 
-Walk one mismatch at a time, apply the user's choice in-place. Focus on the human-curated layer (frameworks, choices, "why we picked this") — don't paste the whole dep list into PROJECT.md; the dep file IS the dep list.
+Present all mismatches as one numbered list, take the user's choices in a single reply, then apply them in a batch. Focus on the human-curated layer (frameworks, choices, "why we picked this") — don't paste the whole dep list into PROJECT.md; the dep file IS the dep list.
 
 If no stack files exist (pure-markdown repo, etc.): say so out loud (`no stack files detected, skipping mechanical check`) and continue.
 
@@ -121,7 +123,7 @@ Apply this filter to every `.td/` doc:
 - **Keep** if all three hold: (a) it matters for next session, (b) it's not derivable from code or `git log`, (c) we actually know it to be true.
 - **Clear** if: it's speculative ("might want to..."), it duplicates what `git log` or the codebase already says, or it's a placeholder that was never filled in.
 
-Walk doc by doc, surface decisions as one-liners:
+Run every check below across all docs, then surface the findings as one numbered list — the user decides in a single reply, you apply the batch:
 
 - **PROJECT.md § Active scope** — anything actually shipped? Move to "Shipped". Anything quietly abandoned? Ask before deleting.
 - **PROJECT.md § What this is / Who for** — re-read against what actually got built. If the one-liner no longer fits, propose a new one and ask.

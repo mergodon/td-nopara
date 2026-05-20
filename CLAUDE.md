@@ -178,7 +178,7 @@ Seven commands, each with a distinct trigger. Full procedure lives in `commands/
 - `/td-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
 - `/td-refresh` — bring project current with the framework conventions (4 phases, diff-and-propose throughout).
-- `/td-mailbox` — unified cross-repo work walk (inbound + outbound, one item at a time).
+- `/td-mailbox` — unified cross-repo work walk (inbound + outbound, one batched digest).
 - `/td-incident` — live production fire mode. Drops everything else.
 - `/td-park` — mid-session `BACKLOG.md` → GitHub Issues flush.
 
