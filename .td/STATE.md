@@ -1,14 +1,14 @@
 # State
 
 Project:  td-flow
-Topic:    idle
-Phase:    idle
+Topic:    architecture-md-standard
+Phase:    shipped (awaiting test)
 Blocker:  none
-Last:     2026-05-20 — shipped #10 (mailbox-aware /td-clear + /td-close); dropped #8 (subagent parallel path, not safe enough for solo-dev use).
+Last:     2026-05-20 — shipped ARCHITECTURE.md as sixth standard doc + scaffold + 4 slash-command hooks + dogfood; Closes #9.
 
 ## Resume note
 
-No active piece.
+**Active piece:** #9 shipped. ARCHITECTURE.md added to canonical six. Template + CLAUDE.md (both root + templates/) + scaffold in /td-init + heads-up in /td-clear + hygiene in /td-close + Phase 4 existence check in /td-refresh + architectural-learning hook in /td-incident close-out + dogfood (this repo's own .td/ARCHITECTURE.md). Awaiting user test — if good, Topic flips to idle.
 
 td-flow is the public, file-based, repo-portable solo-developer framework hosted at `mergodon/td-flow`. It eats its own dog food — this repo IS a td-flow project. Current surface: root `CLAUDE.md` contract + 5 `.td/` docs (PROJECT/WORKWAY/STATE/BACKLOG, optional DEBUG) + `work/<topic>.md` scratch + **7 slash commands** (`/td-init`, `/td-clear`, `/td-close`, `/td-refresh`, `/td-mailbox`, `/td-incident`, `/td-park`). Everything else is conversational.
 

@@ -34,7 +34,7 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
 
 **Brownfield ad-hoc convention detected** — any of `.claude/agreements/`, `ARCHITECTURE.md`, `BLOCKS.md` exist (and not GSD):
 - Read `.claude/agreements/*.md`. Most agreements are universal td-flow rails (cadence, push-after-commit, run-commands) — they're already in CLAUDE.md and don't need preservation. Project-specific ones (branding, uat-style) → append as items in `WORKWAY.md` § Notes.
-- Read `ARCHITECTURE.md`. Keep it at root as-is (it's a stable doc the user already maintains); link to it from `.td/PROJECT.md`.
+- Read existing `ARCHITECTURE.md` (root or `docs/`). If present, move it to `.td/ARCHITECTURE.md` — it's now a standard td-flow doc. If both root and `docs/` have one, ask which to keep. If neither exists but the project has non-trivial rationale to capture, fall back to scaffolding from `~/projects/td-flow/templates/td/ARCHITECTURE.md` like a greenfield project.
 - Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, archive it (rename to `BLOCKS-archive.md` or leave as-is — ask the user).
 - Read existing root `CLAUDE.md`. Extract: project description (`## What this is` / similar) → `.td/PROJECT.md`; stack section → `.td/PROJECT.md`; common commands → `WORKWAY.md` § Local testing or § Production / Ship as appropriate; everything else → `.td/PROJECT.md` (it's content, not contract).
 - Overwrite root `CLAUDE.md` with the canonical td-flow contract.
@@ -95,6 +95,7 @@ Copy templates from `~/.claude/td-templates/` (or `~/projects/td-flow/templates/
 - `CLAUDE.md` → root, exactly as the template
 - `.td/PROJECT.md` → fill placeholders
 - `.td/WORKWAY.md` → fill placeholders for Local testing, Local UAT, Production / Ship
+- `.td/ARCHITECTURE.md` → copy template as-is; leave sections empty for the project to fill organically. The first non-trivial decision the project ships should populate § Important decisions.
 - `.td/STATE.md` → fill placeholders, set `Last:` to today
 - `.td/BACKLOG.md` → as-is
 - `.td/frameworks/.gitkeep` → empty (the dir is for rare overflow; default home for framework awareness is `WORKWAY.md` § Framework specifics)

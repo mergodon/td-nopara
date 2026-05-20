@@ -82,8 +82,9 @@ The incident ends in one of three ways:
 3. Commit: `fix(<area>): <one-line>` with a body that includes Symptom → Root cause → Fix (matching the work file structure).
 4. Push.
 5. Ask: **"Anything worth saving to `DEBUG.md`?"** If yes, capture — creates the file if not present. Include the symptom that took you there, the diagnostic path that worked, and any tool-specific tricks (Sentry correlation ID, Forge log path, etc.).
-6. Reset STATE: Topic back to previous (or `idle`); Phase reflects what's now active; `Last:` notes incident closed.
-7. Fold-and-delete the work file in the same commit (per the contract's fold-and-delete rule).
+6. Ask: **"Anything architectural learned here?"** — if the fire revealed something load-bearing or counterintuitive that future readers should know (e.g., "the queue retry on this jobclass is what makes the optimistic-locking work — touching it breaks reservations silently"), capture it in `.td/ARCHITECTURE.md` under § What's load-bearing or § Surprises. Scaffold the file from `~/projects/td-flow/templates/td/ARCHITECTURE.md` if it doesn't exist yet. DEBUG.md is *how to debug it again*; ARCHITECTURE.md is *why the system works the way it does* — incidents often surface the latter.
+7. Reset STATE: Topic back to previous (or `idle`); Phase reflects what's now active; `Last:` notes incident closed.
+8. Fold-and-delete the work file in the same commit (per the contract's fold-and-delete rule).
 
 **(b) Too big for this session — park to GitHub.**
 
@@ -107,7 +108,7 @@ The incident ends in one of three ways:
 
 One sentence per resolution path:
 
-- (a) `Fixed. Pushed <sha>. <DEBUG.md updated | DEBUG.md unchanged>. Back to <previous topic | idle>.`
+- (a) `Fixed. Pushed <sha>. <DEBUG.md updated | DEBUG.md unchanged>. <ARCHITECTURE.md updated | ARCHITECTURE.md unchanged>. Back to <previous topic | idle>.`
 - (b) `Parked to GitHub as <repo>#<N> (Type: Bug). Local work file removed.`
 - (c) `Filed cross-repo against <slug>#<N> (Type: Bug). Local work file removed.`
 

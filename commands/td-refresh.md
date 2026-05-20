@@ -1,12 +1,13 @@
 ---
-description: Bring this project current with the framework conventions. (1) Diff CLAUDE.md against canonical, propose per section. (2) Flush any accumulated BACKLOG items to GitHub Issues. (3) Cross-repo registry drift check — diff actual filings against PROJECT.md § Cross-repo, propose add/remove per delta. Diff-and-propose throughout — never overwrites without your accept.
+description: Bring this project current with the framework conventions. (1) Diff CLAUDE.md against canonical, propose per section. (2) Flush any accumulated BACKLOG items to GitHub Issues. (3) Cross-repo registry drift check — diff actual filings against PROJECT.md § Cross-repo, propose add/remove per delta. (4) Standard-docs existence check — scaffold any canonical .td/ doc the project is missing. Diff-and-propose throughout — never overwrites without your accept.
 ---
 
-You are bringing this project up to the current framework conventions. Three phases, all diff-and-propose, all per-item-confirmable, never destructive without explicit user accept:
+You are bringing this project up to the current framework conventions. Four phases, all diff-and-propose, all per-item-confirmable, never destructive without explicit user accept:
 
 - **Phase 1 (Steps 0-6):** Review project `CLAUDE.md` against the canonical at `~/projects/td-flow/CLAUDE.md`. The canonical drifts forward over time; project copies fall behind. Surface every section deviation, propose what to take, apply only what the user accepts.
 - **Phase 2 (Step 7):** If `.td/BACKLOG.md` has accumulated items (left over from before the gh-source-of-truth model, or just from extended work), offer to flush them to GitHub Issues using the `/td-park` procedure.
 - **Phase 3 (Step 8):** Cross-repo registry drift check. `.td/PROJECT.md § Cross-repo` is load-bearing (bounds `/td-mailbox` outbound). Compare actual filings (via org-wide `**From:**` marker search) against the declared list; propose add (we filed into a repo not declared) or remove (declared but never used).
+- **Phase 4 (Step 9):** Standard-docs existence check. The canonical six `.td/` docs are PROJECT/WORKWAY/ARCHITECTURE/STATE/BACKLOG plus optional DEBUG. If a project predates a newer doc (e.g. ARCHITECTURE.md added later), offer to scaffold from template. Existence-only check — never overwrites content.
 
 The user owns both surfaces. Your role is to make the deltas reviewable, one item at a time.
 
@@ -151,13 +152,44 @@ No open filings found from <project-name>. Remove from list? (yes / keep)
 
 If you made changes: write back `.td/PROJECT.md`. The user reviews the diff at commit time.
 
-# Step 9 — Tell the user
+# Step 9 — Standard-docs existence check (Phase 4)
 
-One sentence covering all three phases:
+Canonical `.td/` shape: PROJECT/WORKWAY/ARCHITECTURE/STATE/BACKLOG plus optional DEBUG. Projects that predate a doc addition (e.g. ARCHITECTURE.md became standard later) are missing the file. This phase only checks **existence** — never compares content (architecture rationale is project-specific, no canonical content to diff against).
 
-`Refresh complete. <N> CLAUDE.md sections updated. <M> BACKLOG items flushed to GH. <K> Cross-repo entries updated.`
+For each canonical doc in `.td/`:
 
-If a phase didn't fire (no deltas, no items): use "in sync" wording for that phase instead of a number.
+```
+PROJECT.md       → check ./.td/PROJECT.md exists
+WORKWAY.md       → check ./.td/WORKWAY.md exists
+ARCHITECTURE.md  → check ./.td/ARCHITECTURE.md exists
+STATE.md         → check ./.td/STATE.md exists
+BACKLOG.md       → check ./.td/BACKLOG.md exists
+```
+
+For any missing file, surface one at a time:
+
+```
+.td/<doc> not present (canonical .td/ shape). Scaffold from ~/projects/td-flow/templates/td/<doc>?
+(yes / yes-with-stub / not yet)
+```
+
+- `yes` → copy the template verbatim.
+- `yes-with-stub` → copy template + replace section placeholders with explicit `(empty — fill when relevant)` markers, so the file is visibly skeletal rather than looking pre-filled.
+- `not yet` → skip; this phase will re-prompt next refresh.
+
+For DEBUG.md: do NOT prompt — it's opt-in per project (created on demand during `/td-incident` close-out, not scaffolded).
+
+If everything exists: say `Standard docs in sync.` and continue.
+
+If you scaffolded any file: write the new files. The user reviews at commit time.
+
+# Step 10 — Tell the user
+
+One sentence covering all four phases:
+
+`Refresh complete. <N> CLAUDE.md sections updated. <M> BACKLOG items flushed to GH. <K> Cross-repo entries updated. <D> docs scaffolded.`
+
+If a phase didn't fire (no deltas, no items, no missing docs): use "in sync" wording for that phase instead of a number.
 
 # Rules
 
@@ -165,5 +197,5 @@ If a phase didn't fire (no deltas, no items): use "in sync" wording for that pha
 - Never auto-merge sections the user didn't review.
 - Don't propose deltas for whitespace-only differences.
 - If you can't read the canonical (missing, permission), stop and tell the user — don't guess what it should say.
-- This command only touches root `CLAUDE.md`. It does not modify `.td/*`, `~/.claude/*`, or anything else.
+- This command touches root `CLAUDE.md` and (in Phase 4) may scaffold missing canonical `.td/` docs from `~/projects/td-flow/templates/td/`. It never overwrites existing `.td/*` content and never touches `~/.claude/*`.
 - This is a `docs:` commit per `CLAUDE.md § Commit messages`, so the pre-commit `Test command` is exempt.

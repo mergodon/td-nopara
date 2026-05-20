@@ -84,6 +84,20 @@ Skip the outbound segment entirely if `.td/PROJECT.md § Cross-repo` is missing/
 
 Don't fix here — `/td-close` runs the full stack-reality-check. The point is to make the handoff explicit so the next session knows drift may exist.
 
+**Architecture-drift heads-up (no fix, just flag).** If `.td/ARCHITECTURE.md` exists, compare its file mtime against recent code commits. Rough check:
+
+```
+git log --since="$(git log -1 --format=%cI .td/ARCHITECTURE.md)" --name-only -- 'src/**' 'app/**' 'lib/**' 2>/dev/null | wc -l
+```
+
+If significant code shipped since the architecture doc was last touched (heuristic: 10+ files changed across the relevant code roots), surface:
+
+```
+[heads-up] code shipped since .td/ARCHITECTURE.md was last updated — rationale may need a review. /td-close will prompt mechanically.
+```
+
+Don't fix here. The doc captures *rationale*, not file structure, so it doesn't need to update with every commit — just when a decision worth recording has been made. The point is to make the handoff explicit.
+
 Don't restructure. Don't second-guess `WORKWAY.md` content. The deeper cleanup is `/td-close`.
 
 # Step 7 — Update STATE.md as a handoff
@@ -92,7 +106,7 @@ Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context w
 
 - **Keep** in-flight specifics the next session can't reconstruct: current decision, current blocker, mid-thinking, the gotcha you just hit.
 - **Clear** speculation ("we might want to..."), anything `git log` already says, or claims you haven't actually verified.
-- **Heads-ups** from Step 6 (mailbox snapshot, stack-drift if any) belong at the top of the Resume note so the next session sees them immediately. Mailbox snapshot first, stack-drift below it.
+- **Heads-ups** from Step 6 (mailbox snapshot, stack-drift, architecture-drift if any) belong at the top of the Resume note so the next session sees them immediately. Mailbox snapshot first, then drift heads-ups below.
 
 Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 

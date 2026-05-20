@@ -57,12 +57,13 @@ No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
 - `WORKWAY.md` — how to test locally (and the workaround when I can't), how to UAT, how to ship to production, framework-specific notes. The single source for "how do we do things in this project."
+- `ARCHITECTURE.md` — project-specific rationale. NOT a system diagram (code is the structure) — captures the **why**: important decisions, what's load-bearing, surprises, system shape in one paragraph. Earns its keep when a new idea risks breaking an invariant that isn't obvious from the code, and when context-switches stretch past a couple months. Scaffolded by `/td-init`. Template at `~/projects/td-flow/templates/td/ARCHITECTURE.md`.
 - `STATE.md` — current phase, current topic, blocker, resume note. Resume note can be as long as needed — that's where planning lives.
 - `BACKLOG.md` — session-scoped parking. During work, append items I want to defer (`- YYYY-MM-DD — <item>`). At `/td-close`, BACKLOG flushes to GitHub Issues (with the appropriate type per the org's Issue Types) and the file ends empty. Starts empty each session.
 - `work/<topic>.md` — active work; deleted at close.
 - `DEBUG.md` *(optional)* — project-specific troubleshooting reference. Tooling URLs, symptom→diagnostic paths, gotchas, production debug commands. Read only when something's on fire. Created on demand (typically during a `/td-incident` close-out when a non-obvious diagnostic surfaced), not scaffolded at `/td-init`. Same opt-in pattern as `PROJECT.md § Cross-repo`. Template structure at `~/projects/td-flow/templates/td/DEBUG.md`.
 
-If something doesn't fit one of those five core files (plus optional DEBUG.md), it probably doesn't need a doc — git or the existing docs cover it.
+If something doesn't fit one of those six core files (plus optional DEBUG.md), it probably doesn't need a doc — git or the existing docs cover it.
 
 **Doc hygiene.** The next session loads these docs cold and assumes everything in them is true. So the bar is sharp: **keep what (a) matters for next session, (b) isn't derivable from code or `git log`, (c) we actually know to be true.** Clear speculation, clear placeholders, clear anything the codebase already says authoritatively (the stack list shouldn't duplicate `composer.json`). `/td-clear` applies this lightly to STATE.md at handoff (heads-up on stack drift, no fix). `/td-close` applies it across all docs (mechanical stack diff + per-doc pass).
 
@@ -110,6 +111,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "live URL is X" / "deploy is X" / "logs are at X" → `.td/WORKWAY.md` § Live
 - "we use Laravel/Next/X" / framework-specific gotcha → `.td/WORKWAY.md` § Framework specifics
 - "stack changes to X" / "scope is X" → `.td/PROJECT.md`
+- "we chose X because" / "why does it work this way" / "this is load-bearing" / "this looks redundant but isn't" → `.td/ARCHITECTURE.md` (the appropriate § Important decisions / § What's load-bearing / § Surprises section)
 - "remember to X later" / "park this" → append `.td/BACKLOG.md` (session-scoped scratch; flushes to GitHub Issues at `/td-close`).
 - "park this to GH" / "create an issue for X" / "file this as Bug/Task/Idea" → `gh api graphql createIssue` mutation in current repo. Suggest Type from phrasing (vague defaults to `Idea`, not `Task`); show suggestion + the trigger phrase; dedupe against open issues; confirm before posting. Body opens `**From:** <this-project>`. Direct path — skip BACKLOG, track in GH immediately.
 - "flush the backlog" / "park the backlog to GH" / "empty BACKLOG" → invoke `/td-park` (or run its procedure inline if mid-conversation).
