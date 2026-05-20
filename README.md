@@ -36,7 +36,7 @@ To update on any machine: `git pull && ./install.sh`.
 | `/td-refresh` | When local CLAUDE.md drifts from canonical | Diff-and-propose per section. Never auto-overwrites. |
 | `/td-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
 | `/td-incident` | Live production fire | Drop everything else. Focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
-| `/td-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues with type selection + dedupe. Standalone version of `/td-close`'s park step. |
+| `/td-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues — consolidate related lines into a proposed issue set, then batch-create with type + dedupe. The canonical BACKLOG-flush procedure; `/td-close` and `/td-refresh` run it too. |
 
 Shipping individual pieces is conversational: tests pass → commit → push. No slash command for that.
 
