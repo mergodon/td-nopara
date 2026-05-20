@@ -75,7 +75,7 @@ For each section, compare local vs canonical and bucket it:
 
 # Step 4 — Report the shape
 
-Before walking individual sections, print one compact summary:
+Before the section-by-section digest (Step 5), print one compact shape summary:
 
 ```
 N sections clean ✓
@@ -128,7 +128,7 @@ The refresh also checks whether `.td/BACKLOG.md` has accumulated items that belo
 2. **If item count is 0:** skip silently, jump to Step 8.
 3. **Otherwise:** tell the user `BACKLOG has N items. Flush them to GitHub Issues as part of the refresh? (yes / no / show me)` and wait.
 4. **On `show me`:** print each item with line number, then re-ask.
-5. **On `yes`:** run the canonical `/td-park` procedure (its Steps 4–9): consolidate related lines into a proposed issue set, present the digest (Type + dedupe per issue), take the user's decisions in one pass, batch-create. Rewrite `BACKLOG.md` with only skipped lines.
+5. **On `yes`:** run the canonical `/td-park` procedure — its Steps 2–8 (cache Issue Type IDs + friendly name → consolidate related lines → digest with Type + dedupe per issue → one decision point → batch-create → rewrite `BACKLOG.md` with only skipped lines). Skip `/td-park`'s Step 0/1 (already verified, and the BACKLOG was read in Step 7.1) and its Step 9 summary (Step 9 below covers it).
 6. **On `no`:** skip. BACKLOG stays untouched.
 
 This is the migration path for projects that pre-date the gh-source-of-truth model. Projects starting on the current model rarely accumulate BACKLOG items across `/td-close` boundaries, so Phase 2 is usually a no-op or a small flush.

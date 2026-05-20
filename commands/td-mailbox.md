@@ -151,9 +151,9 @@ Mailbox: <N> inbound + <M> outbound
   2. …
 
 📤 Outbound (cross-repo — scoped by .td/PROJECT.md § Cross-repo) — by intent state
-  K. <repo>#<N>  <Type>  <title>   <bucket>   <age>
+  3. <repo>#<N>  <Type>  <title>   <bucket>   <age>
          → <recommendation>
-  …
+  4. …
 
 Reply with decisions in one line — e.g. "close 1 3, comment 2, ping 5,
 verify 6, skip rest". `show N` expands any item's full body + comments.
@@ -175,7 +175,7 @@ Wait for the user's single reply. They reference item numbers and an action each
 - **Inbound:** `start` / `comment` / `close` / `skip`
 - **Outbound:** `comment` / `ping` / `verify` / `close` / `reopen` / `acknowledge` / `skip`
 - **`show N`** — expand item N before deciding (Step 7), then the digest stands again.
-- **freeform** — e.g. "create a new issue for X", or a per-item instruction. Handle conversationally, then return to the digest.
+- **freeform** — e.g. "create a new issue for X", or a per-item instruction. Handle conversationally — for a new cross-repo filing, follow `CLAUDE.md`'s cross-repo routing rule (declare the target in `PROJECT.md § Cross-repo` if new, body opens `**From:** <project-name>`) — then return to the digest.
 
 Anything not named is treated as `skip`. Don't walk the items one at a time — one digest, one reply, then Step 8.
 
@@ -202,7 +202,7 @@ The user can `show` several items before giving decisions. No action is taken in
 
 Process the user's decisions as a batch, not a walk.
 
-**1. Resolve all drafts first.** For every action that needs text — inbound `comment`, inbound `close` with a closing comment, outbound `comment`/`ping`, outbound `verify`, outbound `close` (a withdrawal note) — draft the text now, each signed `— <project-name>`. Show ALL drafts together and confirm once:
+**1. Resolve all drafts first.** For every action that needs text — inbound `comment`, inbound `close`, outbound `comment`/`ping`, outbound `verify`, outbound `close` (a withdrawal note) — draft the text now, each signed `— <project-name>`. Every inbound `close` gets a short closing comment by default; to close an issue bare, the user `drop`s its comment in the confirm below. Show ALL drafts together and confirm once:
 
 ```
 About to post:
@@ -214,7 +214,7 @@ Post all? (yes / edit N / drop N)
 ```
 
 **2. Run the state-changing actions** once confirmed:
-- **Inbound `close`** — `gh issue close <N> --comment "<text>"` (or `gh issue close <N>` if the user chose no comment).
+- **Inbound `close`** — `gh issue close <N> --comment "<text>"` (or `gh issue close <N>` if its drafted comment was dropped).
 - **Inbound `comment`** — `gh issue comment <N> --body "<text>"`.
 - **Outbound `comment` / `ping`** — `gh issue comment <N> --repo <slug> --body "<text>"`.
 - **Outbound `verify`** — add a closing-verification comment (`Confirmed — works as expected. — <project-name>`), or skip the comment if the user only wanted a visual check. No state change unless asked.

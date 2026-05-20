@@ -45,7 +45,7 @@ Update existing memory files rather than creating duplicates. If nothing new was
 
 Two leftover-thinking surfaces to clear — BACKLOG lines and `.td/work/` files. Present each as a digest, take decisions in one pass, execute the batch. Don't walk items one at a time.
 
-**1. `.td/BACKLOG.md`** — run the **canonical BACKLOG-flush procedure**: `/td-park` Steps 4–9 (consolidate related lines → digest with Type + dedupe per proposed issue → one decision point → batch-create). Don't re-derive it here — that procedure already consolidates instead of blind 1:1 line→issue mapping. The Issue Type IDs, repo node ID, and friendly name it needs are gathered the same way as in `/td-park` Steps 2–3.
+**1. `.td/BACKLOG.md`** — run the **canonical BACKLOG-flush procedure**: `/td-park` Steps 2–8 (cache Issue Type IDs + friendly name → consolidate related lines → digest with Type + dedupe per proposed issue → one decision point → batch-create → rewrite BACKLOG). Don't re-derive it here — that procedure already consolidates instead of blind 1:1 line→issue mapping. Skip `/td-park`'s Step 0/1 (this command already verified and read BACKLOG in Step 2) and its Step 9 summary (this command's Step 12 covers it).
 
 **2. `.td/work/<topic>.md` files** — gather all work files, then present one digest:
    - For each: `git log --grep="<topic>" --oneline` — shipped or not?
@@ -102,15 +102,17 @@ Detect which stack files are present, and for each one read its declared top-lev
 - **Go**: `go.mod` (`require` block)
 - **Rust**: `Cargo.toml` `[dependencies]`
 
-Read `PROJECT.md § Stack` and `WORKWAY.md § Framework specifics`. Surface each mismatch as ONE LINE for the user to act on:
+Read `PROJECT.md § Stack` and `WORKWAY.md § Framework specifics`, then present all mismatches as one numbered list:
 
 ```
-[stack drift] composer.json: livewire/livewire ^4.0  →  PROJECT.md says Livewire 3. Bump PROJECT.md? (y/n/edit)
-[stack drift] composer.json: sentry/sentry-laravel ^4.5  →  PROJECT.md § Stack doesn't mention Sentry. Add? (y/n)
-[stack drift] PROJECT.md: "Tailwind"  →  no tailwindcss in package.json. Remove from PROJECT.md? (y/n)
+Stack drift — 3 mismatch(es)
+  1. composer.json: livewire/livewire ^4.0  →  PROJECT.md says Livewire 3. Bump?
+  2. composer.json: sentry/sentry-laravel ^4.5  →  PROJECT.md § Stack doesn't mention Sentry. Add?
+  3. PROJECT.md: "Tailwind"  →  no tailwindcss in package.json. Remove?
+Reply with choices in one line, e.g. "1 bump, 2 add, 3 remove" (or "edit 1").
 ```
 
-Present all mismatches as one numbered list, take the user's choices in a single reply, then apply them in a batch. Focus on the human-curated layer (frameworks, choices, "why we picked this") — don't paste the whole dep list into PROJECT.md; the dep file IS the dep list.
+Take the user's choices in a single reply, then apply them in a batch. Focus on the human-curated layer (frameworks, choices, "why we picked this") — don't paste the whole dep list into PROJECT.md; the dep file IS the dep list.
 
 If no stack files exist (pure-markdown repo, etc.): say so out loud (`no stack files detected, skipping mechanical check`) and continue.
 

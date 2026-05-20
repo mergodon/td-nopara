@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    idle
 Blocker:  none
-Last:     2026-05-21 — shipped v4.5 (batch-decide interaction model).
+Last:     2026-05-21 — shipped v4.5 + dry-trace sanity-check fixups.
 
 ## Resume note
 

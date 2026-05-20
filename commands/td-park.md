@@ -14,7 +14,7 @@ This is the **canonical BACKLOG-flush procedure**. `/td-close` Step 3 and `/td-r
 
 # Step 1 — Read BACKLOG
 
-Read the BACKLOG.md file. Strip the markdown header + preamble + format-comment. Collect the bullet lines (entries shaped like `- YYYY-MM-DD — <description>` or just `- <description>`).
+Read the BACKLOG.md file. Strip the markdown header + preamble + format-comment. Collect the bullet lines (entries shaped like `- YYYY-MM-DD — <description>` or just `- <description>`), numbered 1..L in BACKLOG order — those line numbers are how the digest (Step 5) and the user (`skip line <n>`) reference individual lines.
 
 If the working list is empty (or only `(empty)` placeholder): tell the user `BACKLOG empty. ✓ Nothing to flush.` and exit.
 
