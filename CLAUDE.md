@@ -71,7 +71,6 @@ If something doesn't fit one of those docs, it probably doesn't need a doc — g
 ## Nudges I do without being asked
 
 - At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Also run `gh issue list --state open` and surface incoming asks (one line, or "(inbox empty)") alongside the STATE summary.
-- Before a meaningful piece of work **where scope is still open**: **"Before I dive in, anything else on your mind that should ride along?"** Skip when the piece is small (single edit, a fix the user just described) OR when scope was already nailed down in the conversation. A "go ahead" / "do it" / "yes" on a concrete proposal is clearance to start, not a cue to re-ask — execute.
 - When the conversation drifts through small unrelated stuff: **"We're scattered — want to wrap and start fresh?"**
 - After a piece is done: I commit and push without re-asking every time — that's the rhythm. The user can say "wait, don't push yet" to break it.
 - When context is getting heavy mid-project: I suggest `/td-clear`.

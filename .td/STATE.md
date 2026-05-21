@@ -2,9 +2,9 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    v4.7 shipped (2026-05-21)
+Phase:    v4.8 shipped (2026-05-21)
 Blocker:  none
-Last:     2026-05-21 — shipped v4.7: the ripple-check gate; fixed a stale README example.
+Last:     2026-05-21 — shipped v4.8: removed the pre-work ride-along nudge from the contract.
 
 ## Resume note
 
@@ -15,13 +15,14 @@ dogfood). Surface: root `CLAUDE.md` contract (mirrored byte-for-byte in
 + optional DEBUG + `work/<topic>.md` scratch, eight slash commands, and
 `install.sh` symlinking it all into `~/.claude/`. Everything else is conversational.
 
-Latest: v4.7 — the ripple-check gate, a new `CLAUDE.md` section. Before shipping
-any commit (all types, no exemptions), read the whole-surface docs (`README.md`
-+ `.td/`) and trace each changed fact to everywhere it's stated, fixing stale
-spots in the same commit. Born from a v4.6 miss: a keyword grep skipped a stale
-README example. Preceding it, v4.6 — `/td-health`, the proactive twin of
-`/td-incident`: generic command, project-owned `.td/health.sh`, exit-0/1/2
-protocol, single-project scope. `PROJECT.md § Shipped` has the full history.
+Latest: v4.8 — removed the pre-work ride-along nudge ("anything else on your
+mind that should ride along?") from the contract (`CLAUDE.md` + its
+`templates/CLAUDE.md` mirror). As a turn-ending question it was indistinguishable
+from a "task done, waiting on you" message — the user couldn't tell a finished
+piece from a pre-work scope check. Preceding it, v4.7 — the ripple-check gate:
+before shipping any commit (all types), trace each changed fact to everywhere
+it's stated and fix stale spots in the same commit. `PROJECT.md § Shipped` has
+the full history.
 
 Nothing pending — 0 open issues, BACKLOG empty, no work files. Next session:
 `/td-refresh` syncs a consuming project from canonical, `/td-init` bootstraps a
