@@ -126,6 +126,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
 - "wrap the project" / "we're done with this" / project actually finished → `/td-close`
+- "health check" / "is prod healthy?" / "check production health" → invoke `/td-health`
 - "where are we" → read STATE.md, summarize
 - "save this as a `<name>` template" → copy current `.td/` shape (anonymized) to `~/projects/td-flow/templates/<name>/`
 
@@ -172,13 +173,14 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 
 ## The slash commands
 
-Seven commands, each with a distinct trigger. Full procedure lives in `commands/<name>.md` — the one-liners below are the trigger map.
+Eight commands, each with a distinct trigger. Full procedure lives in `commands/<name>.md` — the one-liners below are the trigger map.
 
 - `/td-init` — bootstrap or migrate a project (one-time per project).
 - `/td-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
 - `/td-refresh` — bring project current with the framework conventions (4 phases, diff-and-propose throughout).
 - `/td-mailbox` — unified cross-repo work walk (inbound + outbound, one batched digest).
+- `/td-health` — proactive production health check. Runs `.td/health.sh`, reports OK/WARN/FAIL.
 - `/td-incident` — live production fire mode. Drops everything else.
 - `/td-park` — mid-session `BACKLOG.md` → GitHub Issues flush.
 

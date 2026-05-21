@@ -19,6 +19,7 @@ Symlinks created:
 - `~/.claude/commands/td-close.md`
 - `~/.claude/commands/td-refresh.md`
 - `~/.claude/commands/td-mailbox.md`
+- `~/.claude/commands/td-health.md`
 - `~/.claude/commands/td-incident.md`
 - `~/.claude/commands/td-park.md`
 - `~/.claude/skills/td-flow`
@@ -35,6 +36,7 @@ To update on any machine: `git pull && ./install.sh`.
 | `/td-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
 | `/td-refresh` | When local CLAUDE.md drifts from canonical | Diff-and-propose per section. Never auto-overwrites. |
 | `/td-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
+| `/td-health` | Proactive production check | Run the project's `.td/health.sh` routine. Reports `OK`/`WARN`/`FAIL`; parks warnings to `BACKLOG.md`, escalates failures to `/td-incident`. First run scaffolds the routine (or marks the project non-production). |
 | `/td-incident` | Live production fire | Drop everything else. Focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
 | `/td-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues — consolidate related lines into a proposed issue set, then batch-create with type + dedupe. The canonical BACKLOG-flush procedure; `/td-close` and `/td-refresh` run it too. |
 
@@ -58,6 +60,7 @@ Most work is conversational. Here's what gets routed where:
 "any incoming?" / "check inbox"       → gh issue list for current repo (or /td-mailbox)
 "what did we file?" / "show outbox"   → /td-mailbox (the outbound section)
 "did rgb-api respond yet?"            → /td-mailbox or inline subIssues query
+"health check" / "is prod healthy?"   → runs /td-health
 "ship it"                             → tests pass → commit → push
 "where are we?"                       → summarizes STATE.md
 "let's clear" / about to /clear       → runs /td-clear
@@ -142,6 +145,20 @@ Me:  tests pass, commits as fix(checkout): add missing index on user_id, pushes.
 You: "yes — the Sentry-filter-by-release trick"
 Me:  appends to DEBUG.md (creates from template if missing), commits.
      STATE back to previous topic.
+```
+
+**Routine health check**
+
+```
+You: /td-health
+Me:  runs .td/health.sh — app reachable, disk, queues, deploy in sync.
+     "myapp: 1 warn · 0 fail — queue 'default' wait 80s. Park to BACKLOG?"
+You: "yes — park it"
+Me:  appends the warning to BACKLOG.md, commits.
+[another day, a check comes back red]
+Me:  "1 fail — worker process not running. Escalate to /td-incident?"
+You: "yes"
+Me:  drops into incident mode, "worker process down" pre-filled as the symptom.
 ```
 
 **Cross-repo request (outbound)**
@@ -240,7 +257,7 @@ Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `
 
 ```
 commands/             slash commands (td-init, td-clear, td-close, td-refresh,
-                                      td-mailbox, td-incident, td-park)
+                                      td-mailbox, td-health, td-incident, td-park)
 templates/            files copied into target projects on /td-init
   CLAUDE.md           the universal contract
   td/PROJECT.md
@@ -248,6 +265,7 @@ templates/            files copied into target projects on /td-init
   td/STATE.md
   td/BACKLOG.md
   td/DEBUG.md         optional troubleshooting template (not auto-scaffolded)
+  td/health.sh        health-check skeleton (scaffolded by /td-health, not /td-init)
   td/frameworks/.gitkeep   (overflow dir, rarely needed)
   .gitignore
   .env.example

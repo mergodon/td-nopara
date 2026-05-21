@@ -2,9 +2,9 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    closed (2026-05-21)
+Phase:    v4.6 shipped (2026-05-21)
 Blocker:  none
-Last:     2026-05-21 — closed.
+Last:     2026-05-21 — shipped v4.6: /td-health command + health.sh template.
 
 ## Resume note
 
@@ -12,17 +12,20 @@ td-flow is the public, file-based, repo-portable solo-dev framework at
 `mergodon/td-flow` — and this repo is itself a td-flow project (eats its own
 dogfood). Surface: root `CLAUDE.md` contract (mirrored byte-for-byte in
 `templates/CLAUDE.md`), four standard `.td/` docs (PROJECT/WORKWAY/STATE/BACKLOG)
-+ optional DEBUG + `work/<topic>.md` scratch, seven slash commands, and
++ optional DEBUG + `work/<topic>.md` scratch, eight slash commands, and
 `install.sh` symlinking it all into `~/.claude/`. Everything else is conversational.
 
-Latest: v4.5 — the batch-decide interaction model. The serial "walk one item at
-a time" pattern is gone from `/td-mailbox`, `/td-park`, `/td-close`, `/td-refresh`;
-all four now gather → present one digest → take decisions in a single pass →
-batch execute. `/td-park` is the single canonical BACKLOG-flush procedure
-(consolidates related lines, no blind 1:1 mapping); `/td-close` Step 3 and
-`/td-refresh` Phase 2 reference it. `PROJECT.md § Shipped` carries the version
-history; `git log` has the detail.
+Latest: v4.6 — `/td-health`, a proactive production health check and the
+proactive twin of `/td-incident`. Generic command, project-owned `.td/health.sh`
+script; the fixed contract is just the protocol (exit 0/1/2, OK/WARN/FAIL lines)
+so the command hardcodes no checks. First run scaffolds the script (drafted from
+`WORKWAY § Live` + `PROJECT § Stack`) or marks the project non-production via an
+opt-in `PROJECT.md § Health` section. WARN → park to BACKLOG; FAIL → escalate to
+`/td-incident`. `PROJECT.md § Shipped` carries the version history.
 
-Nothing pending — 0 open issues, BACKLOG empty, no work files. Next session:
-`/td-refresh` syncs a consuming project from canonical, `/td-init` bootstraps a
-fresh one.
+Parked (BACKLOG): fleet mode — a register of td-flow projects + a `/td-health
+--all` sweep that stacks every project's verdict line into one digest. The v4.6
+verdict-line format was designed for exactly this. Not built.
+
+Nothing else pending — 0 open issues, no work files. Next session: `/td-refresh`
+syncs a consuming project from canonical, `/td-init` bootstraps a fresh one.

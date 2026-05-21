@@ -13,7 +13,7 @@ The framework has no automated test suite (yet). The current contract is manual 
   - [ ] `bash -n install.sh` (syntax-check the installer)
   - [ ] `bash -n hooks/pre-commit` (syntax-check the hook)
   - [ ] `./install.sh` runs idempotently (re-running doesn't error or duplicate symlinks)
-  - [ ] All 7 slash commands appear in `~/.claude/commands/` (`td-init.md`, `td-clear.md`, `td-close.md`, `td-refresh.md`, `td-mailbox.md`, `td-incident.md`, `td-park.md`)
+  - [ ] All 8 slash commands appear in `~/.claude/commands/` (`td-init.md`, `td-clear.md`, `td-close.md`, `td-refresh.md`, `td-mailbox.md`, `td-health.md`, `td-incident.md`, `td-park.md`)
   - [ ] Skill at `~/.claude/skills/td-flow` resolves
   - [ ] Templates at `~/.claude/td-templates` resolves to `templates/`
   - [ ] AWK extractor in `hooks/pre-commit` returns the expected value when run against a filled WORKWAY.md template
