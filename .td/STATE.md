@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    v4.6 shipped (2026-05-21)
 Blocker:  none
-Last:     2026-05-21 — shipped v4.6: /td-health command + health.sh template.
+Last:     2026-05-21 — v4.6 scoped to single-project; fleet-mode references dropped.
 
 ## Resume note
 
@@ -21,11 +21,9 @@ script; the fixed contract is just the protocol (exit 0/1/2, OK/WARN/FAIL lines)
 so the command hardcodes no checks. First run scaffolds the script (drafted from
 `WORKWAY § Live` + `PROJECT § Stack`) or marks the project non-production via an
 opt-in `PROJECT.md § Health` section. WARN → park to BACKLOG; FAIL → escalate to
-`/td-incident`. `PROJECT.md § Shipped` carries the version history.
+`/td-incident`. Single-project scope by design — no cross-project sweep.
+`PROJECT.md § Shipped` carries the version history.
 
-Parked (BACKLOG): fleet mode — a register of td-flow projects + a `/td-health
---all` sweep that stacks every project's verdict line into one digest. The v4.6
-verdict-line format was designed for exactly this. Not built.
-
-Nothing else pending — 0 open issues, no work files. Next session: `/td-refresh`
-syncs a consuming project from canonical, `/td-init` bootstraps a fresh one.
+Nothing pending — 0 open issues, BACKLOG empty, no work files. Next session:
+`/td-refresh` syncs a consuming project from canonical, `/td-init` bootstraps a
+fresh one.

@@ -37,7 +37,7 @@ If **(b)** — add a `## Health` section to `.td/PROJECT.md`:
 Not applicable — <one-line reason, e.g. "local CLI, no production surface">.
 ```
 
-Commit `docs: mark <project> non-production for /td-health`. Done — future runs (and any fleet sweep) skip this project cleanly.
+Commit `docs: mark <project> non-production for /td-health`. Done — future runs skip this project cleanly.
 
 If **(a)** — **draft the script, don't interrogate.** Read `.td/WORKWAY.md` § Live (production URL, deploy host, log locations) and `.td/PROJECT.md` § Stack. From those, draft `.td/health.sh` from the template at `~/.claude/td-templates/td/health.sh` (or `~/projects/td-flow/templates/td/health.sh`):
 
@@ -62,21 +62,13 @@ If the script itself errors (an exit code other than 0/1/2, or it crashes), trea
 
 Branch on the exit code:
 
-**Exit 0 — all green.** Report the verdict line (Step 6). Done — a clean health run changes nothing, nothing to commit.
+**Exit 0 — all green.** Report it — `<project>: all OK`. Done; a clean health run changes nothing, nothing to commit.
 
 **Exit 1 — WARN(s).** Not on fire, but worth a look. List the WARN lines. Offer: *"Park the WARN(s) to BACKLOG.md?"* On yes, append each as `- <YYYY-MM-DD> — health WARN: <check> — <detail>` to `.td/BACKLOG.md`, commit `docs: park health warnings to backlog`.
 
 **Exit 2 — FAIL(s).** Something is broken in production. List the FAIL lines. Offer: *"Escalate to /td-incident?"* On yes, invoke `/td-incident` and supply the failing check(s) as its Step 1 one-liner — don't re-ask "what's broken". On no, stop; the user owns the call.
 
-# Step 6 — Verdict line
-
-End every run (except the non-production Step 2 exit) with one compact line:
-
-```
-<friendly-project-name>: OK | <N> warn · <M> fail   (<YYYY-MM-DD HH:MM>)
-```
-
-Friendly name per `CLAUDE.md § Cross-repo` — first H1 in `PROJECT.md`, fallback directory basename. This line is deliberately uniform: it is the unit a future fleet-wide sweep stacks into one digest.
+Close every run (except the non-production Step 2 exit) with a one-line plain verdict — `<project>: all OK` / `<project>: N warn` / `<project>: N fail` — so the outcome is scannable at a glance. The script's own summary line is the detail; this is just the headline.
 
 # Rules
 
