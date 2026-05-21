@@ -2,9 +2,9 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    v4.6 shipped (2026-05-21)
+Phase:    v4.7 shipped (2026-05-21)
 Blocker:  none
-Last:     2026-05-21 — v4.6 scoped to single-project; fleet-mode references dropped.
+Last:     2026-05-21 — shipped v4.7: the ripple-check gate; fixed a stale README example.
 
 ## Resume note
 
@@ -15,14 +15,13 @@ dogfood). Surface: root `CLAUDE.md` contract (mirrored byte-for-byte in
 + optional DEBUG + `work/<topic>.md` scratch, eight slash commands, and
 `install.sh` symlinking it all into `~/.claude/`. Everything else is conversational.
 
-Latest: v4.6 — `/td-health`, a proactive production health check and the
-proactive twin of `/td-incident`. Generic command, project-owned `.td/health.sh`
-script; the fixed contract is just the protocol (exit 0/1/2, OK/WARN/FAIL lines)
-so the command hardcodes no checks. First run scaffolds the script (drafted from
-`WORKWAY § Live` + `PROJECT § Stack`) or marks the project non-production via an
-opt-in `PROJECT.md § Health` section. WARN → park to BACKLOG; FAIL → escalate to
-`/td-incident`. Single-project scope by design — no cross-project sweep.
-`PROJECT.md § Shipped` carries the version history.
+Latest: v4.7 — the ripple-check gate, a new `CLAUDE.md` section. Before shipping
+any commit (all types, no exemptions), read the whole-surface docs (`README.md`
++ `.td/`) and trace each changed fact to everywhere it's stated, fixing stale
+spots in the same commit. Born from a v4.6 miss: a keyword grep skipped a stale
+README example. Preceding it, v4.6 — `/td-health`, the proactive twin of
+`/td-incident`: generic command, project-owned `.td/health.sh`, exit-0/1/2
+protocol, single-project scope. `PROJECT.md § Shipped` has the full history.
 
 Nothing pending — 0 open issues, BACKLOG empty, no work files. Next session:
 `/td-refresh` syncs a consuming project from canonical, `/td-init` bootstraps a

@@ -87,6 +87,16 @@ Before any `feat:` or `fix:` commit (housekeeping `docs:`/`chore:` are exempt), 
 
 If any of the three is genuinely not applicable, I say which and why.
 
+## The ripple check
+
+A change is rarely just the lines I edit. Changing a count, a name, a path, a format, or removing a step ripples out to every place that *states* or *depends on* that fact — and a stale doc, which the next session reads as true, is a real bug. So before I ship any change — `feat`, `fix`, `docs`, `chore`, no exemptions — I run one gate:
+
+1. **Hold the whole picture.** Read the whole-surface docs — `README.md` if the repo has one, plus the `.td/` docs. They carry the project's global statements and worked examples; a local edit silently invalidates them.
+2. **Trace the ripple.** For each fact I changed, find everywhere else it lives: counts, names, paths, formats, example dialogues, "see X" cross-references, two docs meant to agree. Grep catches the literal matches; only reading catches the semantic ones — a stale example rarely contains the keyword I'd grep for.
+3. **Fix every stale spot in the same commit.** A change that leaves a doc contradicting the code isn't done.
+
+Tells and smells: a number that no longer adds up, an example in a format I just changed, a pointer to something renamed or removed, two docs that now disagree. Found one → fix it. Unsure whether it's stale → flag it, don't guess.
+
 ## Drift signals I surface
 
 I watch for these and flag with one line — the user decides:

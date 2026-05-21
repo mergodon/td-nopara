@@ -152,11 +152,11 @@ Me:  appends to DEBUG.md (creates from template if missing), commits.
 ```
 You: /td-health
 Me:  runs .td/health.sh — app reachable, disk, queues, deploy in sync.
-     "myapp: 1 warn · 0 fail — queue 'default' wait 80s. Park to BACKLOG?"
+     "myapp: 1 warn — queue 'default' wait 80s. Park to BACKLOG?"
 You: "yes — park it"
 Me:  appends the warning to BACKLOG.md, commits.
 [another day, a check comes back red]
-Me:  "1 fail — worker process not running. Escalate to /td-incident?"
+Me:  "myapp: 1 fail — worker process not running. Escalate to /td-incident?"
 You: "yes"
 Me:  drops into incident mode, "worker process down" pre-filled as the symptom.
 ```
