@@ -52,6 +52,7 @@ The "live" environment for this framework is `mergodon/td-flow` on GitHub plus t
 - Slash commands are markdown files with YAML frontmatter (`---\ndescription: …\n---`).
 - Skill at `skill/SKILL.md` with YAML frontmatter (`name`, `description`).
 - All three are loaded by Claude Code from `~/.claude/commands/` and `~/.claude/skills/`.
+- The contract is this repo's root `CLAUDE.md` — the canonical source. `install.sh` links it to `~/.claude/td-flow-contract.md`; every consuming project's `CLAUDE.md` is a one-line `@import` of it (Claude Code expands the import in full at session start). Consuming projects never copy the contract; the td-flow repo's own `CLAUDE.md` is the one full copy.
 
 ### Multi-machine sync
 
