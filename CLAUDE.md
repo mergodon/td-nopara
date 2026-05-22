@@ -188,7 +188,7 @@ Eight commands, each with a distinct trigger. Full procedure lives in `commands/
 - `/td-init` — bootstrap or migrate a project (one-time per project).
 - `/td-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
-- `/td-refresh` — sync the project with the framework: auto-merge canonical `CLAUDE.md`, flush `BACKLOG`, check the cross-repo registry.
+- `/td-refresh` — sync the project with the framework: re-run the installer, auto-merge canonical `CLAUDE.md`. Framework + contract only.
 - `/td-mailbox` — unified cross-repo work walk (inbound + outbound, one batched digest).
 - `/td-health` — proactive production health check. Runs `.td/health.sh`, reports OK/WARN/FAIL.
 - `/td-incident` — live production fire mode. Drops everything else.

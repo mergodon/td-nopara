@@ -130,7 +130,7 @@ Run every check below across all docs, then surface the findings as one numbered
 - **PROJECT.md § Active scope** — anything actually shipped? Move to "Shipped". Anything quietly abandoned? Ask before deleting.
 - **PROJECT.md § What this is / Who for** — re-read against what actually got built. If the one-liner no longer fits, propose a new one and ask.
 - **PROJECT.md § Stack** — drift items from Step 6 already handled. Now check: is anything here just a copy of the dep file? Prune to the human-curated layer.
-- **PROJECT.md § Cross-repo** — load-bearing for `/td-mailbox` outbound. Run the same drift check `/td-refresh` Phase 3 does: org-wide `**From:**` marker search → diff observed vs declared → propose add/remove per delta. Apply confirmed deltas inline. (Or defer: tell the user "Cross-repo drift check available via `/td-refresh` if you want to handle separately.")
+- **PROJECT.md § Cross-repo** — load-bearing for `/td-mailbox` outbound. Cross-repo drift check: an org-wide `**From:**` marker search → diff observed-vs-declared → propose add/remove per delta, apply confirmed deltas inline. (Optional cleanup — if you'd rather not, leave the registry as-is and say so; don't block the close on it.)
 - **WORKWAY.md § Local testing** — does `Test command` still exist in `package.json` / equivalent? Run it. If removed, flag.
 - **WORKWAY.md § Local UAT / Live** — live URL still up? Smoke command works? Anything that reads as guesswork ("probably deploys via...") → verify or clear.
 - **WORKWAY.md § Framework specifics** — anything for a framework we removed? Prune.

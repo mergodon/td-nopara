@@ -34,11 +34,11 @@ To update on any machine: `git pull && ./install.sh`.
 | `/td-init` | Once per project | Bootstrap or migrate (brownfield-aware). `--template <name>` to start from a saved starter. |
 | `/td-clear` | Mid-session checkpoint | Memory scan → light prune → STATE handoff → push. Ready for `/clear`. Fast. |
 | `/td-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
-| `/td-refresh` | When the framework has moved on | Re-syncs `CLAUDE.md` from canonical in one pass — your `td:custom` region preserved. Also flushes `BACKLOG`, checks the cross-repo registry. |
+| `/td-refresh` | When the framework has moved on | Syncs the framework install + re-syncs `CLAUDE.md` from canonical in one mechanical pass — your `td:custom` region preserved. |
 | `/td-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
 | `/td-health` | Proactive production check | Run the project's `.td/health.sh` routine. Reports `OK`/`WARN`/`FAIL`; parks warnings to `BACKLOG.md`, escalates failures to `/td-incident`. First run scaffolds the routine (or marks the project non-production). |
 | `/td-incident` | Live production fire | Drop everything else. Focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
-| `/td-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues — consolidate related lines into a proposed issue set, then batch-create with type + dedupe. The canonical BACKLOG-flush procedure; `/td-close` and `/td-refresh` run it too. |
+| `/td-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues — consolidate related lines into a proposed issue set, then batch-create with type + dedupe. The canonical BACKLOG-flush procedure; `/td-close` runs it too. |
 
 Shipping individual pieces is conversational: tests pass → commit → push. No slash command for that.
 
@@ -233,7 +233,7 @@ Unified view across all your repos: `gh search issues --owner <your-org> --state
 
 If you initialized a project before recent contract changes, its local `CLAUDE.md` is stale. Two paths:
 
-**Fast:** in the project, run `/td-refresh`. It syncs the framework, then re-syncs your `CLAUDE.md` from canonical — everything outside the `td:custom` region is canonical, so the merge is mechanical and your project-only rules survive. It also flushes `BACKLOG` and checks the cross-repo registry. One pass; the unpushed `docs: refresh` commit is your review gate.
+**Fast:** in the project, run `/td-refresh`. It syncs the framework install, then re-syncs your `CLAUDE.md` from canonical — everything outside the `td:custom` region is canonical, so the merge is mechanical and your project-only rules survive. One pass; the unpushed `docs: refresh` commit is your review gate.
 
 **Manual:** pull the framework (`cd ~/projects/td-flow && git pull && ./install.sh`), then diff `~/projects/<your-project>/CLAUDE.md` against `~/projects/td-flow/templates/CLAUDE.md` and adopt what you want.
 

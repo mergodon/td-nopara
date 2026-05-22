@@ -126,4 +126,4 @@ One sentence: `Cleared. <N> commits pushed. STATE handoff written. Safe to /clea
 - If the user says "discard" for uncommitted changes, ask explicit confirmation — destructive.
 - This command is the only place we rewrite recent local history. Day-to-day shipping never does.
 - Don't run the full doc audit here — that's `/td-close`. Stay fast.
-- Don't run cross-repo registry drift checks here — that's `/td-refresh` Phase 3 (or `/td-close` Step 7). Stay fast.
+- Don't run cross-repo registry drift checks here — that's `/td-close` Step 7. Stay fast.

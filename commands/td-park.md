@@ -4,7 +4,7 @@ description: Flush BACKLOG.md to GitHub Issues — consolidate related lines fir
 
 You are flushing `.td/BACKLOG.md` to GitHub Issues. Read every line, consolidate lines that describe the same work, then present the whole proposed issue set as ONE digest — the user reviews and adjusts in a single pass, and you create the batch. No line-by-line interrogation, no blind 1:1 line→issue mapping.
 
-This is the **canonical BACKLOG-flush procedure**. `/td-close` Step 3 and `/td-refresh` Phase 2 both run it — they point here rather than re-describing it.
+This is the **canonical BACKLOG-flush procedure**. `/td-close` Step 3 runs it too — pointing here rather than re-describing it.
 
 # Step 0 — Verify
 
