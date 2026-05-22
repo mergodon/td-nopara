@@ -49,5 +49,5 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 
 - Research / context7 deep integration in the rhythm — **decided against** 2026-05-20 (closed #7 as not-planned). The MCP is already wired up and ad-hoc use is already documented in CLAUDE.md. A formal "research phase" would add ceremony for every piece — anti the three-lines-beats-abstraction instinct.
 - Subagents for implementation fan-out — **decided against** 2026-05-20 (closed #8 as not-planned). The Agent tool exists in the harness and research fan-out (Explore agents) is already documented; implementation fan-out can't be made fully safe (contract leaks, semantic conflicts past file-level isolation, partial-failure rollback). Coordination cost outweighs speedup for a solo dev where speed isn't the bottleneck. Revisit only with a real concrete case.
-- npm package / CLI / Electron studio (the gsd-2 mistake). Never.
+- npm package / CLI / Electron studio. Never.
 - Automated test suite for the framework itself — explicitly dropped 2026-05-05. We validate project-by-project as we use td-flow on real projects. Drift signals + "Before I commit a piece" ritual are the self-validation.

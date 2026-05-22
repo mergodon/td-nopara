@@ -1,20 +1,22 @@
 # State
 
 Project:  td-flow
-Topic:    idle
-Phase:    v4.8 closed (2026-05-21)
+Topic:    section-ownership
+Phase:    working
 Blocker:  none
-Last:     2026-05-21 — closed v4.8.
+Last:     2026-05-22 — shipped v4.9 Piece 5 (dropped GSD legacy migration).
 
 ## Resume note
 
-td-flow is the public, file-based, repo-portable solo-dev framework at
-`mergodon/td-flow`, and this repo is itself a td-flow project (dogfoods its own
-contract). Surface: root `CLAUDE.md` (mirrored byte-for-byte in
-`templates/CLAUDE.md`), four standard `.td/` docs (PROJECT/WORKWAY/STATE/BACKLOG,
-+ optional DEBUG), eight slash commands, and `install.sh` symlinking it all into
-`~/.claude/`. Everything else is conversational. v4.8 closed 2026-05-21 — dropped
-the pre-work ride-along nudge from the contract. Nothing pending: 0 open issues,
-BACKLOG empty, no work files. `PROJECT.md § Shipped` has the full version history;
-`git log` has the detail. Next session: `/td-init` bootstraps a fresh project,
-`/td-refresh` syncs a consuming project from canonical.
+Building v4.9 — five pieces, full plan in `.td/work/section-ownership.md`.
+
+Shipped: Piece 5 — GSD legacy migration dropped from `/td-init` + `SKILL.md`
+(dead code since v3; "(the gsd-2 mistake)" attribution dropped from PROJECT.md).
+
+Remaining: Piece 1 (managed-file header + `td:custom` region in CLAUDE.md),
+Piece 2 (`/td-refresh` take-canonical-and-resplice — depends on 1), Piece 3
+(Bug/Task-only inbox nudges), Piece 4 (Idea→Task promotion). Then close as v4.9.
+
+Two things to verify before building: the exact GraphQL mutation to change an
+issue's Type (Piece 4), and whether `gh issue list` supports `--type` natively
+(Piece 3) or the nudge needs the GraphQL shape `/td-mailbox` Step 2 already uses.
