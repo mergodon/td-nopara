@@ -31,7 +31,7 @@ gh api graphql -H "GraphQL-Features: sub_issues" -f query='
     repository(owner: $owner, name: $name) {
       issues(first: 50, states: OPEN, orderBy: {field: UPDATED_AT, direction: DESC}) {
         nodes {
-          number title body url createdAt updatedAt
+          id number title body url createdAt updatedAt
           author { login }
           issueType { name }
           subIssuesSummary { total completed percentCompleted }
@@ -155,8 +155,8 @@ Mailbox: <N> inbound + <M> outbound
          → <recommendation>
   4. …
 
-Reply with decisions in one line — e.g. "close 1 3, comment 2, ping 5,
-verify 6, skip rest". `show N` expands any item's full body + comments.
+Reply with decisions in one line — e.g. "close 1 3, comment 2, promote 4,
+ping 5, verify 6, skip rest". `show N` expands any item's full body + comments.
 ```
 
 `<source-project>` comes from the `**From:** <name>` marker at the top of the inbound body; if absent, label `(unmarked)`.
@@ -172,7 +172,7 @@ And exit.
 # Step 6 — One decision point
 
 Wait for the user's single reply. They reference item numbers and an action each. Valid actions:
-- **Inbound:** `start` / `comment` / `close` / `skip`
+- **Inbound:** `start` / `comment` / `close` / `promote` / `skip`
 - **Outbound:** `comment` / `ping` / `verify` / `close` / `reopen` / `acknowledge` / `skip`
 - **`show N`** — expand item N before deciding (Step 7), then the digest stands again.
 - **freeform** — e.g. "create a new issue for X", or a per-item instruction. Handle conversationally — for a new cross-repo filing, follow `CLAUDE.md`'s cross-repo routing rule (declare the target in `PROJECT.md § Cross-repo` if new, body opens `**From:** <project-name>`) — then return to the digest.
@@ -216,13 +216,14 @@ Post all? (yes / edit N / drop N)
 **2. Run the state-changing actions** once confirmed:
 - **Inbound `close`** — `gh issue close <N> --comment "<text>"` (or `gh issue close <N>` if its drafted comment was dropped).
 - **Inbound `comment`** — `gh issue comment <N> --body "<text>"`.
+- **Inbound `promote`** — re-type an `Idea` to `Task`. Resolve the `Task` Issue Type ID (org `issueTypes` query — same as `/td-park` Step 2), then `gh api graphql -f query='mutation($id: ID!, $t: ID!) { updateIssue(input: {id: $id, issueTypeId: $t}) { issue { number } } }' -F id=<issue node id> -F t=<Task type ID>`. The issue node `id` comes from the Step 2 query. Only meaningful on an `Idea` — if the target isn't one, say so and skip it.
 - **Outbound `comment` / `ping`** — `gh issue comment <N> --repo <slug> --body "<text>"`.
 - **Outbound `verify`** — add a closing-verification comment (`Confirmed — works as expected. — <project-name>`), or skip the comment if the user only wanted a visual check. No state change unless asked.
 - **Outbound `close`** (withdrawing our own stale ask) — `gh issue close <N> --repo <slug> --reason "not planned" --comment "<withdrawal text>"`. The `not planned` reason tells GitHub (and any parent Epic's progress bar) this wasn't an abandoned-because-done close. Never close without a comment — zero context for the receiver is rude.
 - **Outbound `reopen`** — destructive (reopens someone else's issue, or reactivates a stale one we closed): confirm a second time, then `gh issue reopen <N> --repo <slug>` plus a comment explaining why.
 - **`acknowledge` / `skip`** — no-op.
 
-**3. Handle `start` last** (at most one per batch — a Topic is singular). If the user said `start` on an **Epic**, don't activate it — an Epic isn't a single piece of work; offer to `start` one of its open child issues instead. To activate an issue:
+**3. Handle `start` last** (at most one per batch — a Topic is singular). If the user said `start` on an **Epic**, don't activate it — an Epic isn't a single piece of work; offer to `start` one of its open child issues instead. If `start` targets an **Idea**, promote it to `Task` first (per the `promote` handler above) — starting work commits to it, so it's no longer exploration — then activate the now-`Task`. To activate an issue:
 
 1. Propose a kebab-case `<slug>` from the title (3–5 words, lowercase ASCII). Confirm with the user.
 2. Ask: "Multi-step (planning surface → `.td/work/<slug>.md`) or single-piece (just STATE Resume note)?" If the issue body is one clear edit, default to single-piece.

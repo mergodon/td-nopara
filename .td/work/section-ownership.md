@@ -88,7 +88,7 @@ Commit: feat(refresh): take-canonical-and-resplice Phase 1
 
 Commit: feat(nudges): scope unprompted inbox surfacing to Bug/Task
 
-## Piece 4 — Idea → Task promotion
+## Piece 4 — Idea → Task promotion ✓ shipped
 
 - /td-mailbox inbound vocabulary gains `promote N` — converts Idea #N to Task.
 - /td-mailbox Step 8 `start`: target is an Idea → promote to Task first

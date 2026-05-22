@@ -2,20 +2,21 @@
 
 Project:  td-flow
 Topic:    section-ownership
-Phase:    working
+Phase:    v4.9 built — ready to close
 Blocker:  none
-Last:     2026-05-22 — shipped v4.9 Piece 3 (Bug/Task-only inbox nudges).
+Last:     2026-05-22 — shipped v4.9 Piece 4 (Idea→Task promotion); all five pieces done.
 
 ## Resume note
 
-Building v4.9 — five pieces, full plan in `.td/work/section-ownership.md`.
+v4.9 — five pieces, full plan in `.td/work/section-ownership.md`. All shipped:
 
-Shipped: Piece 5 (GSD legacy migration dropped); Piece 1 (CLAUDE.md managed file
-+ `td:custom` region); Piece 2 (`/td-refresh` take-canonical-and-resplice);
-Piece 3 (inbox nudges scoped to Bugs/Tasks — Ideas/Epics quiet unless asked;
-`gh issue list` can't filter by type, so the nudge uses `gh api graphql`).
+- Piece 5 — GSD legacy migration dropped.
+- Piece 1 — CLAUDE.md is a managed file + a `td:custom` region.
+- Piece 2 — `/td-refresh` rewritten to take-canonical-and-resplice.
+- Piece 3 — inbox nudges scoped to Bugs/Tasks (Ideas/Epics quiet unless asked).
+- Piece 4 — Idea→Task promotion (`/td-mailbox` `promote` + auto-promote on
+  `start`, "show me the ideas" conversational route).
 
-Remaining: Piece 4 (Idea→Task promotion). Then close as v4.9.
-
-Verify before building Piece 4: the exact GraphQL mutation to change an issue's
-Issue Type (`updateIssue` with `issueTypeId`, or a dedicated mutation).
+Ready to close as v4.9 — `/td-close`: PROJECT.md § Shipped entry, STATE to
+closed shape, doc-hygiene pass. `.td/work/section-ownership.md` folds-and-deletes
+at close.

@@ -58,6 +58,7 @@ Most work is conversational. Here's what gets routed where:
 "add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
 "file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
 "any incoming?" / "check inbox"       → open Bugs/Tasks in this repo (or /td-mailbox)
+"show me the ideas"                   → lists open Ideas to triage / promote to Task
 "what did we file?" / "show outbox"   → /td-mailbox (the outbound section)
 "did rgb-api respond yet?"            → /td-mailbox or inline subIssues query
 "health check" / "is prod healthy?"   → runs /td-health
@@ -201,6 +202,8 @@ GitHub Issues are the source of truth for parked work. At the org level, four Is
 | `Task` | specific piece of work — most things end up here, including new features |
 | `Bug` | unexpected problem or broken behavior |
 | `Epic` | bigger work that decomposes into sub-issues |
+
+An `Idea` you decide to act on becomes a `Task` — via `/td-mailbox`'s `promote`, or automatically when you start work on it. Ask "show me the ideas" any time to triage the `Idea` queue.
 
 Epics can have formal sub-issues across repos in the same org. Per-project Epics live in the project's own repo. The parent's progress bar updates automatically as cross-repo sub-issues close.
 
