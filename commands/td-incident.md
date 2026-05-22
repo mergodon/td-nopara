@@ -79,14 +79,14 @@ The incident ends in one of three ways:
 
 1. Apply the fix (confirm with user before code edits).
 2. Run pre-ship checks per project's `WORKWAY.md § Local testing`. If there's a live URL, smoke after deploy.
-3. Commit: `fix(<area>): <one-line>` with a body that includes Symptom → Root cause → Fix (matching the work file structure).
-4. Push.
-5. **Single capture prompt:** ask **"Anything from this fire worth keeping? (`debug: <text>` / `backlog: <text>` / `no`)"**. Route by prefix — the user just fought a fire, one decision point is enough. Multiple prefixes per response are OK (one per line). What each routes to:
+3. **Single capture prompt:** ask **"Anything from this fire worth keeping? (`debug: <text>` / `backlog: <text>` / `no`)"**. Route by prefix — the user just fought a fire, one decision point is enough. Multiple prefixes per response are OK (one per line). What each routes to:
    - `debug:` → append to `.td/DEBUG.md` under the right section (symptom → diagnostic / gotchas / production commands per content). Create from template if missing. Capture the symptom that took you there + the diagnostic path that worked + any tool-specific tricks.
    - `backlog:` → append to `.td/BACKLOG.md` (follow-up work surfaced during the fire — not the fire itself).
    - `no` → continue.
-6. Reset STATE: Topic back to previous (or `idle`); Phase reflects what's now active; `Last:` notes incident closed.
-7. Fold-and-delete the work file in the same commit (per the contract's fold-and-delete rule).
+4. Reset STATE: Topic back to previous (or `idle`); Phase reflects what's now active; `Last:` notes incident closed.
+5. Fold-and-delete the work file (per the contract's fold-and-delete rule).
+6. Commit it all as one commit: the fix + the STATE reset + the work-file deletion (and `.td/DEBUG.md` / `.td/BACKLOG.md` if the capture wrote to them). `fix(<area>): <one-line>`, body including Symptom → Root cause → Fix (matching the work file structure). STATE and the fold land in the same commit as the fix, per the contract.
+7. Push.
 
 **(b) Too big for this session — park to GitHub.**
 

@@ -110,13 +110,17 @@ in the middle of planning a multi-step thing, this is where the plan lives.>
 
 Resume note is the load-bearing part. During execution I'll skim it; for fresh-context orientation I'll read it fully. Don't artificially cap it.
 
-# Step 8 — Push
+# Step 8 — Commit, then push
+
+Steps 6–7 edited the `.td/` docs and rewrote `STATE.md` — those changes are uncommitted. Commit them, then push:
 
 ```
+git add .td/ <any other docs touched in Step 6>
+git commit -m "chore: clear <topic>"
 git push origin main
 ```
 
-If push is rejected (network, auth, divergence), surface the error and stop.
+`<topic>` is the current `STATE.Topic`. If Steps 6–7 happened to change nothing (rare — the STATE handoff is almost always a change), skip the commit. If push is rejected (network, auth, divergence), surface the error and stop.
 
 # Step 9 — Tell the user
 
