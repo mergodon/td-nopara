@@ -16,7 +16,7 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 - Cross-project requests ride on GitHub Issues + `gh` CLI. No custom DB, no schema, no inbox service.
 - **Tracker-free outbound.** Per-project `.td/PROJECT.md § Cross-repo` lists connected repos; `**From:** <project>` body marker on every cross-repo filing identifies the source. `/td-mailbox` does one bounded search across declared repos — no separate registry repo, no tracker Epic, no in-repo tracking infrastructure beyond the human-curated list and the body marker.
 - Cloned to `~/projects/td-flow/` on each machine.
-- Distributed as symlinks into `~/.claude/commands/`, `~/.claude/skills/td-flow`, and `~/.claude/td-templates` via `install.sh`.
+- Distributed as symlinks into `~/.claude/` — `commands/`, `skills/td-flow`, `td-templates`, and `td-flow-contract.md` (the contract every project `@import`s) — via `install.sh`.
 
 ## Active scope
 

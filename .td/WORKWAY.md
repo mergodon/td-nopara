@@ -16,6 +16,7 @@ The framework has no automated test suite (yet). The current contract is manual 
   - [ ] All 8 slash commands appear in `~/.claude/commands/` (`td-init.md`, `td-clear.md`, `td-close.md`, `td-refresh.md`, `td-mailbox.md`, `td-health.md`, `td-incident.md`, `td-park.md`)
   - [ ] Skill at `~/.claude/skills/td-flow` resolves
   - [ ] Templates at `~/.claude/td-templates` resolves to `templates/`
+  - [ ] Contract at `~/.claude/td-flow-contract.md` resolves to the repo's `CLAUDE.md`
   - [ ] AWK extractor in `hooks/pre-commit` returns the expected value when run against a filled WORKWAY.md template
 
 ### When local testing isn't possible
@@ -33,7 +34,7 @@ The framework is fully testable locally. If a future change involves a Claude Co
 The "live" environment for this framework is `mergodon/td-flow` on GitHub plus the symlinked install on each machine.
 
 - Live URL:        https://github.com/mergodon/td-flow
-- Deploy:          `git push origin main` (immediate; symlinks pick up changes since `templates/`, `commands/`, `skill/` are linked, not copied)
+- Deploy:          `git push origin main` (immediate; symlinks pick up changes since `templates/`, `commands/`, `skill/`, and the contract are linked, not copied)
 - Smoke after ship: re-run `./install.sh` on the local machine; verify the new content is visible
 - Logs:            none (this is just files + symlinks)
 - Dashboards:      none

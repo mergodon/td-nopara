@@ -7,7 +7,7 @@ description: Solo-developer project framework. Conversational interface, structu
 
 Same shape every project. Conversational interface. Four standard docs. Eight slash commands.
 
-The contract — including the "Who does what" matrix, the routing map ("where things go"), nudges, drift signals, and commit conventions — lives in root `CLAUDE.md`. This skill exists to surface the rhythm when context is heavy or `CLAUDE.md` isn't loaded yet. **Read root `CLAUDE.md` for anything specific.**
+The contract — the "Who does what" matrix, the routing map ("where things go"), nudges, drift signals, commit conventions — is the canonical td-flow contract, pulled into every project's root `CLAUDE.md` via a one-line `@import` from the shared install. This skill exists to surface the rhythm when context is heavy or the contract isn't loaded yet. **Read `CLAUDE.md` (it imports the contract) for anything specific.**
 
 ## When to engage
 
@@ -31,7 +31,7 @@ GitHub is the work memory. Big meaningful pushes. No duplication.
 ## Files in every project
 
 ```
-CLAUDE.md                ← td-flow contract; managed by /td-refresh
+CLAUDE.md                ← one-line @import of the shared td-flow contract
 .td/
   PROJECT.md             ← what / who / stack / scope
   WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics
@@ -51,7 +51,7 @@ CLAUDE.md                ← td-flow contract; managed by /td-refresh
 /td-init --template <name>  # bootstrap from a saved template (e.g. laravel)
 /td-clear                   # mid-project: doc-sync + STATE handoff + prune + push. Before /clear.
 /td-close                   # wrap project (or phase): full doc audit + prune + push.
-/td-refresh                 # sync the project with the framework — auto-merge canonical CLAUDE.md.
+/td-refresh                 # pull the latest framework + re-run the installer (migrates legacy CLAUDE.md to the @import).
 /td-mailbox                 # unified cross-repo walk: inbound + outbound in one pass.
 /td-health                  # proactive production health check — run .td/health.sh, report.
 /td-incident                # live production fire mode — focus, diagnose, fix or park.

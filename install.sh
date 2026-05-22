@@ -62,6 +62,16 @@ fi
 ln -s "$REPO_DIR/templates" "$TEMPLATES_LINK"
 echo "  templates linked"
 
+# 5. Symlink the canonical contract — projects @import this, instead of each
+#    carrying its own full copy in CLAUDE.md.
+CONTRACT_LINK="$CLAUDE_DIR/td-flow-contract.md"
+echo "→ linking contract to $CONTRACT_LINK"
+if [ -L "$CONTRACT_LINK" ] || [ -f "$CONTRACT_LINK" ]; then
+  rm "$CONTRACT_LINK"
+fi
+ln -s "$REPO_DIR/CLAUDE.md" "$CONTRACT_LINK"
+echo "  td-flow-contract.md linked"
+
 echo
 echo "td-flow installed."
 echo

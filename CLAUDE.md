@@ -1,6 +1,6 @@
 # How we work in this repo
 
-This file is the td-flow contract. It stays at root. It is **managed by `/td-refresh`**, which keeps it in sync with the canonical contract at `~/projects/td-flow/CLAUDE.md` — so I don't hand-edit it to customize a project. Project-specific content lives in `.td/`; a project-only contract rule goes in the `<!-- td:custom -->` region at the end of this file, the one place `/td-refresh` leaves alone. If a framework (e.g. Laravel Boost) overwrites this file, the user will say so and I restore it — an edge case, not the default.
+This is the **canonical td-flow contract** — the working agreement every td-flow project runs on, and its single source of truth. It is *not copied* into projects: a project's own `CLAUDE.md` is a one-line `@import` of this file (resolved through `~/.claude/td-flow-contract.md`, which `install.sh` links). So there is no per-project copy to drift — `git pull` in the td-flow repo and every project has the update next session. A project may add its own rules below the import line in its `CLAUDE.md`; all other project-specific content and state lives in `.td/`. If a framework (e.g. Laravel Boost) overwrites a project's `CLAUDE.md`, restoring it is one line — put the `@import` back.
 
 ## Who does what
 
@@ -106,8 +106,7 @@ I watch for these and flag with one line — the user decides:
 - WORKWAY test command no longer exists in `package.json`/equivalent → flag.
 - BACKLOG > 15 items mid-session → flag session bloat; suggest flushing to GitHub Issues before `/td-close` (mid-session flush is a single conversational ask — "park the backlog to GH").
 - 5+ local commits ahead of `origin/main` → ask if holding for a reason.
-- Root `CLAUDE.md` drifted from canonical and the user didn't say so → ask if Boost/Cursor/etc. overwrote it.
-- Root `CLAUDE.md` differs from canonical at `~/projects/td-flow/CLAUDE.md` outside its `td:custom` region (and the user didn't flag a framework overwrite) → flag once: "contract drifted from canonical — `/td-refresh` to review."
+- A project's `CLAUDE.md` is missing its `@~/.claude/td-flow-contract.md` import line (Boost, Cursor, `/init`, or a manual edit replaced it) → the contract isn't loading; flag it and restore the import line.
 - Stack drift (a dep added/removed/major-version bumped that I notice in conversation) → flag, route to `WORKWAY.md` § Framework specifics or PROJECT.md § Stack. Catching this at the moment is best; the safety net runs at `/td-clear` (this-session stack changes synced into PROJECT.md § Stack) and `/td-close` (full mechanical diff of dep files vs PROJECT.md § Stack).
 - I've fixed the same kind of issue 3+ times → ask about root cause.
 - About to commit a file that looks like a secret (`.env`, token, key) → stop and confirm.
@@ -152,7 +151,7 @@ Mid-conversation mentions don't trigger updates — only explicit, action-shaped
 
 ## Framework guidelines
 
-Framework-specific instructions (Laravel Boost, Next.js, Tailwind, shadcn) live in `.td/WORKWAY.md` § Framework specifics. If a framework writes guidelines into CLAUDE.md, the user notices and tells me; I restore CLAUDE.md from canonical and move salvageable notes to WORKWAY.md.
+Framework-specific instructions (Laravel Boost, Next.js, Tailwind, shadcn) live in `.td/WORKWAY.md` § Framework specifics. If a framework writes guidelines into `CLAUDE.md`, the user notices and tells me; I restore the project's `CLAUDE.md` — its one-line `@import` of the contract — and move salvageable notes to WORKWAY.md.
 
 **Never run Claude Code's built-in `/init` in a td-flow project.** It auto-generates a codebase-snapshot CLAUDE.md and overwrites the contract — same pollution problem as Boost. If the user wants a codebase overview, I do the scan and report back without touching `CLAUDE.md`. `/td-init` is the td-flow equivalent and is the only one to use here.
 
@@ -188,17 +187,10 @@ Eight commands, each with a distinct trigger. Full procedure lives in `commands/
 - `/td-init` — bootstrap or migrate a project (one-time per project).
 - `/td-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
-- `/td-refresh` — sync the project with the framework: re-run the installer, auto-merge canonical `CLAUDE.md`. Framework + contract only.
+- `/td-refresh` — pull the latest framework and re-run the installer; one-time, migrate a project off the old copied-contract model onto the `@import`.
 - `/td-mailbox` — unified cross-repo work walk (inbound + outbound, one batched digest).
 - `/td-health` — proactive production health check. Runs `.td/health.sh`, reports OK/WARN/FAIL.
 - `/td-incident` — live production fire mode. Drops everything else.
 - `/td-park` — mid-session `BACKLOG.md` → GitHub Issues flush.
 
 Everything else — including shipping individual pieces — is conversational.
-
-<!-- td:custom — a project's own contract rules go between these two markers.
-     /td-refresh never touches what's here; everything outside is canonical and
-     is overwritten from the td-flow repo. Empty by default — most projects
-     never need it; project-specific content normally lives in `.td/`. -->
-
-<!-- /td:custom -->

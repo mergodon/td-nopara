@@ -1,25 +1,23 @@
 # State
 
 Project:  td-flow
-Topic:    section-ownership
-Phase:    v4.9 built — ready to close
+Topic:    contract-by-import
+Phase:    v5.0 built — UAT + close remain
 Blocker:  none
-Last:     2026-05-22 — added a session doc-sync to /td-clear (post-review).
+Last:     2026-05-22 — shipped v5.0: contract delivered by @import, not per-project copy.
 
 ## Resume note
 
-v4.9 — five pieces, full plan in `.td/work/section-ownership.md`. All shipped:
+v5.0 shipped (one commit) — the td-flow contract is delivered by `@import`, no
+longer copied into each project. Plan record: `.td/work/contract-by-import.md`.
 
-- Piece 5 — GSD legacy migration dropped.
-- Piece 1 — CLAUDE.md is a managed file + a `td:custom` region.
-- Piece 2 — `/td-refresh` rewritten to take-canonical-and-resplice, then trimmed
-  to framework-sync only (BACKLOG flush + cross-repo drift dropped — scope creep).
-- Piece 3 — inbox nudges scoped to Bugs/Tasks (Ideas/Epics quiet unless asked).
-- Piece 4 — Idea→Task promotion (`/td-mailbox` `promote` + auto-promote on
-  `start`, "show me the ideas" conversational route).
-- Plus (post-review): `/td-clear` gained a session doc-sync — it now syncs
-  PROJECT.md/WORKWAY.md to what the session changed, not just STATE.
+What shipped: `install.sh` links `~/.claude/td-flow-contract.md` → the canonical
+contract; `templates/CLAUDE.md` is now a one-line `@~/.claude/td-flow-contract.md`
+import; `/td-refresh` rewritten (pull + install + one-time legacy migration); the
+`td:custom`/managed-file model removed from the contract; `/td-init`, README,
+SKILL updated. The Step 0 gate passed — the import loads (verified live via
+`/memory`: `td-flow-contract.md` showed `@-imported`).
 
-Ready to close as v4.9 — `/td-close`: PROJECT.md § Shipped entry, STATE to
-closed shape, doc-hygiene pass. `.td/work/section-ownership.md` folds-and-deletes
-at close.
+Remaining before close: UAT — a full `/td-init` in a throwaway project, and a
+`/td-refresh` migration of a legacy full-copy project. Then `/td-close` as v5.0
+(it writes the § Shipped entry; v4.9's 7 commits fold into the v5.0 entry).

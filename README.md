@@ -24,6 +24,7 @@ Symlinks created:
 - `~/.claude/commands/td-park.md`
 - `~/.claude/skills/td-flow`
 - `~/.claude/td-templates`
+- `~/.claude/td-flow-contract.md` — the canonical contract, `@import`-ed by every project
 
 To update on any machine: `git pull && ./install.sh`.
 
@@ -34,7 +35,7 @@ To update on any machine: `git pull && ./install.sh`.
 | `/td-init` | Once per project | Bootstrap or migrate (brownfield-aware). `--template <name>` to start from a saved starter. |
 | `/td-clear` | Mid-session checkpoint | Memory scan → doc-sync → light prune → STATE handoff → push. Ready for `/clear`. Fast. |
 | `/td-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
-| `/td-refresh` | When the framework has moved on | Syncs the framework install + re-syncs `CLAUDE.md` from canonical in one mechanical pass — your `td:custom` region preserved. |
+| `/td-refresh` | When the framework has moved on | Pulls the latest framework + re-runs the installer. One-time: migrates a legacy project's `CLAUDE.md` onto the `@import`. |
 | `/td-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
 | `/td-health` | Proactive production check | Run the project's `.td/health.sh` routine. Reports `OK`/`WARN`/`FAIL`; parks warnings to `BACKLOG.md`, escalates failures to `/td-incident`. First run scaffolds the routine (or marks the project non-production). |
 | `/td-incident` | Live production fire | Drop everything else. Focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
@@ -87,7 +88,7 @@ A session can cover any subset. `STATE.md` tracks where you are; the next sessio
 Four standard docs, one optional, plus scratch:
 
 ```
-CLAUDE.md                ← td-flow contract; managed by /td-refresh
+CLAUDE.md                ← one-line @import of the shared td-flow contract
 .td/
   PROJECT.md             ← what / who / stack / scope
   WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics
@@ -231,11 +232,15 @@ Unified view across all your repos: `gh search issues --owner <your-org> --state
 
 ## Updating an existing td-flow project
 
-If you initialized a project before recent contract changes, its local `CLAUDE.md` is stale. Two paths:
+Updating is nearly free now — the contract isn't copied into your project; your `CLAUDE.md` `@import`s the canonical one. So:
 
-**Fast:** in the project, run `/td-refresh`. It syncs the framework install, then re-syncs your `CLAUDE.md` from canonical — everything outside the `td:custom` region is canonical, so the merge is mechanical and your project-only rules survive. One pass; the unpushed `docs: refresh` commit is your review gate.
+```
+cd ~/projects/td-flow && git pull && ./install.sh
+```
 
-**Manual:** pull the framework (`cd ~/projects/td-flow && git pull && ./install.sh`), then diff `~/projects/<your-project>/CLAUDE.md` against `~/projects/td-flow/templates/CLAUDE.md` and adopt what you want.
+That's it — **every** td-flow project picks up the new contract on its next session. Nothing per-project.
+
+If a project still carries a *pre-import* full copy of the contract in its `CLAUDE.md`, run `/td-refresh` in it once — that migrates the `CLAUDE.md` onto the `@import`.
 
 ## Saving and reusing templates
 
@@ -252,7 +257,7 @@ Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `
 1. Use Boost's MCP server (the genuinely useful part — `.mcp.json` is gitignored, regenerated, and that's fine).
 2. Note the framework in `.td/WORKWAY.md` § Framework specifics so I know how to use it.
 3. Gitignore Boost's auto-generated guideline files.
-4. If Boost overwrites root `CLAUDE.md`, you tell me; I restore it from canonical (or you run `/td-refresh`). One-line edge case, not the default.
+4. If Boost overwrites root `CLAUDE.md`, you tell me; I restore it — it's just the one `@import` line. An edge case, not the default.
 
 ## Repo layout (this repo)
 
