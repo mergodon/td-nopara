@@ -2,17 +2,15 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    idle
+Phase:    closed (2026-05-23)
 Blocker:  none
-Last:     2026-05-22 — lifecycle-command test; fixed /td-incident step order + /td-clear's missing commit step.
+Last:     2026-05-23 — closed v5.1 (full command-surface validation + 5 fixes).
 
 ## Resume note
 
-No active work. v5.0 is shipped; the cross-repo machinery test passed.
-
-The four lifecycle commands (`/td-incident`, `/td-health`, `/td-clear`,
-`/td-close`) were tested as a connected sequence on the harness (2026-05-22) —
-all chained correctly. Two procedure bugs found and fixed: `/td-incident`
-Step 6(a) committed before the STATE reset / work-file fold (reordered so the
-commit is last); `/td-clear` never committed its own doc-sync + STATE handoff
-before pushing (added the `chore: clear <topic>` commit step).
+td-flow v5.1 just closed — a full validation+hardening pass that exercised
+all 8 slash commands against real fixtures and fixed 5 procedure bugs. The
+two-repo test harness (`mergodon/td-flow-test1` + `td-flow-test2`, private,
+kept) is recorded in WORKWAY § Notes for re-runs. v5.0's `@import` contract
+delivery — one canonical contract, every project `@import`s it — is the
+current shape; v5.1 hardened the procedures around it.
