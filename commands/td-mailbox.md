@@ -51,6 +51,8 @@ gh api graphql -H "GraphQL-Features: sub_issues" -f query='
 
 This gives the inbound list directly. Epics with cross-repo sub-issues show their children inline (for planning context).
 
+**Sub-issue rollup lag.** An Epic's `subIssuesSummary` lags a child issue's close — observed stale for up to ~1 min before the count catches up. If an Epic shows progress that looks one behind a just-closed child, it's lag, not a miscount; it corrects on the next run. (Same eventual-consistency caveat as the search-index lag in Step 4.)
+
 Then, for each inbound issue, gather related commits — `git log --grep="#<N>" --oneline -10`. Hold the results: they drive the digest recommendation ("looks resolved — close?") and render in the `show N` drill-down.
 
 # Step 3 — Read the cross-repo registry

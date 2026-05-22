@@ -63,11 +63,16 @@ For each proposed issue:
 
    When the phrasing doesn't clearly fit a category, default to `Idea` — not `Task`. Vague *is* the signal: `Idea` is the right home for "not sure yet, browse later." A grouped issue (several lines folded in) usually reads as `Task` (one concrete chunk) or `Epic` (decomposes into sub-issues).
 
-2. **Dedupe check** against existing open issues:
+2. **Dedupe check** against existing open issues. Fetch the repo's open issues **once** — one query for the whole pass, never one search per proposed issue:
    ```
-   gh issue list --state open --search "<2-3 key words>"
+   gh api graphql -f query='
+     query($owner: String!, $name: String!) {
+       repository(owner: $owner, name: $name) {
+         issues(first: 100, states: OPEN) { nodes { number title body } }
+       }
+     }' -F owner=<owner> -F name=<name>
    ```
-   If a similar issue exists, note it as a candidate in the digest — the user may want to comment on the existing one instead of creating a new issue.
+   Then match each proposed issue's 2–3 key words against that set locally (title + body). If a similar issue exists, note it as a candidate in the digest — the user may want to comment on the existing one instead of creating a new issue. One round-trip for the whole pass — never loop a search per proposed issue (that's N serial network calls; this is one, same as `/td-mailbox` Step 2).
 
 Then print the **digest** — the whole proposed set as one lettered list:
 
