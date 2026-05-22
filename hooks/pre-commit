@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # td-flow pre-commit hook — runs the project's Test command from .td/WORKWAY.md § Local testing.
-# Installed by /td-init. Do not bypass with --no-verify.
+# Installed by /td-init. Don't skip it with --no-verify on code commits.
 
 set -e
 

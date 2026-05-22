@@ -123,9 +123,11 @@ If `.git/` doesn't exist, ask: "Init a git repo now?" If yes, `git init`, then i
 
 # Step 6 — First commit
 
+This commit only adds the td-flow scaffolding — no project code — so it commits `--no-verify`, skipping the pre-commit hook Step 5 just installed. Without that, on a project whose deps or test setup aren't ready yet, the hook's `Test command` would block the bootstrap commit.
+
 ```
 git add CLAUDE.md .td/ .gitignore .env.example
-git commit -m "chore: td-flow init"
+git commit --no-verify -m "chore: td-flow init"
 ```
 
 If a remote is configured, ask: "Push to `origin/main` now?" If yes, push.

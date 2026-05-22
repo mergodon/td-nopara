@@ -20,7 +20,7 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 
 ## Active scope
 
-(none — v5.0 shipped 2026-05-22. Awaiting real-project use: the first `/td-refresh` on each existing td-flow project migrates its `CLAUDE.md` onto the imported contract; a full `/td-init` + `/td-refresh`-migration UAT in a throwaway project is still worth doing.)
+(none — v5.0 shipped 2026-05-22; its `/td-init` + `/td-refresh`-migration UAT was role-played 2026-05-22 and passed, with one gap found and fixed (`/td-init` and `/td-refresh` now commit their own scaffolding/migration commits with `--no-verify`). Awaiting real-project use: the first `/td-refresh` on each existing td-flow project migrates its `CLAUDE.md` onto the imported contract.)
 
 ## Shipped
 

@@ -44,7 +44,7 @@ Read this project's `./CLAUDE.md`.
 - **It is a full copy of the contract** — a pre-import-model project carrying the whole contract inline (possibly with an old `<!-- td:custom -->` region) → migrate it:
   1. Extract any genuinely project-specific content — the body of an old `<!-- td:custom -->` region, or any section clearly not part of the canonical contract. If you can't tell whether something is project-specific, surface it to the user rather than discard it.
   2. Rewrite `./CLAUDE.md` as: the `@~/.claude/td-flow-contract.md` import line, then the extracted project-specific content (if any) below it.
-  3. Commit: `git add CLAUDE.md` then `git commit -m "docs: migrate CLAUDE.md to the imported td-flow contract"`. Don't push — the user pushes when ready.
+  3. Commit: `git add CLAUDE.md` then `git commit --no-verify -m "docs: migrate CLAUDE.md to the imported td-flow contract"`. The `--no-verify` skips the pre-commit hook's `Test command` — this commit only rewrites a doc, there is no code change to gate, and the project's test env may not be ready. Don't push — the user pushes when ready.
 
 This runs once per project. After it, the project's `CLAUDE.md` never needs reconciling again — it imports the canonical, which `git pull` keeps current.
 
@@ -58,5 +58,5 @@ One line:
 
 - `/td-refresh` syncs the framework and migrates a legacy `CLAUDE.md` — nothing else. It never touches `.td/` docs, `BACKLOG.md`, or the cross-repo registry.
 - Step 0 may `git pull` the td-flow repo, but only as a clean-tree fast-forward; it never merges or forces.
-- The only commit `/td-refresh` makes is Step 1's one-time migration commit, so the pre-commit `Test command` is exempt.
+- The only commit `/td-refresh` makes is Step 1's one-time migration commit; it commits `--no-verify` so the pre-commit hook's `Test command` doesn't gate a doc-only rewrite.
 - Never push.
