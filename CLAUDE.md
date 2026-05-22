@@ -1,6 +1,6 @@
 # How we work in this repo
 
-This file is the contract. It stays at root. The user controls it. If a framework (e.g. Laravel Boost) overwrites it, the user will say so and I restore it — that's an edge case, not the default.
+This file is the td-flow contract. It stays at root. It is **managed by `/td-refresh`**, which keeps it in sync with the canonical contract at `~/projects/td-flow/CLAUDE.md` — so I don't hand-edit it to customize a project. Project-specific content lives in `.td/`; a project-only contract rule goes in the `<!-- td:custom -->` region at the end of this file, the one place `/td-refresh` leaves alone. If a framework (e.g. Laravel Boost) overwrites this file, the user will say so and I restore it — an edge case, not the default.
 
 ## Who does what
 
@@ -107,7 +107,7 @@ I watch for these and flag with one line — the user decides:
 - BACKLOG > 15 items mid-session → flag session bloat; suggest flushing to GitHub Issues before `/td-close` (mid-session flush is a single conversational ask — "park the backlog to GH").
 - 5+ local commits ahead of `origin/main` → ask if holding for a reason.
 - Root `CLAUDE.md` drifted from canonical and the user didn't say so → ask if Boost/Cursor/etc. overwrote it.
-- Root `CLAUDE.md` differs from canonical at `~/projects/td-flow/CLAUDE.md` (and the user didn't flag a framework overwrite) → flag once: "contract drifted from canonical — `/td-refresh` to review."
+- Root `CLAUDE.md` differs from canonical at `~/projects/td-flow/CLAUDE.md` outside its `td:custom` region (and the user didn't flag a framework overwrite) → flag once: "contract drifted from canonical — `/td-refresh` to review."
 - Stack drift (a dep added/removed/major-version bumped that I notice in conversation) → flag, route to `WORKWAY.md` § Framework specifics or PROJECT.md § Stack. Catching this at the moment is best; the mechanical safety net runs at `/td-clear` (heads-up: dep files changed since last STATE) and `/td-close` (full diff of dep files vs PROJECT.md § Stack).
 - I've fixed the same kind of issue 3+ times → ask about root cause.
 - About to commit a file that looks like a secret (`.env`, token, key) → stop and confirm.
@@ -194,3 +194,10 @@ Eight commands, each with a distinct trigger. Full procedure lives in `commands/
 - `/td-park` — mid-session `BACKLOG.md` → GitHub Issues flush.
 
 Everything else — including shipping individual pieces — is conversational.
+
+<!-- td:custom — a project's own contract rules go between these two markers.
+     /td-refresh never touches what's here; everything outside is canonical and
+     is overwritten from the td-flow repo. Empty by default — most projects
+     never need it; project-specific content normally lives in `.td/`. -->
+
+<!-- /td:custom -->

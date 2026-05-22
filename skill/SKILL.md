@@ -31,7 +31,7 @@ GitHub is the work memory. Big meaningful pushes. No duplication.
 ## Files in every project
 
 ```
-CLAUDE.md                ← contract at root, user controls it
+CLAUDE.md                ← td-flow contract; managed by /td-refresh
 .td/
   PROJECT.md             ← what / who / stack / scope
   WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics

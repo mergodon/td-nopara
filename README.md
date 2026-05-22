@@ -86,7 +86,7 @@ A session can cover any subset. `STATE.md` tracks where you are; the next sessio
 Four standard docs, one optional, plus scratch:
 
 ```
-CLAUDE.md                ← contract at root; user controls
+CLAUDE.md                ← td-flow contract; managed by /td-refresh
 .td/
   PROJECT.md             ← what / who / stack / scope
   WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics

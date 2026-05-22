@@ -23,7 +23,7 @@ with ONE editable region (`td:custom`) for project carve-outs. YAML frontmatter
 considered for STATE's field block — declined: td-flow has no parser, Claude
 reads the block fine, it'd be complexity with no user-visible payoff.
 
-## Piece 1 — Managed-file header + td:custom region
+## Piece 1 — Managed-file header + td:custom region ✓ shipped
 
 CLAUDE.md gets a top-of-file managed header (HTML comment) + one editable region:
 
@@ -38,9 +38,11 @@ CLAUDE.md gets a top-of-file managed header (HTML comment) + one editable region
 ```
 
 - `td:custom` is XML-namespace syntax (`prefix:name`) — closing tag `/td:custom`.
-- Optional secondary marker `<!-- td:scratch --> … <!-- /td:scratch -->` —
-  remove-at-close region. Narrow use (work files already cover whole-file
-  scratch); keep it light, user can cut.
+- `td:scratch` (remove-at-close region) considered and DROPPED — work files
+  already cover whole-file scratch; an in-doc marker is surface area for a rare
+  problem. Flagged to the user; re-add if a real need shows up.
+- Implemented as a managed-file *preamble* (prose), not a separate HTML-comment
+  header — the preamble is read every session anyway, so it carries the statement.
 - Canonical CLAUDE.md: short section documenting the convention.
 - templates/CLAUDE.md: mirror (header + empty td:custom region is fine here —
   templates/CLAUDE.md is already maintained as conceptually distinct).
