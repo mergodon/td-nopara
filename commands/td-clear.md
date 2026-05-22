@@ -1,8 +1,8 @@
 ---
-description: Mid-project context reset. Save state, push, ready for /clear. Project continues — this is a checkpoint, not a wrap.
+description: Mid-project context reset. Sync the .td/ docs to this session, write the STATE handoff, push — ready for /clear. Project continues; a checkpoint, not a wrap.
 ---
 
-You are checkpointing the current session so the user can `/clear` and the next session picks up cold. The project is not done — it's mid-flight. Keep it fast: state handoff, prune obvious junk, push. Optimization, code review, restructuring — out of scope. If something invites that, surface it as a backlog item or a future topic and move on.
+You are checkpointing the current session so the user can `/clear` and the next session picks up cold. The project is not done — it's mid-flight. Keep it fast: sync the `.td/` docs to what this session did, write the STATE handoff, prune obvious junk, push. Optimization, code review, restructuring, exhaustive doc audits — out of scope (that's `/td-close`). If something invites that, surface it as a backlog item or a future topic and move on.
 
 # Step 1 — Update memory
 
@@ -55,9 +55,19 @@ Wait for the answer. If they name something, append it to `.td/BACKLOG.md` as `-
 
 This is a single question — don't prompt for elaboration or turn it into a planning session.
 
-# Step 6 — Light prune + handoff signals
+# Step 6 — Sync the docs to this session, then prune
 
-Walk `.td/` for content git already covers:
+Before `/clear` wipes the conversation, make sure the `.td/` docs reflect what this session actually did — the next session loads them cold and treats them as true.
+
+**Doc-sync.** Scan this session for anything that changed what a doc should say and isn't in it yet, and write it now:
+
+- Scope moved — something shipped, or added to / dropped from active scope → `PROJECT.md § Active scope` / `§ Shipped`.
+- Stack changed this session — a dependency added, removed, or major-version bumped → `PROJECT.md § Stack`. (Quick check: `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u`.)
+- A durable framework gotcha, test-command change, deploy detail, or env quirk surfaced → `WORKWAY.md`.
+
+This is **session-scoped** — only what changed *this session*, which you have the context for. It is not the exhaustive whole-doc audit; that's `/td-close`. In-the-moment routing (`CLAUDE.md § Where things go`) stays primary — this is the backstop for things that drifted through the work without a clean action-shaped statement. Anything genuinely ambiguous → note it in the Resume note (Step 7) for `/td-close` or the next session; don't block the checkpoint on it.
+
+**Light prune.** Walk `.td/` for content git already covers:
 
 - A `.td/work/<topic>.md` for a topic that's been shipped (its commits are in `git log`) → delete.
 - Resolved blockers in `.td/STATE.md` → clear them out.
@@ -71,13 +81,7 @@ Walk `.td/` for content git already covers:
 
 Examples: `[mailbox] 📥 3 inbound (1 Bug, 2 Task), 📤 0 outbound` | `[mailbox] empty`. Skip outbound segment if `.td/PROJECT.md § Cross-repo` is missing. No Bugs/Tasks inbound and no outbound → `[mailbox] empty`.
 
-**Drift heads-up** (only renders if the check fires — no noise when clean). One mechanical check, no fix here — `/td-close` runs the full version:
-
-- **Stack:** `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u` → if anything, note `<file> changed; PROJECT.md § Stack may be stale`.
-
-If it fires, it renders as a `## Heads-ups` block at the top of the Resume note (Step 7). Clean → no block at all, and the next session opens to a clean handoff.
-
-Don't restructure. Don't second-guess `WORKWAY.md` content. Deeper cleanup is `/td-close`.
+Don't restructure, and don't re-audit doc content that didn't change this session — the exhaustive doc audit is `/td-close`.
 
 # Step 7 — Update STATE.md as a handoff
 
@@ -86,7 +90,6 @@ Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context w
 - **Keep** in-flight specifics the next session can't reconstruct: current decision, current blocker, mid-thinking, the gotcha you just hit.
 - **Clear** speculation ("we might want to..."), anything `git log` already says, or claims you haven't actually verified.
 - **Mailbox snapshot** from Step 6 always renders at the very top of the Resume note (status read, not noise).
-- **Heads-ups block** renders below the snapshot ONLY if a check fired in Step 6 — empty means no block at all, not an empty heading.
 
 Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 

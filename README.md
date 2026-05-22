@@ -32,7 +32,7 @@ To update on any machine: `git pull && ./install.sh`.
 | Command | When you reach for it | What it does |
 |---|---|---|
 | `/td-init` | Once per project | Bootstrap or migrate (brownfield-aware). `--template <name>` to start from a saved starter. |
-| `/td-clear` | Mid-session checkpoint | Memory scan → light prune → STATE handoff → push. Ready for `/clear`. Fast. |
+| `/td-clear` | Mid-session checkpoint | Memory scan → doc-sync → light prune → STATE handoff → push. Ready for `/clear`. Fast. |
 | `/td-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
 | `/td-refresh` | When the framework has moved on | Syncs the framework install + re-syncs `CLAUDE.md` from canonical in one mechanical pass — your `td:custom` region preserved. |
 | `/td-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
@@ -188,7 +188,7 @@ Me:  drafts comment, signs as <this-project>, confirms, posts.
 **End of work day**
 
 ```
-Quick checkpoint:    /td-clear   → memory scan, park nudge, STATE handoff, push, ready for /clear
+Quick checkpoint:    /td-clear   → memory scan, doc-sync, STATE handoff, push, ready for /clear
 Full project wrap:   /td-close   → park leftovers to GH, code sanity, doc audit, push
 ```
 

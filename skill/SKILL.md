@@ -49,7 +49,7 @@ CLAUDE.md                ← td-flow contract; managed by /td-refresh
 ```
 /td-init                    # bootstrap or migrate (brownfield-aware)
 /td-init --template <name>  # bootstrap from a saved template (e.g. laravel)
-/td-clear                   # mid-project: STATE handoff + light prune + push. Before /clear.
+/td-clear                   # mid-project: doc-sync + STATE handoff + prune + push. Before /clear.
 /td-close                   # wrap project (or phase): full doc audit + prune + push.
 /td-refresh                 # sync the project with the framework — auto-merge canonical CLAUDE.md.
 /td-mailbox                 # unified cross-repo walk: inbound + outbound in one pass.

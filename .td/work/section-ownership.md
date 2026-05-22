@@ -125,6 +125,13 @@ Reconcile `.td/`-doc STRUCTURE (heading set) against templates when the framewor
 adds a mandatory section — real gap today, but new scope + risk. Editable-region
 pattern applies (headings self-delineate the regions), but defer.
 
+## Post-plan additions (this session)
+
+- /td-refresh trimmed to framework-sync only (folded into Piece 2 above).
+- /td-clear gained a session doc-sync — syncs PROJECT/WORKWAY to the session,
+  not just STATE. Old stack-drift flag-no-fix replaced by fixing it; the vacated
+  `## Heads-ups` block mechanism removed.
+
 ## Close
 
 chore: close v4.9 — PROJECT.md § Shipped entry, STATE to closed, full ripple check.

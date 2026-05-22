@@ -66,7 +66,7 @@ No labels, no status enum. Open = pending; closed = done.
 
 If something doesn't fit one of those docs, it probably doesn't need a doc — git or the existing docs cover it.
 
-**Doc hygiene.** The next session loads these docs cold and assumes everything in them is true. So the bar is sharp: **keep what (a) matters for next session, (b) isn't derivable from code or `git log`, (c) we actually know to be true.** Clear speculation, clear placeholders, clear anything the codebase already says authoritatively (the stack list shouldn't duplicate `composer.json`). `/td-clear` applies this lightly to STATE.md at handoff (heads-up on stack drift, no fix). `/td-close` applies it across all docs (mechanical stack diff + per-doc pass).
+**Doc hygiene.** The next session loads these docs cold and assumes everything in them is true. So the bar is sharp: **keep what (a) matters for next session, (b) isn't derivable from code or `git log`, (c) we actually know to be true.** Clear speculation, clear placeholders, clear anything the codebase already says authoritatively (the stack list shouldn't duplicate `composer.json`). `/td-clear` syncs the docs to the current session at handoff — scope, stack, gotchas, the STATE handoff. `/td-close` applies the full audit across all docs (mechanical stack diff + per-doc pass).
 
 ## Nudges I do without being asked
 
@@ -108,7 +108,7 @@ I watch for these and flag with one line — the user decides:
 - 5+ local commits ahead of `origin/main` → ask if holding for a reason.
 - Root `CLAUDE.md` drifted from canonical and the user didn't say so → ask if Boost/Cursor/etc. overwrote it.
 - Root `CLAUDE.md` differs from canonical at `~/projects/td-flow/CLAUDE.md` outside its `td:custom` region (and the user didn't flag a framework overwrite) → flag once: "contract drifted from canonical — `/td-refresh` to review."
-- Stack drift (a dep added/removed/major-version bumped that I notice in conversation) → flag, route to `WORKWAY.md` § Framework specifics or PROJECT.md § Stack. Catching this at the moment is best; the mechanical safety net runs at `/td-clear` (heads-up: dep files changed since last STATE) and `/td-close` (full diff of dep files vs PROJECT.md § Stack).
+- Stack drift (a dep added/removed/major-version bumped that I notice in conversation) → flag, route to `WORKWAY.md` § Framework specifics or PROJECT.md § Stack. Catching this at the moment is best; the safety net runs at `/td-clear` (this-session stack changes synced into PROJECT.md § Stack) and `/td-close` (full mechanical diff of dep files vs PROJECT.md § Stack).
 - I've fixed the same kind of issue 3+ times → ask about root cause.
 - About to commit a file that looks like a secret (`.env`, token, key) → stop and confirm.
 
