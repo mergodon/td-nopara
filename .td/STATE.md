@@ -4,21 +4,18 @@ Project:  td-flow
 Topic:    section-ownership
 Phase:    working
 Blocker:  none
-Last:     2026-05-22 — shipped v4.9 Piece 2 (/td-refresh take-canonical-and-resplice).
+Last:     2026-05-22 — shipped v4.9 Piece 3 (Bug/Task-only inbox nudges).
 
 ## Resume note
 
 Building v4.9 — five pieces, full plan in `.td/work/section-ownership.md`.
 
-Shipped: Piece 5 (GSD legacy migration dropped); Piece 1 (CLAUDE.md is a managed
-file — managed-file preamble + a `td:custom` editable region); Piece 2
-(`/td-refresh` rewritten to take-canonical-and-resplice — the section-categorizer
-is gone, the reconcile is mechanical and non-interactive). `td:scratch`
-considered, dropped — lean.
+Shipped: Piece 5 (GSD legacy migration dropped); Piece 1 (CLAUDE.md managed file
++ `td:custom` region); Piece 2 (`/td-refresh` take-canonical-and-resplice);
+Piece 3 (inbox nudges scoped to Bugs/Tasks — Ideas/Epics quiet unless asked;
+`gh issue list` can't filter by type, so the nudge uses `gh api graphql`).
 
-Remaining: Piece 3 (Bug/Task-only inbox nudges — Ideas/Epics quiet unless
-asked), Piece 4 (Idea→Task promotion). Then close as v4.9.
+Remaining: Piece 4 (Idea→Task promotion). Then close as v4.9.
 
-Two things to verify before building: the exact GraphQL mutation to change an
-issue's Type (Piece 4), and whether `gh issue list` supports `--type` natively
-(Piece 3) or the nudge needs the GraphQL shape `/td-mailbox` Step 2 already uses.
+Verify before building Piece 4: the exact GraphQL mutation to change an issue's
+Issue Type (`updateIssue` with `issueTypeId`, or a dedicated mutation).

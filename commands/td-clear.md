@@ -63,13 +63,13 @@ Walk `.td/` for content git already covers:
 - Resolved blockers in `.td/STATE.md` → clear them out.
 - Backlog items that have shipped → delete the line.
 
-**Mailbox snapshot** (status read, always renders unless mailbox is empty). Fetch open issues in this repo and cross-repo filings (same shape as `/td-mailbox` Steps 2+4). Format:
+**Mailbox snapshot** (status read, always renders unless mailbox is empty). Fetch open issues in this repo and cross-repo filings (same shape as `/td-mailbox` Steps 2+4). Inbound counts **Bugs and Tasks only** — Ideas and Epics aren't handoff to-dos, so they stay out of the snapshot. Format:
 
 ```
-[mailbox] 📥 <N> inbound (<type-breakdown>), 📤 <M> outbound (<state-breakdown>)
+[mailbox] 📥 <N> inbound (<Bug/Task breakdown>), 📤 <M> outbound (<state-breakdown>)
 ```
 
-Examples: `[mailbox] 📥 4 inbound (3 Task, 1 Idea), 📤 0 outbound` | `[mailbox] empty`. Skip outbound segment if `.td/PROJECT.md § Cross-repo` is missing.
+Examples: `[mailbox] 📥 3 inbound (1 Bug, 2 Task), 📤 0 outbound` | `[mailbox] empty`. Skip outbound segment if `.td/PROJECT.md § Cross-repo` is missing. No Bugs/Tasks inbound and no outbound → `[mailbox] empty`.
 
 **Drift heads-up** (only renders if the check fires — no noise when clean). One mechanical check, no fix here — `/td-close` runs the full version:
 

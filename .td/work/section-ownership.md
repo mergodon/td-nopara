@@ -76,7 +76,7 @@ project" section.
 
 Commit: feat(refresh): take-canonical-and-resplice Phase 1
 
-## Piece 3 — Nudge scoping (Ideas/Epics quiet unless asked)
+## Piece 3 — Nudge scoping (Ideas/Epics quiet unless asked) ✓ shipped
 
 - Fresh-session nudge: surface open Bugs + Tasks only. Ideas + Epics not surfaced
   unprompted. Type-aware query needed — GraphQL like /td-mailbox Step 2, or

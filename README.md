@@ -57,7 +57,7 @@ Most work is conversational. Here's what gets routed where:
 "let's plan a big redesign"           → starts a planning work file (later → Epic)
 "add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
 "file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
-"any incoming?" / "check inbox"       → gh issue list for current repo (or /td-mailbox)
+"any incoming?" / "check inbox"       → open Bugs/Tasks in this repo (or /td-mailbox)
 "what did we file?" / "show outbox"   → /td-mailbox (the outbound section)
 "did rgb-api respond yet?"            → /td-mailbox or inline subIssues query
 "health check" / "is prod healthy?"   → runs /td-health
@@ -110,7 +110,7 @@ Plus the environment scaffolding:
 
 ```
 You: "fix the navbar dropdown — not closing on outside click"
-Me:  reads STATE, surfaces open issues (startup nudge), starts the rhythm.
+Me:  reads STATE, surfaces open Bugs/Tasks (startup nudge), starts the rhythm.
      [work + test happens]
 You: "ship it"
 Me:  tests pass, commits as fix(navbar): close dropdown on outside click, pushes.

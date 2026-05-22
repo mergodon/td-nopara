@@ -51,7 +51,7 @@ A parent `Epic` can have sub-issues in other mergodon repos via the `addSubIssue
 
 ### Inbox scope
 
-**Repo-scoped by default.** "CRs?" / "any incoming?" runs `gh issue list --state open` for the current repo only. Cross-repo widening requires explicit ask ("all repos", "global inbox") or invoking `/td-mailbox` (which walks both directions in one pass — inbound + outbound). `## Cross-repo` registry tells me which repos this project *files into*, not which to *poll*.
+**Repo-scoped by default.** "CRs?" / "any incoming?" checks the current repo only — open Bugs and Tasks (see § Where things go). Cross-repo widening requires an explicit ask ("all repos", "global inbox") or invoking `/td-mailbox` (which walks both directions in one pass — inbound + outbound). `## Cross-repo` registry tells me which repos this project *files into*, not which to *poll*.
 
 No labels, no status enum. Open = pending; closed = done.
 
@@ -70,7 +70,7 @@ If something doesn't fit one of those docs, it probably doesn't need a doc — g
 
 ## Nudges I do without being asked
 
-- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Also run `gh issue list --state open` and surface incoming asks (one line, or "(inbox empty)") alongside the STATE summary.
+- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Alongside it, I surface open **Bugs and Tasks** in this repo — one line, or "(inbox clear)". (Type filtering needs `gh api graphql`, not `gh issue list`.) Ideas and Epics aren't surfaced unprompted — Ideas are browse-on-request (`/td-mailbox`, or "show me the ideas"), Epics are planning surfaces; neither is a to-do.
 - When the conversation drifts through small unrelated stuff: **"We're scattered — want to wrap and start fresh?"**
 - After a piece is done: I commit and push without re-asking every time — that's the rhythm. The user can say "wait, don't push yet" to break it.
 - When context is getting heavy mid-project: I suggest `/td-clear`.
@@ -129,7 +129,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "add to DEBUG" / "save this debug trick" / "this gotcha goes in the runbook" → write to `.td/DEBUG.md`. Create from `~/projects/td-flow/templates/td/DEBUG.md` template if missing.
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
 - "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`. **If the target isn't listed, ask the user first** — it's a real cross-repo relationship that needs declaring (one-line edit to PROJECT.md). Then `gh api graphql createIssue` against the target repo with body opening `**From:** <friendly-name>` followed by ask + why. Use the `Bug`/`Task`/`Idea` type that fits. **If the work belongs to an existing Epic in this repo (planning surface), also `addSubIssue` to that Epic** so cross-repo progress rolls up natively. Otherwise no extra step — `/td-mailbox`'s outbound query finds the filing via the `**From:**` marker scoped to the connected-repos list.
-- "any incoming?" / "check the inbox" / "CRs?" → `gh issue list --state open` (current repo ONLY — the default; never widen here). Or invoke `/td-mailbox` for the full walk (both directions).
+- "any incoming?" / "check the inbox" / "CRs?" → surface open **Bugs and Tasks** in this repo (`gh api graphql` by Issue Type — current repo ONLY, never widen here). Ideas and Epics aren't included — "show me the ideas" or `/td-mailbox` for those. `/td-mailbox` does the full walk (both directions).
 - "what did we file?" / "show our outbox" / "any updates from the issues we filed?" → `/td-mailbox` (the outbound section). For a specific repo question like "did <repo> respond?", optional shortcut: inline GraphQL query on the relevant parent issue's `subIssues`, no full walk.
 - "all repos?" / "global inbox" / "everything open" / "what's open across the board?" → `gh search issues --owner <owner> --involves @me --state open` (cross-repo, only on explicit ask; flag form, not quoted-string).
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
