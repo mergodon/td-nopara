@@ -51,7 +51,7 @@ CLAUDE.md                ← td-flow contract; managed by /td-refresh
 /td-init --template <name>  # bootstrap from a saved template (e.g. laravel)
 /td-clear                   # mid-project: STATE handoff + light prune + push. Before /clear.
 /td-close                   # wrap project (or phase): full doc audit + prune + push.
-/td-refresh                 # review deltas between this project's CLAUDE.md and canonical.
+/td-refresh                 # sync the project with the framework — auto-merge canonical CLAUDE.md.
 /td-mailbox                 # unified cross-repo walk: inbound + outbound in one pass.
 /td-health                  # proactive production health check — run .td/health.sh, report.
 /td-incident                # live production fire mode — focus, diagnose, fix or park.

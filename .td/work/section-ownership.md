@@ -51,7 +51,7 @@ CLAUDE.md gets a top-of-file managed header (HTML comment) + one editable region
 
 Commit: feat(markers): managed-file header + td:custom region
 
-## Piece 2 — /td-refresh: take-canonical-and-resplice
+## Piece 2 — /td-refresh: take-canonical-and-resplice ✓ shipped
 
 - Phase 0: auto-pull when behind + ff-only + clean tree (already the only case
   it pulls — stop asking). Dirty/diverged → skip + note.
