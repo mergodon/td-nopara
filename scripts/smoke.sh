@@ -26,14 +26,10 @@ else
   fail "hooks/pre-commit — bash syntax error"
 fi
 
-# 2. install.sh idempotency — run twice, both must exit 0
-if ./install.sh >/dev/null 2>&1 && ./install.sh >/dev/null 2>&1; then
-  ok "install.sh — idempotent (two consecutive runs)"
-else
-  fail "install.sh — not idempotent or errors out"
-fi
+# Check current install state BEFORE running install.sh (which self-heals).
+# install.sh idempotency runs last for that reason.
 
-# 3. All 9 slash commands resolve in ~/.claude/commands/
+# 2. All 9 slash commands resolve in ~/.claude/commands/
 EXPECTED_COMMANDS=(td-init td-clear td-close td-refresh td-mailbox td-health td-incident td-park td-snapshot)
 missing=0
 for c in "${EXPECTED_COMMANDS[@]}"; do
@@ -61,7 +57,7 @@ for link in "$HOME/.claude/commands/"*.md; do
   esac
 done
 
-# 4. Skill, templates, contract symlinks
+# 3. Skill, templates, contract symlinks
 for path in \
   "skills/td-flow" \
   "td-templates" \
@@ -73,6 +69,14 @@ for path in \
     fail "~/.claude/$path missing or broken"
   fi
 done
+
+# 4. install.sh idempotency — run twice, both must exit 0. Runs LAST because
+#    install.sh self-heals symlinks; running it earlier would mask checks 2+3.
+if ./install.sh >/dev/null 2>&1 && ./install.sh >/dev/null 2>&1; then
+  ok "install.sh — idempotent (two consecutive runs)"
+else
+  fail "install.sh — not idempotent or errors out"
+fi
 
 # 5. AWK extractor — verify it returns a non-empty value from this project's WORKWAY
 extracted=$(awk '
