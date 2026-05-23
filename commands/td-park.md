@@ -63,16 +63,21 @@ For each proposed issue:
 
    When the phrasing doesn't clearly fit a category, default to `Idea` — not `Task`. Vague *is* the signal: `Idea` is the right home for "not sure yet, browse later." A grouped issue (several lines folded in) usually reads as `Task` (one concrete chunk) or `Epic` (decomposes into sub-issues).
 
-2. **Dedupe check** against existing open issues. Fetch the repo's open issues **once** — one query for the whole pass, never one search per proposed issue:
+2. **Dedupe check** against existing open issues. Fetch the repo's open issues **once** — one query for the whole pass, never one search per proposed issue. Capture each node's `id` (node ID) too — needed if the digest's default action is `promote`:
    ```
    gh api graphql -f query='
      query($owner: String!, $name: String!) {
        repository(owner: $owner, name: $name) {
-         issues(first: 100, states: OPEN) { nodes { number title body } }
+         issues(first: 100, states: OPEN) { nodes { id number title body issueType { name } } }
        }
      }' -F owner=<owner> -F name=<name>
    ```
-   Then match each proposed issue's 2–3 key words against that set locally (title + body). If a similar issue exists, note it as a candidate in the digest — the user may want to comment on the existing one instead of creating a new issue. One round-trip for the whole pass — never loop a search per proposed issue (that's N serial network calls; this is one, same as `/td-mailbox` Step 2).
+   Then match each proposed issue's 2–3 key words against that set locally (title + body). On a match, the digest's default action depends on the existing issue's type:
+
+   - **Match is an `Idea`** → default action is **promote** (re-type Idea → Task). The BACKLOG line means the user committed to it; it's no longer exploration. Don't create a new issue, don't leave a stale Idea sitting next to a new Task.
+   - **Match is a `Bug` / `Task` / `Epic`** → default action is **comment** on the existing issue (the user may want to add the BACKLOG context there instead of creating a duplicate).
+
+   One round-trip for the whole pass — never loop a search per proposed issue (that's N serial network calls; this is one, same as `/td-mailbox` Step 2).
 
 Then print the **digest** — the whole proposed set as one lettered list:
 
@@ -81,15 +86,17 @@ BACKLOG: <L> lines → <I> proposed issues<if merges: " (<M> merges)">
 
   A. <Type>  <title>
        ← line(s) <n>[, <n>…]<if merged: "  (<one-line why merged>)">
-       <if dedupe hit: "dedupe: similar to open #<N> <title> — comment there instead?">
+       <if dedupe hit on Idea: "dedupe: open #<N> <title> (Idea) — promoting to Task">
+       <if dedupe hit on Bug/Task/Epic: "dedupe: open #<N> <title> (<Type>) — commenting there instead">
   B. …
 
 Reply to adjust — retype any ("B→Task"), unmerge ("split D"), merge more
-("merge A+C"), drop, "ship A now", or "skip line <n>" to leave a line in
-BACKLOG. Otherwise I create A–<last> as shown.
+("merge A+C"), drop, "ship A now", "skip line <n>" to leave a line in
+BACKLOG, or override a dedupe action ("A: create new" / "A: comment").
+Otherwise I create A–<last> as shown.
 ```
 
-Skip the dedupe line for issues with no candidate. Skip the merge-count note if there were no merges.
+Skip the dedupe line for issues with no candidate. Skip the merge-count note if there were no merges. **Promote and comment are defaults, not prompts** — the digest shows what will happen; the user vetoes by saying so.
 
 # Step 6 — One decision point
 
@@ -104,8 +111,9 @@ Don't walk the issues one at a time. One digest, one reply, then act.
 
 # Step 7 — Execute the batch
 
-For every confirmed issue in the set, create it via GraphQL:
+For each confirmed issue, dispatch by action:
 
+**Create** (no dedupe match, or user override `create new`) — create it via GraphQL:
 ```
 gh api graphql -H "GraphQL-Features: sub_issues" -f query='
   mutation($repoId: ID!, $title: String!, $body: String!, $typeId: ID!) {
@@ -119,9 +127,18 @@ Get `<repo-node-id>` once per run: `gh api graphql -f query='query { repository(
 
 The body opens with the `**From:** <sender-name>` marker, then the source content — for a merged issue, fold the source lines into a short checklist so nothing is lost.
 
-For a "comment on existing #N instead" decision: `gh issue comment <N> --body "<context from the line(s)> — <sender-name>"`.
+**Promote** (dedupe match on Idea, default action) — re-type the existing Idea to Task. Same `updateIssue` mutation as `/td-mailbox`'s `promote`:
+```
+gh api graphql -f query='
+  mutation($id: ID!, $t: ID!) {
+    updateIssue(input: { id: $id, issueTypeId: $t }) { issue { number } }
+  }' -F id=<matched issue node id> -F t=<Task type ID>
+```
+Then add a short comment on the promoted issue with the BACKLOG context, signed `— <sender-name>`, so the promotion has provenance. Don't create a new issue.
 
-Print each result: `Created <repo>#<N> (Type: X)` or `Commented on #<N>`.
+**Comment** (dedupe match on Bug/Task/Epic, default action; or user override `comment`) — `gh issue comment <N> --body "<context from the line(s)> — <sender-name>"`.
+
+Print each result: `Created <repo>#<N> (Type: X)`, `Promoted <repo>#<N> Idea → Task`, or `Commented on #<N>`.
 
 # Step 8 — Rewrite BACKLOG.md
 
@@ -130,7 +147,7 @@ After the batch, rewrite `.td/BACKLOG.md` containing only the lines the user mar
 # Step 9 — Tell the user
 
 ```
-Flushed: <L> lines → <N> issues created<if merges: ", <M> merges">. <D> dropped. <C> commented onto existing. <S> shipped (rhythm started). <K> skipped (still in BACKLOG).
+Flushed: <L> lines → <N> issues created<if merges: ", <M> merges">. <P> promoted (Idea → Task). <C> commented onto existing. <D> dropped. <S> shipped (rhythm started). <K> skipped (still in BACKLOG).
 ```
 
 If `<S>` > 0: "You shipped <issue>; the rest of the set wasn't created. Run `/td-park` again when ready."
