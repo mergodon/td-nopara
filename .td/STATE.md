@@ -4,8 +4,14 @@ Project:  td-flow
 Topic:    idle
 Phase:    idle
 Blocker:  none
-Last:     2026-05-24 — /td-snapshot landed; /td-incident rewritten as composition; #11 closed.
+Last:     2026-05-24 — /td-clear after v5.2 ship; next topic is small test framework.
 
 ## Resume note
 
-td-flow v5.2 just shipped — added `/td-snapshot` (commit current piece to a `snapshot/<slug>` branch + `Snapshot`-type GH issue with native `claude --resume` line), rewrote `/td-incident` to invoke `/td-snapshot` first (replacing the bespoke pointer-preservation mechanic that caused #11), surfaced Snapshots in `/td-mailbox` as a separate bucket, added Fix D contract rule (materialise topic to disk before designing). Five-commit increment from `b645118` to here. Next session: clean slate — pick up from `/td-mailbox` or whatever comes in.
+[mailbox] empty
+
+td-flow v5.2 shipped earlier this session (`b645118` → `6017c72`, five commits): `/td-snapshot` (commit current piece to `snapshot/<slug>` branch + `Snapshot`-type GH issue with native `claude --resume <session-id>` line); `/td-incident` rewritten as `/td-snapshot` composition (drops the bespoke pointer-preservation that caused #11); `/td-mailbox` surfaces Snapshots as a separate bucket with `resume`/`delete` actions; Fix D contract rule (materialise topic to disk before designing). #11 closed.
+
+**Next topic: a small test framework.** User asked for it after the v5.2 ship. The current testing surface is manual: pre-ship checklist in WORKWAY.md § Local testing (syntax checks, install idempotency, command symlinks), plus the two test-harness repos (`mergodon/td-flow-test1` + `td-flow-test2`, private, kept). The biggest gap: `/td-snapshot` and the rewritten `/td-incident` shipped today but have NEVER been live-exercised — only dry-run in roleplay. Highest-value first step is either (a) automate the pre-ship checklist as `scripts/smoke.sh`, or (b) live-exercise `/td-snapshot` against `td-flow-test1` to validate it actually works. Discuss with user which to build first when picking it up.
+
+Session-ID env var (`$CLAUDE_CODE_SESSION_ID`) and transcript-path derivation (`~/.claude/projects/<pwd-as-dashes>/<session-id>.jsonl`) — both verified in this session, both used by `/td-snapshot`. The Snapshot Issue Type was created in mergodon org during this session (visible in `gh api graphql organization(login:"mergodon"){issueTypes{...}}`).
