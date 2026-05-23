@@ -1,10 +1,10 @@
 # State
 
 Project:  td-flow
-Topic:    idle
-Phase:    idle
+Topic:    test-framework
+Phase:    (b) shipped — moving to (a) scripts/smoke.sh
 Blocker:  none
-Last:     2026-05-24 — /td-clear after v5.2 ship; next topic is small test framework.
+Last:     2026-05-24 — (b) /td-snapshot UAT against td-flow-test1 passed, one Step-1 clarity bug found + fixed. Next: build scripts/smoke.sh.
 
 ## Resume note
 

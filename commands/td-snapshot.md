@@ -25,6 +25,8 @@ Optional argument: `/td-snapshot <reason>` — short phrase recorded in the comm
 
 **Transcript path** — derive: `~/.claude/projects/$(pwd | tr '/' '-')/${CLAUDE_CODE_SESSION_ID}.jsonl`. Hold as `<transcript-path>`. Sanity check that the file exists; if not, still include the path in the issue body but note "(transcript file not found at snapshot time — Claude Code session may not have flushed yet)".
 
+**Original STATE fields** — from `.td/STATE.md`, hold the current values of `Topic:`, `Phase:`, `Last:` lines as `<original-topic>`, `<original-phase>`, `<original-last>`. They're used in Step 6's issue body to freeze the STATE at the snapshot moment. Capture them **before** Step 7 rewrites STATE.
+
 **Reason** — the optional argument, or `user-requested` if none.
 
 # Step 2 — Cache Snapshot Issue Type ID
