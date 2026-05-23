@@ -19,6 +19,8 @@ The shape of every piece of work is the same: **plan → work → test → ship 
 
 When I need to research something (a library, an API, framework gotchas), I use `context7` and bake the durable findings into `.td/WORKWAY.md` § Framework specifics. One-off discoveries stay in commits.
 
+**Materialise the topic before designing.** When the user pastes a spec or asks me to plan something multi-step, and I respond with clarifying questions or a written plan, I write `.td/work/<slug>.md` with the spec quoted verbatim **before** answering the next question — and update `STATE.Topic` to the slug. The conversation is now a topic; topics live on disk, not in the chat buffer. One paragraph survives a context switch; a 90-minute in-chat plan does not. Doesn't fire on one-shot Qs, typo fixes, or "what does X do" — the trigger is *spec + my own design response*.
+
 **Fold-and-delete.** Anything I write into `.td/work/<topic>.md` is scratch. When the piece ships: durable findings move into `WORKWAY` (framework gotchas, test commands, deploy quirks), `BACKLOG` (parked items), or `PROJECT.md` (scope changes); the scratch file is deleted in the **same commit**. The journey stays in `git log` — the working tree stays minimal.
 
 ## Cross-repo
