@@ -13,7 +13,7 @@ The framework has no automated test suite (yet). The current contract is manual 
   - [ ] `bash -n install.sh` (syntax-check the installer)
   - [ ] `bash -n hooks/pre-commit` (syntax-check the hook)
   - [ ] `./install.sh` runs idempotently (re-running doesn't error or duplicate symlinks)
-  - [ ] All 8 slash commands appear in `~/.claude/commands/` (`td-init.md`, `td-clear.md`, `td-close.md`, `td-refresh.md`, `td-mailbox.md`, `td-health.md`, `td-incident.md`, `td-park.md`)
+  - [ ] All 9 slash commands appear in `~/.claude/commands/` (`td-init.md`, `td-clear.md`, `td-close.md`, `td-refresh.md`, `td-mailbox.md`, `td-health.md`, `td-incident.md`, `td-park.md`, `td-snapshot.md`)
   - [ ] Skill at `~/.claude/skills/td-flow` resolves
   - [ ] Templates at `~/.claude/td-templates` resolves to `templates/`
   - [ ] Contract at `~/.claude/td-flow-contract.md` resolves to the repo's `CLAUDE.md`

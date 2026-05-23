@@ -134,6 +134,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "show me the ideas" / "review the ideas" → list open `Idea` issues in this repo (`gh api graphql` by Issue Type) for triage. Promoting an Idea to `Task` is a one-shot `updateIssue` re-type (the `issueTypeId` field) — same as `/td-mailbox`'s `promote`. When work actually starts on an Idea, promote it first: committing to an Idea makes it real work, not exploration.
 - "what did we file?" / "show our outbox" / "any updates from the issues we filed?" → `/td-mailbox` (the outbound section). For a specific repo question like "did <repo> respond?", optional shortcut: inline GraphQL query on the relevant parent issue's `subIssues`, no full walk.
 - "all repos?" / "global inbox" / "everything open" / "what's open across the board?" → `gh search issues --owner <owner> --involves @me --state open` (cross-repo, only on explicit ask; flag form, not quoted-string).
+- "snapshot this" / "save and switch" / "step away mid-flight" / "pause this, work on X" → invoke `/td-snapshot` (commits in-flight to `snapshot/<slug>` branch, files `Snapshot`-type GH issue with the resume command, resets STATE to idle). Resume later by `git checkout snapshot/<slug>` plus the `claude --resume <session-id>` line from the issue body.
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
 - "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
 - "wrap the project" / "we're done with this" / project actually finished → `/td-close`
@@ -184,15 +185,16 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 
 ## The slash commands
 
-Eight commands, each with a distinct trigger. Full procedure lives in `commands/<name>.md` — the one-liners below are the trigger map.
+Nine commands, each with a distinct trigger. Full procedure lives in `commands/<name>.md` — the one-liners below are the trigger map.
 
 - `/td-init` — bootstrap or migrate a project (one-time per project).
 - `/td-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
 - `/td-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
 - `/td-refresh` — pull the latest framework and re-run the installer; one-time, migrate a project off the old copied-contract model onto the `@import`.
-- `/td-mailbox` — unified cross-repo work walk (inbound + outbound, one batched digest).
+- `/td-mailbox` — unified cross-repo work walk (inbound + outbound + snapshots, one batched digest).
 - `/td-health` — proactive production health check. Runs `.td/health.sh`, reports OK/WARN/FAIL.
-- `/td-incident` — live production fire mode. Drops everything else.
+- `/td-incident` — live production fire mode. Snapshots any in-flight piece first, then drops everything else.
 - `/td-park` — mid-session `BACKLOG.md` → GitHub Issues flush.
+- `/td-snapshot` — save the current in-flight piece to a `snapshot/<slug>` branch + `Snapshot`-type GH issue. Resumable via the `claude --resume` line in the issue body. Composed by `/td-incident`; standalone for mid-session pivots.
 
 Everything else — including shipping individual pieces — is conversational.

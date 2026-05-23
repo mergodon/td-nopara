@@ -1,11 +1,11 @@
 ---
 name: td-flow
-description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-init, /td-clear, /td-close, /td-refresh, /td-mailbox, /td-health, /td-incident, /td-park, or asks how this project works. After /td-init, the user just talks — Claude orchestrates.
+description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-init, /td-clear, /td-close, /td-refresh, /td-mailbox, /td-health, /td-incident, /td-park, /td-snapshot, or asks how this project works. After /td-init, the user just talks — Claude orchestrates.
 ---
 
 # td-flow
 
-Same shape every project. Conversational interface. Four standard docs. Eight slash commands.
+Same shape every project. Conversational interface. Four standard docs. Nine slash commands.
 
 The contract — the "Who does what" matrix, the routing map ("where things go"), nudges, drift signals, commit conventions — is the canonical td-flow contract, pulled into every project's root `CLAUDE.md` via a one-line `@import` from the shared install. This skill exists to surface the rhythm when context is heavy or the contract isn't loaded yet. **Read `CLAUDE.md` (it imports the contract) for anything specific.**
 
@@ -54,8 +54,9 @@ CLAUDE.md                ← one-line @import of the shared td-flow contract
 /td-refresh                 # pull the latest framework + re-run the installer (migrates legacy CLAUDE.md to the @import).
 /td-mailbox                 # unified cross-repo walk: inbound + outbound in one pass.
 /td-health                  # proactive production health check — run .td/health.sh, report.
-/td-incident                # live production fire mode — focus, diagnose, fix or park.
+/td-incident                # live production fire mode — snapshots in-flight first, then focus, diagnose, fix or park.
 /td-park                    # flush BACKLOG.md to GH Issues (with type + dedupe) mid-session.
+/td-snapshot                # save the current in-flight piece to a snapshot/<slug> branch + GH Snapshot issue. Resumable via the `claude --resume` line in the issue body. Composed by /td-incident; standalone for mid-session pivots.
 ```
 
 Shipping individual pieces is conversational: tests pass → commit → push to `origin/main`. No slash command.

@@ -22,6 +22,7 @@ Symlinks created:
 - `~/.claude/commands/td-health.md`
 - `~/.claude/commands/td-incident.md`
 - `~/.claude/commands/td-park.md`
+- `~/.claude/commands/td-snapshot.md`
 - `~/.claude/skills/td-flow`
 - `~/.claude/td-templates`
 - `~/.claude/td-flow-contract.md` — the canonical contract, `@import`-ed by every project
@@ -38,8 +39,9 @@ To update on any machine: `git pull && ./install.sh`.
 | `/td-refresh` | When the framework has moved on | Pulls the latest framework + re-runs the installer. One-time: migrates a legacy project's `CLAUDE.md` onto the `@import`. |
 | `/td-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
 | `/td-health` | Proactive production check | Run the project's `.td/health.sh` routine. Reports `OK`/`WARN`/`FAIL`; parks warnings to `BACKLOG.md`, escalates failures to `/td-incident`. First run scaffolds the routine (or marks the project non-production). |
-| `/td-incident` | Live production fire | Drop everything else. Focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
+| `/td-incident` | Live production fire | Drop everything else. Snapshots any in-flight piece first (so nothing is lost), then focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
 | `/td-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues — consolidate related lines into a proposed issue set, then batch-create with type + dedupe. The canonical BACKLOG-flush procedure; `/td-close` runs it too. |
+| `/td-snapshot` | Save the in-flight piece, switch focus | Commits current state to `snapshot/<slug>`, files a `Snapshot`-type GitHub issue with the resume command (`git checkout` + `claude --resume <session-id>`), resets STATE to idle. Resume by checking out the branch + running the resume line. Used standalone for mid-session pivots, or composed by `/td-incident`. |
 
 Shipping individual pieces is conversational: tests pass → commit → push. No slash command for that.
 
@@ -55,6 +57,8 @@ Most work is conversational. Here's what gets routed where:
 "remember to debounce later"          → appends .td/BACKLOG.md
 "park this to GH as Bug"              → creates GH issue directly with Type
 "flush the backlog to GH"             → invokes /td-park
+"snapshot this" / "save and switch"   → invokes /td-snapshot (branch + GH Snapshot issue)
+"resume snapshot/X"                   → git checkout + claude --resume from the issue
 "let's plan a big redesign"           → starts a planning work file (later → Epic)
 "add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
 "file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
@@ -136,7 +140,11 @@ Me:  picks up #42, sets STATE.Topic, starts the rhythm.
 
 ```
 You: /td-incident
-Me:  "What's broken? One-line description."
+Me:  STATE.Topic != idle — invokes /td-snapshot first to preserve current piece.
+     Commits in-flight work to snapshot/user-dashboard, files Snapshot issue #88
+     with the `claude --resume <session-id>` line in the body, switches back to
+     main with STATE idle, pushes.
+     "Snapshotted user-dashboard → #88. What's broken? One-line description."
 You: "checkout flow returns 500 for ~10% of users"
 Me:  sets STATE.Topic = "incident: checkout-500", opens work file, surfaces
      DEBUG.md if present, walks diagnosis (read-only-by-default on prod).
@@ -146,7 +154,8 @@ Me:  tests pass, commits as fix(checkout): add missing index on user_id, pushes.
      "Anything worth saving to DEBUG.md?"
 You: "yes — the Sentry-filter-by-release trick"
 Me:  appends to DEBUG.md (creates from template if missing), commits.
-     STATE back to previous topic.
+     STATE back to idle. "Previous piece resumable from snapshot/user-dashboard
+     (#88) — the resume line is in the issue body."
 ```
 
 **Routine health check**
@@ -195,7 +204,7 @@ Full project wrap:   /td-close   → park leftovers to GH, code sanity, doc audi
 
 ## Issue Types and Epics
 
-GitHub Issues are the source of truth for parked work. At the org level, four Issue Types organize the queue:
+GitHub Issues are the source of truth for parked work. At the org level, five Issue Types organize the queue:
 
 | Type | When |
 |---|---|
@@ -203,6 +212,7 @@ GitHub Issues are the source of truth for parked work. At the org level, four Is
 | `Task` | specific piece of work — most things end up here, including new features |
 | `Bug` | unexpected problem or broken behavior |
 | `Epic` | bigger work that decomposes into sub-issues |
+| `Snapshot` | personal lifecycle marker for paused in-flight work (filed by `/td-snapshot`) — not a work request, surfaces in `/td-mailbox`'s Snapshots bucket |
 
 An `Idea` you decide to act on becomes a `Task` — via `/td-mailbox`'s `promote`, or automatically when you start work on it. Ask "show me the ideas" any time to triage the `Idea` queue.
 
