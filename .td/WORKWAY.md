@@ -4,20 +4,18 @@ How the td-flow framework itself gets tested, verified, and shipped. This repo i
 
 ## Local testing
 
-The framework has no automated test suite (yet). The current contract is manual smoke checks.
+The framework has no application-code test suite (and never will — there's no application code). The pre-ship checks are mechanical sanity checks automated by `scripts/smoke.sh`, which the pre-commit hook runs on every commit.
 
-- Test command:    none
+- Test command:    scripts/smoke.sh
 - Dev server:      none
 - Local URL:       none
-- Pre-ship checklist:
-  - [ ] `bash -n install.sh` (syntax-check the installer)
-  - [ ] `bash -n hooks/pre-commit` (syntax-check the hook)
-  - [ ] `./install.sh` runs idempotently (re-running doesn't error or duplicate symlinks)
-  - [ ] All 9 slash commands appear in `~/.claude/commands/` (`td-init.md`, `td-clear.md`, `td-close.md`, `td-refresh.md`, `td-mailbox.md`, `td-health.md`, `td-incident.md`, `td-park.md`, `td-snapshot.md`)
-  - [ ] Skill at `~/.claude/skills/td-flow` resolves
-  - [ ] Templates at `~/.claude/td-templates` resolves to `templates/`
-  - [ ] Contract at `~/.claude/td-flow-contract.md` resolves to the repo's `CLAUDE.md`
-  - [ ] AWK extractor in `hooks/pre-commit` returns the expected value when run against a filled WORKWAY.md template
+- Pre-ship checks (automated by `scripts/smoke.sh`, OK/WARN/FAIL output, exit 0/1/2):
+  - [x] `bash -n install.sh` + `bash -n hooks/pre-commit` (syntax)
+  - [x] `./install.sh` runs idempotently (two consecutive runs both exit 0)
+  - [x] All 9 slash commands resolve in `~/.claude/commands/` (`td-init`, `td-clear`, `td-close`, `td-refresh`, `td-mailbox`, `td-health`, `td-incident`, `td-park`, `td-snapshot`)
+  - [x] Skill at `~/.claude/skills/td-flow`, templates at `~/.claude/td-templates`, contract at `~/.claude/td-flow-contract.md` all resolve
+  - [x] AWK extractor in `hooks/pre-commit` returns a non-empty value from `.td/WORKWAY.md § Local testing`
+  - WARN: any unexpected td-flow command symlinked in `~/.claude/commands/` (drift signal — retired command not pruned)
 
 ### When local testing isn't possible
 

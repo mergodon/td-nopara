@@ -306,5 +306,5 @@ FEEDBACK.md           feedback about td-flow itself, captured from any project
 
 - Research / context7 as a formal rhythm phase — decided against; ad-hoc context7 use is already the norm.
 - Subagents for implementation fan-out — decided against; coordination cost outweighs the speedup for a solo dev.
-- An automated test suite for the framework itself — we validate by dogfooding on real projects.
+- An application-code test suite for the framework itself — there's no application code to test. Mechanical sanity checks (bash syntax, install idempotency, symlink integrity, AWK extractor) are automated in `scripts/smoke.sh` and run by the pre-commit hook; semantic UAT (does `/td-snapshot` actually work?) is still by hand, against `mergodon/td-flow-test1`.
 - Anything that turns this into a CLI or npm package. Never.
