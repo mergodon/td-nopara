@@ -114,6 +114,8 @@ Bucket each direction, then print everything as ONE numbered list.
 4. **Idea**
 5. **(untyped)**
 
+**Exclude `Snapshot`-type issues from this bucket** — they're personal lifecycle markers (in-flight pieces you paused), not work requests to act on. They get their own dedicated section below the inbound list, with their own actions (resume/delete) and are **not numbered in the main decision list**.
+
 **Outbound** — bucket the cross-repo matches by intent state. Determine "us" vs "them" by parsed sign-off in comment text (a comment ending with `— <project-name>` is ours).
 - **Awaiting reply** — `state: OPEN`, last comment from someone OTHER than us (or no comments yet).
 - **Pending action** — `state: OPEN`, last comment is from us (they need to act).
@@ -141,10 +143,10 @@ Outbound:
 - **Recently closed, last comment theirs** → "verify the resolution matched your ask?"
 - **Recently closed, you commented after close** → "already verified — skip."
 
-Number items continuously across both directions (so "close 3" is unambiguous). Print:
+Number items continuously across inbound + outbound (so "close 3" is unambiguous). Snapshots use their issue number directly, not a list position. Print:
 
 ```
-Mailbox: <N> inbound + <M> outbound
+Mailbox: <I> inbound + <M> outbound + <S> snapshots
 <if <active-issue> set: "  ● Active: #<N> <title> (STATE.Topic)">
 
 📥 Inbound (this repo) — by Issue Type
@@ -157,17 +159,25 @@ Mailbox: <N> inbound + <M> outbound
          → <recommendation>
   4. …
 
+🔖 Snapshots (your paused in-flight pieces — not work requests)
+  • #<N>  [Snapshot] <slug>   branch: snapshot/<slug>   paused <age>
+         resume: cd <repo-path> && git checkout snapshot/<slug> && claude --resume <session-id>
+         <if >30d untouched: "→ stale — delete?">
+  • …
+
 Reply with decisions in one line — e.g. "close 1 3, comment 2, promote 4,
-ping 5, verify 6, skip rest". `show N` expands any item's full body + comments.
+ping 5, verify 6, resume 18, delete 22, skip rest". Snapshots take
+`resume <N>` / `delete <N>` / leave (default). `show N` expands any item.
 ```
 
 `<source-project>` comes from the `**From:** <name>` marker at the top of the inbound body; if absent, label `(unmarked)`.
 
-If both directions are empty:
+If both directions and snapshots are empty:
 ```
 Mailbox empty. ✓
-  Inbound:  no open issues in this repo
-  Outbound: no cross-repo filings found (scope: <list connected repos>)
+  Inbound:   no open issues in this repo
+  Outbound:  no cross-repo filings found (scope: <list connected repos>)
+  Snapshots: no paused in-flight pieces
 ```
 And exit.
 
@@ -176,6 +186,7 @@ And exit.
 Wait for the user's single reply. They reference item numbers and an action each. Valid actions:
 - **Inbound:** `start` / `comment` / `close` / `promote` / `skip`
 - **Outbound:** `comment` / `ping` / `verify` / `close` / `reopen` / `acknowledge` / `skip`
+- **Snapshots:** `resume <N>` / `delete <N>` / leave (default — no-op if not named)
 - **`show N`** — expand item N before deciding (Step 7), then the digest stands again.
 - **freeform** — e.g. "create a new issue for X", or a per-item instruction. Handle conversationally — for a new cross-repo filing, follow `CLAUDE.md`'s cross-repo routing rule (declare the target in `PROJECT.md § Cross-repo` if new, body opens `**From:** <project-name>`) — then return to the digest.
 
@@ -223,6 +234,8 @@ Post all? (yes / edit N / drop N)
 - **Outbound `verify`** — add a closing-verification comment (`Confirmed — works as expected. — <project-name>`), or skip the comment if the user only wanted a visual check. No state change unless asked.
 - **Outbound `close`** (withdrawing our own stale ask) — `gh issue close <N> --repo <slug> --reason "not planned" --comment "<withdrawal text>"`. The `not planned` reason tells GitHub (and any parent Epic's progress bar) this wasn't an abandoned-because-done close. Never close without a comment — zero context for the receiver is rude.
 - **Outbound `reopen`** — destructive (reopens someone else's issue, or reactivates a stale one we closed): confirm a second time, then `gh issue reopen <N> --repo <slug>` plus a comment explaining why.
+- **Snapshot `resume <N>`** — parse the snapshot's slug from the issue title (`[Snapshot] <slug>`). Run `git checkout snapshot/<slug>`. Print the full resume line from the issue body (`cd <repo-path> && git checkout snapshot/<slug> && claude --resume <session-id>`) so the user can spawn the original conversation back in a new terminal. Don't try to switch the current Claude session — `--resume` is for a fresh `claude` invocation, not the live one.
+- **Snapshot `delete <N>`** — close the issue as "not planned" with a one-line comment (`Snapshot abandoned — branch deleted. — <project-name>`), then delete the branch local + remote: `git branch -D snapshot/<slug>` and `git push origin :snapshot/<slug>`. Confirm once before the branch delete (destructive). If the branch is already gone locally, skip the local delete and proceed to remote.
 - **`acknowledge` / `skip`** — no-op.
 
 **3. Handle `start` last** (at most one per batch — a Topic is singular). If the user said `start` on an **Epic**, don't activate it — an Epic isn't a single piece of work; offer to `start` one of its open child issues instead. If `start` targets an **Idea**, promote it to `Task` first (per the `promote` handler above) — starting work commits to it, so it's no longer exploration — then activate the now-`Task`. To activate an issue:
@@ -242,9 +255,11 @@ Post all? (yes / edit N / drop N)
 
 ```
 Mailbox walked: <T> reviewed total.
-  Inbound:  <St> started, <C> closed, <Co> commented on, <S> skipped.
-  Outbound: <Co> commented/pinged, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
+  Inbound:   <St> started, <C> closed, <Co> commented on, <S> skipped.
+  Outbound:  <Co> commented/pinged, <V> verified, <Cs> closed-as-stale, <R> reopened, <S> skipped.
+  Snapshots: <Re> resumed, <De> deleted, <Le> left.
 <if a `start` happened: "  ● STATE.Topic now <slug> (#<N>)">
+<if a `resume` happened: "  ● Now on snapshot/<slug> — paste the `claude --resume` line in a new terminal to spawn the original session.">
 ```
 
 # Rules
@@ -260,3 +275,5 @@ Mailbox walked: <T> reviewed total.
 - **GraphQL preview header** `GraphQL-Features: sub_issues` required for `subIssuesSummary` + `subIssues`. Inline on each query that uses them.
 - **If GraphQL errors** (rate limit, auth, schema drift): surface the error and stop. Fall back to `gh issue list --json` for a degraded-mode inbound listing if the user insists.
 - **Cross-org outbound is unsupported** by sub-issue linkage, but the From-marker search still finds it. So a cross-org CR filed with the marker WILL show in outbound if its repo is declared in PROJECT.md § Cross-repo. (Sub-issue parent linkage just won't work for that one.)
+- **Snapshots are a third bucket, never numbered with inbound/outbound.** They're personal lifecycle markers (paused in-flight pieces from `/td-snapshot`), not work to act on. Default behavior is leave-alone — only `resume <N>` or `delete <N>` change anything. The 30-day stale nudge is informational; the user decides.
+- **Snapshot `delete` is destructive.** Branches are real work even when paused. Confirm once before the local + remote branch delete. If the snapshot's work shipped via a normal merge to main (with `Closes #<N>`), the issue auto-closed and won't appear here — no manual cleanup needed.

@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    preserve-in-flight-design
 Phase:    working
 Blocker:  none
-Last:     2026-05-24 — /td-snapshot shipped (16cfe82); /td-incident rewritten as composition.
+Last:     2026-05-24 — /td-incident rewritten (e80f669); /td-mailbox surfaces Snapshot bucket.
 
 ## Resume note
 
