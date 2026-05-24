@@ -48,17 +48,32 @@ Read this project's `./CLAUDE.md`.
 
 This runs once per project. After it, the project's `CLAUDE.md` never needs reconciling again — it imports the canonical, which `git pull` keeps current.
 
+# Step 1.5 — Prune deprecated nudge patterns from `./CLAUDE.md`
+
+Runs every refresh, not just on migration. Some rules that lived in earlier contract versions have been retired because the user pushed back on them. Migrated projects (or project-specific tails below the `@import` line) can still carry the old phrasing. Prune it.
+
+Known-deprecated patterns (extend this list when new ones surface):
+
+- `anything else on your mind` — unscoped pre-work nudge, retired.
+- `ride along` — sibling phrasing of the same nudge.
+
+Procedure:
+
+1. `grep -in -E "anything else on your mind|ride along" ./CLAUDE.md` — if zero hits, skip the rest.
+2. For each hit, locate the bounding chunk (the bullet, line, or short paragraph that contains it). If the chunk is cleanly delimited (a single bullet or sentence), remove it. If the phrase sits inside a longer paragraph where removal would mangle surrounding meaning, surface the line to the user with the exact text and ask once before editing.
+3. If any change was made, commit: `git add CLAUDE.md` then `git commit --no-verify -m "chore: prune deprecated nudge language from CLAUDE.md"`. Same `--no-verify` rationale as Step 1 — doc-only rewrite. Don't push.
+
 # Step 2 — Tell the user
 
 Two lines:
 
-`Framework synced (<pulled N commits / already current>). CLAUDE.md <migrated to the @import / already on the import model>.`
+`Framework synced (<pulled N commits / already current>). CLAUDE.md <migrated to the @import / already on the import model / pruned N deprecated nudge line(s) / no changes>.`
 
 `Slash commands available: ` then list the basename of every `*.md` in `~/.claude/commands/` that resolves into `<TD_REPO>/commands/`. Useful when refreshing from a long-stale state — surfaces commands the user may not have seen before (e.g. `/td-snapshot` was added in v5.2).
 
 # Rules
 
-- `/td-refresh` syncs the framework and migrates a legacy `CLAUDE.md` — nothing else. It never touches `.td/` docs, `BACKLOG.md`, or the cross-repo registry.
+- `/td-refresh` syncs the framework, migrates a legacy `CLAUDE.md`, and prunes deprecated nudge patterns — nothing else. It never touches `.td/` docs, `BACKLOG.md`, or the cross-repo registry.
 - Step 0 may `git pull` the td-flow repo, but only as a clean-tree fast-forward; it never merges or forces.
-- The only commit `/td-refresh` makes is Step 1's one-time migration commit; it commits `--no-verify` so the pre-commit hook's `Test command` doesn't gate a doc-only rewrite.
+- The only commits `/td-refresh` makes are Step 1's one-time migration commit and Step 1.5's prune commit (only if a match was found and cleanly removed); both `--no-verify` so the pre-commit hook's `Test command` doesn't gate doc-only rewrites.
 - Never push.

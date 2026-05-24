@@ -1,10 +1,10 @@
 # State
 
 Project:  td-flow
-Topic:    idle
-Phase:    closed (2026-05-24)
+Topic:    branch-awareness
+Phase:    planning
 Blocker:  none
-Last:     2026-05-24 — v5.x arc closed. v5.3 + doc sweep shipped.
+Last:     2026-05-24 — shipped /td-refresh Step 1.5 (prune deprecated nudge phrases from project CLAUDE.md). branch-awareness plan still in .td/work/ awaiting user review.
 
 ## Resume note
 
