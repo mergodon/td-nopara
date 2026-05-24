@@ -56,10 +56,11 @@ Known-deprecated patterns (extend this list when new ones surface):
 
 - `anything else on your mind` — unscoped pre-work nudge, retired.
 - `ride along` — sibling phrasing of the same nudge.
+- `We're scattered` — mid-flow "want to wrap and start fresh?" interrupting question, retired.
 
 Procedure:
 
-1. `grep -in -E "anything else on your mind|ride along" ./CLAUDE.md` — if zero hits, skip the rest.
+1. `grep -in -E "anything else on your mind|ride along|We're scattered" ./CLAUDE.md` — if zero hits, skip the rest.
 2. For each hit, locate the bounding chunk (the bullet, line, or short paragraph that contains it). If the chunk is cleanly delimited (a single bullet or sentence), remove it. If the phrase sits inside a longer paragraph where removal would mangle surrounding meaning, surface the line to the user with the exact text and ask once before editing.
 3. If any change was made, commit: `git add CLAUDE.md` then `git commit --no-verify -m "chore: prune deprecated nudge language from CLAUDE.md"`. Same `--no-verify` rationale as Step 1 — doc-only rewrite. Don't push.
 

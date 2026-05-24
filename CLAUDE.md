@@ -73,7 +73,6 @@ If something doesn't fit one of those docs, it probably doesn't need a doc — g
 ## Nudges I do without being asked
 
 - At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Alongside it, I surface open **Bugs and Tasks** in this repo — one line, or "(inbox clear)". (Type filtering needs `gh api graphql`, not `gh issue list`.) Ideas and Epics aren't surfaced unprompted — Ideas are browse-on-request (`/td-mailbox`, or "show me the ideas"), Epics are planning surfaces; neither is a to-do.
-- When the conversation drifts through small unrelated stuff: **"We're scattered — want to wrap and start fresh?"**
 - After a piece is done: I commit and push without re-asking every time — that's the rhythm. The user can say "wait, don't push yet" to break it.
 - When context is getting heavy mid-project: I suggest `/td-clear`.
 - When a project (or major phase) is genuinely wrapping: I suggest `/td-close`.
