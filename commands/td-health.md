@@ -75,5 +75,5 @@ Close every run (except the non-production Step 2 exit) with a one-line plain ve
 - **Read-only on production, always.** `/td-health` observes. It never restarts, purges, deploys, migrates, or edits production. Fixing is `/td-incident`'s job.
 - **The script is the contract.** `/td-health` hardcodes no checks — every project's `.td/health.sh` owns its own battery. The only fixed contract is the protocol: exit `0`/`1`/`2`, `OK`/`WARN`/`FAIL` lines. A project's checks evolve by editing its script, never this command.
 - **Not a STATE-moving command.** A health run is not a "piece" — it does not touch `STATE.Topic`/`Phase`/`Last`. (If it escalates into `/td-incident`, that command moves STATE itself.)
-- **Confirm before** writing the scaffolded script, editing `PROJECT.md`, committing, parking to BACKLOG, or escalating.
+- **Confirm at the real branch points only:** Step 3's drafted script + PROJECT.md edit (single accept), Step 5's "park WARNs to BACKLOG?", Step 5's "escalate to /td-incident?". Don't add extra gates around the commits — they follow the normal rhythm.
 - **Path drift:** if the routine is found at `.td/ops/health.sh`, run it, and mention once that the canonical path is `.td/health.sh` — don't move it unprompted.

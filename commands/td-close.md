@@ -4,7 +4,7 @@ description: Wrap the project (or a major phase). Park all leftover BACKLOG + wo
 
 You are closing the project (or a major phase). The work is done — shipped, live if it has a live, tested. This is the deeper cleanup that `/td-clear` skips: park leftover thinking to GitHub, walk every doc, validate it against current code and `git log`, prune anything redundant, restructure if drift has crept in. End with a clean, minimal `.td/` that an outsider could read in 2 minutes and understand the project.
 
-If state shows clearly mid-flight (active `Topic`, `work/<topic>.md` files, unfinished plan in Resume note), still run — projects-per-hour is normal here. But surface in Step 2: "This looks mid-flight — are you wrapping the whole thing, or did you mean `/td-clear`?" and wait for the answer.
+If state shows clearly mid-flight (active `Topic`, `work/<topic>.md` files, unfinished plan in Resume note), still run — projects-per-hour is normal here. The user invoked `/td-close`; take them at their word and proceed.
 
 # Step 1 — Update memory
 
@@ -21,7 +21,6 @@ Update existing memory files rather than creating duplicates. If nothing new was
 - Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
 - `git status --short` — uncommitted? If yes: stop, ask "Commit, stash, or discard?" Wait.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
-- If STATE shows mid-flight: ask the user "wrapping the whole project, or did you mean `/td-clear`?" Wait.
 - **Unresolved-issue gate.** Fetch open issues in this repo (same query as `/td-mailbox` Step 2). Filter to `Bug` + `Task` only — Epics are planning surfaces (track via their Task/Bug children, not the parent itself); Ideas are long-tail by design and don't gate a close. Also fetch awaiting-reply outbound (informational only, no gate — same shape as `/td-mailbox` Step 4).
 
   If any open Bug or Task exists, surface and ask:
@@ -71,10 +70,17 @@ Skim the working tree and recent commits for:
 
 - Accidentally committed secrets (`.env` values, tokens, keys). If found: stop and confirm with the user.
 - Obvious leftovers: commented-out blocks, dead `if false`, debug prints, `console.log`, `dd()`.
-- TODO/FIXME comments in code. Surface them as one line each — user decides:
-  - **fix now** — the rhythm resumes briefly to fix
-  - **create GH issue** as `Idea` or `Task` (direct creation via `gh api graphql`, since BACKLOG is now empty)
-  - **leave** — TODO stays in code, untracked
+- TODO/FIXME comments in code. Gather all hits, then present as **one digest** with a suggested action per line (`fix now` / `Idea` / `Task` / `leave`); take decisions in a single reply, then execute the batch. Don't walk one at a time.
+
+  ```
+  TODO/FIXME — <N> hit(s)
+    1. src/foo.ts:42  // TODO: handle retry            → Task
+    2. src/bar.ts:17  // FIXME: edge case for empty    → fix now
+    3. README.md:88   <!-- TODO: link to API docs -->  → leave
+  Reply with overrides (e.g. "1 leave, 3 Idea"), or "go" to take as proposed.
+  ```
+
+  On `go` or after overrides: fix-nows resume the rhythm briefly; Ideas/Tasks created via `gh api graphql` (BACKLOG is empty by this step); leaves stay in code.
 
 Don't refactor. Don't optimize. Surface, don't act.
 

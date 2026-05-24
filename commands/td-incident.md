@@ -19,11 +19,11 @@ Read `.td/STATE.md`. Parse `Topic:` line.
 
 This single step replaces the old `/td-incident`'s bespoke "preserve previous topic as a pointer in Resume note" mechanic — the mechanic that caused the #11 failure mode by preserving pointers instead of the actual content.
 
-# Step 2 — Ask what's broken
+# Step 2 — Capture what's broken
 
-Ask the user: **"What's broken? One-line description."**
+If `/td-incident` was invoked with an argument (e.g. `/td-incident login is 500ing`), use the argument as the one-liner. Otherwise — and only otherwise — ask: **"What's broken? One-line description."** and wait.
 
-Wait for the answer. Keep it tight — capturing the headline, not the diagnostic. Detailed context comes in Step 5.
+Keep it tight — the headline, not the diagnostic. Detailed context comes in Step 5.
 
 # Step 3 — Set STATE to incident mode
 
@@ -99,7 +99,7 @@ The incident ends in one of three ways:
 
 **(a) Fixed in this session.**
 
-1. Apply the fix (confirm with user before code edits).
+1. Apply the fix.
 2. Run pre-ship checks per project's `WORKWAY.md § Local testing`. If there's a live URL, smoke after deploy.
 3. **Single capture prompt:** ask **"Anything from this fire worth keeping? (`debug: <text>` / `backlog: <text>` / `no`)"**. Route by prefix — the user just fought a fire, one decision point is enough. Multiple prefixes per response are OK (one per line). What each routes to:
    - `debug:` → append to `.td/DEBUG.md` under the right section (symptom → diagnostic / gotchas / production commands per content). Create from template if missing.
@@ -141,8 +141,8 @@ One sentence per resolution path:
 - **Snapshot before pivot is non-negotiable.** If STATE.Topic isn't idle, Step 1 always runs. No "preserve as a pointer" — we commit it to a branch + file a tracker. The #11 failure mode lived in pointer-preservation; this command no longer does that.
 - **No scope creep.** Refactors, optimizations, "while we're here" cleanups — surface them in the work file's Context or as backlog items; do not act during incident mode.
 - **Read-only on production by default.** Mutations (restart, purge, rollback, migrate) require explicit user go-ahead per command.
-- **Always confirm before posting** to GH, committing, or pushing.
+- **Confirm before posting to GH** (cross-repo or in-repo issue creation). Commits and pushes follow the normal rhythm — don't add an extra gate during a fire.
 - **STATE updates land in the same commit as the fix** (existing `feat:`/`fix:` contract rule).
-- **Capture for DEBUG.md as you go**, not just at close-out. If a useful diagnostic command surfaces, ask "save this to DEBUG?" right then — small captures during the incident beat trying to reconstruct at the end. The Step 7 close-out prompt is the safety net, not the primary capture moment.
+- **DEBUG.md capture happens at close-out** (Step 7's single capture prompt). Don't interrupt the fire with mid-stream "save this?" asks.
 - **Incident mode is exclusive.** Don't switch the conversation back to a previous topic until resolution is complete. The user can break this with an explicit "pause the incident."
 - **Resume of the previous piece is the user's choice, not auto.** After the incident ships, STATE goes idle. The previous piece lives on its snapshot branch + GH Snapshot issue; the user resumes when they want (via `/td-mailbox` or direct `git checkout`).

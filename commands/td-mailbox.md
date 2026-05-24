@@ -240,16 +240,15 @@ Post all? (yes / edit N / drop N)
 
 **3. Handle `start` last** (at most one per batch — a Topic is singular). If the user said `start` on an **Epic**, don't activate it — an Epic isn't a single piece of work; offer to `start` one of its open child issues instead. If `start` targets an **Idea**, promote it to `Task` first (per the `promote` handler above) — starting work commits to it, so it's no longer exploration — then activate the now-`Task`. To activate an issue:
 
-1. Propose a kebab-case `<slug>` from the title (3–5 words, lowercase ASCII). Confirm with the user.
-2. Ask: "Multi-step (planning surface → `.td/work/<slug>.md`) or single-piece (just STATE Resume note)?" If the issue body is one clear edit, default to single-piece.
+1. Derive a kebab-case `<slug>` from the title (3–5 words, lowercase ASCII). Use it; the user can rename later if it doesn't fit.
+2. Infer multi-step vs single-piece from the issue body — multi-paragraph or checklist body → multi-step (create `.td/work/<slug>.md`); short one-edit body → single-piece (STATE Resume note only).
 3. Update `.td/STATE.md`:
    - `Topic: <slug>`
    - `Phase: planning` (multi-step) or `working` (single-piece)
    - `Last: YYYY-MM-DD — picked up #<N> from mailbox`
    - Append/replace Resume note line: `Active piece: #<N> <title> — Closes #<N> on ship.`
 4. If multi-step: create `.td/work/<slug>.md` with a short header (`# <title>`, link to `#<N>`, the issue body folded in as initial context).
-5. Tell the user: `STATE.Topic is now <slug>. First commit on this piece must include "Closes #<N>" so GitHub auto-closes the issue when it ships.`
-6. Ask: "Break out to work on #<N> now, or anything else in the mailbox?" — wait.
+5. Tell the user: `STATE.Topic is now <slug> (<multi-step|single-piece>). First commit on this piece must include "Closes #<N>" so GitHub auto-closes the issue when it ships.`
 
 # Step 9 — Single end-summary
 

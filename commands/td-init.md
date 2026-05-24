@@ -23,7 +23,7 @@ If any of these are present, we're migrating, not bootstrapping. Don't re-ask th
 
 **Brownfield ad-hoc convention detected** — any of `.claude/agreements/`, `BLOCKS.md` exist:
 - Read `.claude/agreements/*.md`. Most agreements are universal td-flow rails (cadence, push-after-commit, run-commands) — they're already in CLAUDE.md and don't need preservation. Project-specific ones (branding, uat-style) → append as items in `WORKWAY.md` § Notes.
-- Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, archive it (rename to `BLOCKS-archive.md` or leave as-is — ask the user).
+- Read `BLOCKS.md`. If active blocks remain (unchecked status), keep `BLOCKS.md` at root as the multi-block roadmap and reference it from `.td/PROJECT.md` "Active scope". If all blocks are complete, rename it to `BLOCKS-archive.md` (non-destructive, still in tree) and mention what you did in the Step 7 summary.
 - Read existing root `CLAUDE.md`. Extract: project description (`## What this is` / similar) → `.td/PROJECT.md`; stack section → `.td/PROJECT.md`; common commands → `WORKWAY.md` § Local testing or § Live as appropriate; everything else → `.td/PROJECT.md` (it's content, not contract).
 - Write root `CLAUDE.md` as the one-line `@import` template (copy `templates/CLAUDE.md`) — the contract is imported, not copied.
 - Read existing `.gitignore`, `package.json` etc. for stack signals (still run Step 1 detection for things not in existing docs).

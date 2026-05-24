@@ -36,7 +36,7 @@ If 2+ commits are ahead of `origin/main`, ask: "Squash these N local commits int
 Suggested message format:
 
 - Inside an active topic mid-piece: `feat(<topic>): <one-line> (checkpoint)`
-- Otherwise: ask the user for a one-line message.
+- Otherwise: generate a one-liner from the squashed diff (file scope + verb). Don't ask the user for it.
 
 If confirmed:
 
@@ -47,15 +47,7 @@ git commit -m "<message>"
 
 Never squash commits already on `origin/main`. Never force-push.
 
-# Step 5 — Park anything before clearing
-
-Ask the user: **"Anything to add to the backlog before we clear?"**
-
-Wait for the answer. If they name something, append it to `.td/BACKLOG.md` as `- YYYY-MM-DD — <item>`. If they say nothing or no, continue immediately.
-
-This is a single question — don't prompt for elaboration or turn it into a planning session.
-
-# Step 6 — Sync the docs to this session, then prune
+# Step 5 — Sync the docs to this session, then prune
 
 Before `/clear` wipes the conversation, make sure the `.td/` docs reflect what this session actually did — the next session loads them cold and treats them as true.
 
@@ -65,7 +57,7 @@ Before `/clear` wipes the conversation, make sure the `.td/` docs reflect what t
 - Stack changed this session — a dependency added, removed, or major-version bumped → `PROJECT.md § Stack`. (Quick check: `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u`.)
 - A durable framework gotcha, test-command change, deploy detail, or env quirk surfaced → `WORKWAY.md`.
 
-This is **session-scoped** — only what changed *this session*, which you have the context for. It is not the exhaustive whole-doc audit; that's `/td-close`. In-the-moment routing (`CLAUDE.md § Where things go`) stays primary — this is the backstop for things that drifted through the work without a clean action-shaped statement. Anything genuinely ambiguous → note it in the Resume note (Step 7) for `/td-close` or the next session; don't block the checkpoint on it.
+This is **session-scoped** — only what changed *this session*, which you have the context for. It is not the exhaustive whole-doc audit; that's `/td-close`. In-the-moment routing (`CLAUDE.md § Where things go`) stays primary — this is the backstop for things that drifted through the work without a clean action-shaped statement. Anything genuinely ambiguous → note it in the Resume note (Step 6) for `/td-close` or the next session; don't block the checkpoint on it.
 
 **Light prune.** Walk `.td/` for content git already covers:
 
@@ -83,13 +75,13 @@ Examples: `[mailbox] 📥 3 inbound (1 Bug, 2 Task), 📤 0 outbound` | `[mailbo
 
 Don't restructure, and don't re-audit doc content that didn't change this session — the exhaustive doc audit is `/td-close`.
 
-# Step 7 — Update STATE.md as a handoff
+# Step 6 — Update STATE.md as a handoff
 
 Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context will load this and assume it's true — so the filter is sharp: **keep what matters and isn't derivable; clear everything else.**
 
 - **Keep** in-flight specifics the next session can't reconstruct: current decision, current blocker, mid-thinking, the gotcha you just hit.
 - **Clear** speculation ("we might want to..."), anything `git log` already says, or claims you haven't actually verified.
-- **Mailbox snapshot** from Step 6 always renders at the very top of the Resume note (status read, not noise).
+- **Mailbox snapshot** from Step 5 always renders at the very top of the Resume note (status read, not noise).
 
 Top section is field-shaped; Resume note is free-form prose — as long as it needs to be:
 
@@ -110,19 +102,19 @@ in the middle of planning a multi-step thing, this is where the plan lives.>
 
 Resume note is the load-bearing part. During execution I'll skim it; for fresh-context orientation I'll read it fully. Don't artificially cap it.
 
-# Step 8 — Commit, then push
+# Step 7 — Commit, then push
 
-Steps 6–7 edited the `.td/` docs and rewrote `STATE.md` — those changes are uncommitted. Commit them, then push:
+Steps 5–6 edited the `.td/` docs and rewrote `STATE.md` — those changes are uncommitted. Commit them, then push:
 
 ```
-git add .td/ <any other docs touched in Step 6>
+git add .td/ <any other docs touched in Step 5>
 git commit -m "chore: clear <topic>"
 git push origin main
 ```
 
-`<topic>` is the current `STATE.Topic`. If Steps 6–7 happened to change nothing (rare — the STATE handoff is almost always a change), skip the commit. If push is rejected (network, auth, divergence), surface the error and stop.
+`<topic>` is the current `STATE.Topic`. If Steps 5–6 happened to change nothing (rare — the STATE handoff is almost always a change), skip the commit. If push is rejected (network, auth, divergence), surface the error and stop.
 
-# Step 9 — Tell the user
+# Step 8 — Tell the user
 
 One sentence: `Cleared. <N> commits pushed. STATE handoff written. Safe to /clear.`
 
