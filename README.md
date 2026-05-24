@@ -59,6 +59,15 @@ Most work is conversational. Here's what gets routed where:
 "flush the backlog to GH"             → invokes /td-park
 "snapshot this" / "save and switch"   → invokes /td-snapshot (branch + GH Snapshot issue)
 "resume snapshot/X"                   → git checkout + claude --resume from the issue
+
+# Picking between /td-park and /td-snapshot:
+#   /td-park     — flushes accumulated ideas (BACKLOG.md → GH Issues). Doesn't touch code,
+#                  doesn't touch STATE.Topic. Use when brainstorm ideas have piled up and you
+#                  want a clean BACKLOG without changing the active piece.
+#   /td-snapshot — preserves an in-flight piece (STATE.Topic != idle, uncommitted edits, work
+#                  file) to a snapshot/<slug> branch + Snapshot-type GH issue. Use when you're
+#                  mid-work and need to pivot (incident, other priority, stepping away).
+# Both can run in sequence: /td-snapshot first to preserve code, /td-park to flush ideas.
 "let's plan a big redesign"           → starts a planning work file (later → Epic)
 "add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
 "file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
@@ -273,9 +282,10 @@ Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `
 
 ```
 commands/             slash commands (td-init, td-clear, td-close, td-refresh,
-                                      td-mailbox, td-health, td-incident, td-park)
+                                      td-mailbox, td-health, td-incident,
+                                      td-park, td-snapshot)
 templates/            files copied into target projects on /td-init
-  CLAUDE.md           the universal contract
+  CLAUDE.md           one-line @import of the canonical contract
   td/PROJECT.md
   td/WORKWAY.md       the way-of-work doc with locked sections
   td/STATE.md
@@ -286,9 +296,11 @@ templates/            files copied into target projects on /td-init
   .gitignore
   .env.example
   <name>/             saved starter templates (e.g. cloudflare-static-assets)
+CLAUDE.md             the canonical td-flow contract (symlinked as ~/.claude/td-flow-contract.md)
 skill/SKILL.md        skill definition (symlinked into ~/.claude/skills/td-flow)
 hooks/pre-commit      test-on-commit hook installed by /td-init
-install.sh            symlinks commands, skill, templates into ~/.claude/
+scripts/smoke.sh      pre-ship sanity checks for this repo (wired as Test command)
+install.sh            symlinks commands, skill, templates, contract into ~/.claude/
 FEEDBACK.md           feedback about td-flow itself, captured from any project
 ```
 

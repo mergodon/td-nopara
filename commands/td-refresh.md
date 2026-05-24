@@ -50,9 +50,11 @@ This runs once per project. After it, the project's `CLAUDE.md` never needs reco
 
 # Step 2 — Tell the user
 
-One line:
+Two lines:
 
 `Framework synced (<pulled N commits / already current>). CLAUDE.md <migrated to the @import / already on the import model>.`
+
+`Slash commands available: ` then list the basename of every `*.md` in `~/.claude/commands/` that resolves into `<TD_REPO>/commands/`. Useful when refreshing from a long-stale state — surfaces commands the user may not have seen before (e.g. `/td-snapshot` was added in v5.2).
 
 # Rules
 

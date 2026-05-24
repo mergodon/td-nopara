@@ -136,11 +136,11 @@ If a remote is configured, ask: "Push to `origin/main` now?" If yes, push.
 
 Short summary:
 
-- Files created
+- Files created (highlight: root `CLAUDE.md` is a one-line `@import` of the canonical contract — every td-flow rule loads automatically from `~/.claude/td-flow-contract.md` next session, no per-project drift)
 - Frameworks detected and pre-noted in WORKWAY.md
-- Pre-commit hook installed
+- Pre-commit hook installed (reads `Test command` from `.td/WORKWAY.md § Local testing`)
 - Git: init/exists/pushed
-- How to use from here: just talk. Say what you want to build, fix, or change. I'll start the rhythm.
+- How to use from here: just talk. Say what you want to build, fix, or change. I'll start the rhythm. The 9 slash commands (`/td-init`, `/td-clear`, `/td-close`, `/td-refresh`, `/td-mailbox`, `/td-health`, `/td-incident`, `/td-park`, `/td-snapshot`) are listed in the contract — everything else is conversational.
 
 # Save-as-template path
 

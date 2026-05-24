@@ -2,7 +2,7 @@
 
 ## What this is
 
-The **td-flow** framework itself: a minimal, file-based, repo-portable working agreement for solo development. Same shape every project, conversational interface, structured docs in `.td/`, GitHub commits as memory. Eight slash commands (`/td-init`, `/td-clear`, `/td-close`, `/td-refresh`, `/td-mailbox`, `/td-health`, `/td-incident`, `/td-park`) — everything else is conversational.
+The **td-flow** framework itself: a minimal, file-based, repo-portable working agreement for solo development. Same shape every project, conversational interface, structured docs in `.td/`, GitHub commits as memory. Nine slash commands (`/td-init`, `/td-clear`, `/td-close`, `/td-refresh`, `/td-mailbox`, `/td-health`, `/td-incident`, `/td-park`, `/td-snapshot`) — everything else is conversational.
 
 ## Who it's for
 
@@ -20,7 +20,7 @@ Solo developers working with Claude Code. Originally built for one user's portfo
 
 ## Active scope
 
-(none — v5.0 shipped 2026-05-22 and hardened by v5.1 — see § Shipped. Awaiting real-project use: the first `/td-refresh` on each existing td-flow project migrates its `CLAUDE.md` onto the imported contract.)
+(none — v5.3 shipped 2026-05-24; framework is in a settled lean state. See § Shipped for the full v5.x arc. Ongoing: real-project use across the portfolio; the first `/td-refresh` on each pre-v5.0 project migrates its `CLAUDE.md` onto the imported contract.)
 
 ## Shipped
 
