@@ -29,8 +29,8 @@ fi
 # Check current install state BEFORE running install.sh (which self-heals).
 # install.sh idempotency runs last for that reason.
 
-# 2. All 9 slash commands resolve in ~/.claude/commands/
-EXPECTED_COMMANDS=(td-init td-clear td-close td-refresh td-mailbox td-health td-incident td-park td-snapshot)
+# 2. All 10 slash commands resolve in ~/.claude/commands/
+EXPECTED_COMMANDS=(td-init td-clear td-close td-complex-clear td-refresh td-mailbox td-health td-incident td-park td-snapshot)
 missing=0
 for c in "${EXPECTED_COMMANDS[@]}"; do
   link="$HOME/.claude/commands/$c.md"
@@ -39,7 +39,7 @@ for c in "${EXPECTED_COMMANDS[@]}"; do
     missing=$((missing+1))
   fi
 done
-[ "$missing" -eq 0 ] && ok "all 9 slash commands resolve in ~/.claude/commands/"
+[ "$missing" -eq 0 ] && ok "all 10 slash commands resolve in ~/.claude/commands/"
 
 # Bonus: warn if extra commands not on the expected list are present (likely retired but un-pruned)
 for link in "$HOME/.claude/commands/"*.md; do

@@ -58,11 +58,16 @@ Blocker:  <one-line if any, else "none">
 Last:     <YYYY-MM-DD HH:MM> — <one-line summary>
 ```
 
-### Resume note (free-form prose with REQUIRED sections)
+### Resume note (free-form prose: a lead block, then REQUIRED sections)
 
-Cover, in approximately this order, every applicable section. Skip a section only if it genuinely doesn't apply — but say so out loud ("§ X N/A this session").
+The resume note **opens with the "Resume — start here" block**, then the detailed sections. Cover every applicable section below in approximately the listed order; skip one only if it genuinely doesn't apply — but say so out loud ("§ X N/A this session").
 
-**Required sections — these are the contract:**
+**Lead block — REQUIRED, must be physically FIRST in the resume note (before § 1):**
+
+- **Resume — start here.** The single first-action pointer ("the very next thing to do on resume", one sentence), followed by the ordered first 2–4 steps the next session should take. If a `.td/work/<topic>.md` section (or any other doc) must be read on resume, **name it here explicitly** — don't assume the reader reaches a later section. A fresh reader scans the top fields, then this block, and must know exactly what to do, by whom, in what order, *without reading further*. Everything below is reference; this block is the entry point.
+- **Why it leads, not trails:** a first-action pointer placed at the bottom of a long handoff gets skipped — the reader forms the gist from the top sections and stops. Putting the next step where the eye lands first is the whole point of the structured handoff. Do not bury it.
+
+**Required sections — these are the contract (in approximately this order, after the lead block):**
 
 1. **Mailbox snapshot** (from Step 6) — at the top.
 2. **Heads-ups block** (from Step 6) — only if drift fired.
@@ -75,17 +80,17 @@ Cover, in approximately this order, every applicable section. Skip a section onl
    - `D` parked (BACKLOG) — what's not in scope for the immediate next session but worth listing as a one-liner referring to BACKLOG.md
    - `E` post-launch / longer-horizon — if applicable
 6. **Dependency graph / critical path** — even a text-ASCII sketch. Shows what blocks what; what can run in parallel. Should make the critical path to "ship" obvious.
-7. **First-action pointer** — single explicit "the very next thing to do on resume." One sentence.
-8. **Background / in-flight processes** — what's running on the machine right now (PIDs / commands / owners — `ps -ef | grep <relevant>`). Flag anything stateful that future-Claude shouldn't kill.
-9. **Volatile artifacts** — table of paths NOT git-tracked + what each holds + recovery cost if lost. Flag the highest-recovery-cost item explicitly + recommend protection step ("snapshot to ~/").
-10. **Credentials state** — anything rotated this session, anything still pending rotation, anything that LEAKED (chat / log / public). Be explicit.
-11. **Authoritative paths** — every relevant artifact location (plans, audits, staging, seeds, data dirs).
-12. **Cumulative spend + budget marker** (if money is being spent on LLM calls / external APIs) — current total + budget cap or "no cap stated."
-13. **Safe-without-asking vs needs-approval boundary** — explicit list of operations the next session can do autonomously vs ones that need the user's nod. Include "NEVER do" items (e.g. touch prod, force-push, skip pre-commit hook).
-14. **Conversation-only context** (from Step 5b) — decisions / clarifications / wrong-path findings whose *why* lived only in chat. Captured here so they survive `/clear`.
-15. **First actions on resume (suggested order)** — concrete steps 1, 2, 3 the next session should take. Reference (7) explicitly.
+7. **Background / in-flight processes** — what's running on the machine right now (PIDs / commands / owners — `ps -ef | grep <relevant>`). Flag anything stateful that future-Claude shouldn't kill.
+8. **Volatile artifacts** — table of paths NOT git-tracked + what each holds + recovery cost if lost. Flag the highest-recovery-cost item explicitly + recommend protection step ("snapshot to ~/").
+9. **Credentials state** — anything rotated this session, anything still pending rotation, anything that LEAKED (chat / log / public). Be explicit.
+10. **Authoritative paths** — every relevant artifact location (plans, audits, staging, seeds, data dirs).
+11. **Cumulative spend + budget marker** (if money is being spent on LLM calls / external APIs) — current total + budget cap or "no cap stated."
+12. **Safe-without-asking vs needs-approval boundary** — explicit list of operations the next session can do autonomously vs ones that need the user's nod. Include "NEVER do" items (e.g. touch prod, force-push, skip pre-commit hook).
+13. **Conversation-only context** (from Step 5b) — decisions / clarifications / wrong-path findings whose *why* lived only in chat. Captured here so they survive `/clear`.
 
-**Tone**: write so a fresh-context Claude can pick up cold. Complete sentences. No "see above" — sections may be read in any order.
+The first-action pointer and the ordered first steps both live in the **Resume — start here** lead block above — do not also scatter them into trailing sections.
+
+**Tone**: write so a fresh-context Claude can pick up cold. Complete sentences. No "see above" — each section is self-contained and may be read in any order. The one ordering rule: the **Resume — start here** lead block is physically first.
 
 **Length**: no cap. 300-500+ lines is fine for a 2-day complex session.
 
@@ -124,7 +129,7 @@ Self-validation: Q1 ✓ Q2 ✓ Q3 ✓ Q4 ✓. Safe to /clear.
 - Working tree must be clean before pushing.
 - Never force-push. Squashing is for local-only commits.
 - Don't run the full doc audit — that's `/td-close`. Stay focused on handoff.
-- **The structured sections in Step 7 are not optional.** A `/td-complex-clear` STATE that's missing the action list / dependency graph / volatile-artifacts table is not done. Iterate.
+- **The structured sections in Step 7 are not optional.** A `/td-complex-clear` STATE that's missing the **Resume — start here** lead block, the action list, the dependency graph, or the volatile-artifacts table is not done. Iterate.
 - **The self-validation in Step 7.5 must be surfaced to the user** in the final response. Don't quietly self-pass — make the gate visible.
 - If the session genuinely doesn't have material for a required section (e.g. no LLM spend, no volatile artifacts), say "§ X N/A this session" explicitly rather than skipping silently.
 - This skill is heavier than `/td-clear` by design — use it when the complexity warrants the rigor. Simple sessions stick with `/td-clear`.
