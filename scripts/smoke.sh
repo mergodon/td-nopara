@@ -87,7 +87,7 @@ extracted=$(awk '
     print
     exit
   }
-' .td/WORKWAY.md | xargs)
+' .td/WORKWAY.md | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
 if [ -n "$extracted" ]; then
   ok "AWK extractor returns Test command value: '$extracted'"
 else

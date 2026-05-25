@@ -17,7 +17,7 @@ CMD=$(awk '
     print
     exit
   }
-' .td/WORKWAY.md | xargs)
+' .td/WORKWAY.md | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
 
 if [ -z "$CMD" ] || [ "$CMD" = "none" ] || [ "$CMD" = "{{test_command}}" ]; then
   echo "td-flow: no runnable Test command in .td/WORKWAY.md § Local testing — skipping"
