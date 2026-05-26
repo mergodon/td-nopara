@@ -151,23 +151,81 @@ for cmd in commands/td-flow-*.md; do
 done
 [ "$fm_broken" -eq 0 ] && ok "all 10 commands have valid frontmatter with non-empty description"
 
-# 8. /td-flow-complex-clear structural anchors — load-bearing pieces that
-#    a future edit must preserve. (a) Step 7.5 self-validation gate, the
-#    enforce-then-iterate mechanism. (b) "Resume — start here" lead block
-#    requirement (added in b23a488 after garmin's maiden run skipped the
-#    bottom-buried first-action pointer on resume — fix made the pointer
-#    physically first in the resume note).
-CC=commands/td-flow-complex-clear.md
-cc_missing=0
-if ! grep -q '^# Step 7\.5 — Self-validation gate' "$CC"; then
-  fail "td-flow-complex-clear: Step 7.5 self-validation gate header missing"
-  cc_missing=$((cc_missing+1))
-fi
-if ! grep -q 'Resume — start here' "$CC"; then
-  fail "td-flow-complex-clear: 'Resume — start here' lead block requirement missing"
-  cc_missing=$((cc_missing+1))
-fi
-[ "$cc_missing" -eq 0 ] && ok "td-flow-complex-clear structural anchors present (Step 7.5 + Resume — start here)"
+# 8. Per-command load-bearing anchors. For each command, assert that
+#    load-bearing strings (step headers, commit conventions, protocol
+#    fragments, named procedure references) still exist in the file.
+#    Catches silent regressions when an edit / refactor / AI rewrite
+#    drops a piece the command's behavior depends on. Add a row when a
+#    new load-bearing piece lands (e.g. v7.0 added refresh's Step 1.7).
+#    Pattern is grep -qE (extended regex); use -i where case-insensitive
+#    matters. Format: <command>|<pattern>|<short description>.
+ANCHORS=(
+  # /td-flow-init — Step 0 detection + Step 3 scaffold + @import target
+  "td-flow-init|^# Step 0 — Detect|brownfield/v2/already-init detection branch"
+  "td-flow-init|ln -s \.td-flow \.td|v7.0 compat symlink scaffold step"
+  "td-flow-init|td-flow-contract\.md|@import target reference"
+
+  # /td-flow-clear — STATE handoff + commit convention
+  "td-flow-clear|^# Step 6 — Update STATE|STATE handoff step header"
+  "td-flow-clear|chore: clear|commit message convention"
+
+  # /td-flow-complex-clear — self-validation gate + lead block (b23a488)
+  "td-flow-complex-clear|^# Step 7\.5 — Self-validation gate|self-validation gate (enforce-then-iterate)"
+  "td-flow-complex-clear|Resume — start here|lead-block requirement (b23a488 — garmin's resume fix)"
+
+  # /td-flow-close — framework-update check (v4.3) + commit + park delegation (v4.5)
+  "td-flow-close|^# Step 11|framework-update check (v4.3)"
+  "td-flow-close|chore: close|commit message convention"
+  "td-flow-close|BACKLOG-flush procedure|delegates to /td-flow-park's canonical procedure (v4.5)"
+
+  # /td-flow-refresh — framework sync + nudge prune + state-dir migration (v7.0) + safety flags
+  "td-flow-refresh|^# Step 0 — Sync the framework|framework sync phase"
+  "td-flow-refresh|^# Step 1\.5|deprecated-nudge prune"
+  "td-flow-refresh|^# Step 1\.7|v7.0 .td → .td-flow migration step"
+  "td-flow-refresh|--no-verify|doc-only commits skip pre-commit hook"
+  "td-flow-refresh|--ff-only|never merge or force on framework pull"
+
+  # /td-flow-mailbox — body marker + sub-issue support + cross-repo registry
+  "td-flow-mailbox|\*\*From:\*\*|body marker for outbound identification"
+  "td-flow-mailbox|sub_issues|GraphQL header for sub-issue rollup"
+  "td-flow-mailbox|Cross-repo|connected-repos registry source"
+
+  # /td-flow-health — protocol (OK/WARN/FAIL + exit codes) + script path + escalation
+  "td-flow-health|OK/WARN/FAIL|protocol output format"
+  "td-flow-health|= all OK|protocol exit-0 = all OK contract line"
+  "td-flow-health|\.td-flow/health\.sh|project-owned health script path"
+  "td-flow-health|/td-flow-incident|escalation path for FAIL"
+
+  # /td-flow-incident — snapshot composition + STATE handling + read-only constraint
+  "td-flow-incident|/td-flow-snapshot|composition (snapshot in-flight before pivot)"
+  "td-flow-incident|STATE\.Topic|incident-mode STATE handling"
+  "td-flow-incident|[Rr]ead-only|production diagnosis constraint"
+
+  # /td-flow-park — consolidation (v4.5) + createIssue mutation + BACKLOG source
+  "td-flow-park|consolidat|consolidation pass (v4.5)"
+  "td-flow-park|createIssue|GraphQL mutation (gh issue create can't set Type)"
+  "td-flow-park|BACKLOG\.md|source file reference"
+
+  # /td-flow-snapshot — branch pattern + resume line + Snapshot Issue Type
+  "td-flow-snapshot|snapshot/|snapshot branch name pattern"
+  "td-flow-snapshot|claude --resume|resume line in Snapshot issue body"
+  "td-flow-snapshot|Snapshot-type|Snapshot Issue Type filing"
+)
+anchors_missing=0
+for entry in "${ANCHORS[@]}"; do
+  IFS='|' read -r cmd pattern desc <<< "$entry"
+  file="commands/$cmd.md"
+  if [ ! -f "$file" ]; then
+    fail "$cmd: command file missing (referenced by anchor check)"
+    anchors_missing=$((anchors_missing+1))
+    continue
+  fi
+  if ! grep -qE -e "$pattern" "$file"; then
+    fail "$cmd: missing anchor — pattern '$pattern' ($desc)"
+    anchors_missing=$((anchors_missing+1))
+  fi
+done
+[ "$anchors_missing" -eq 0 ] && ok "all per-command load-bearing anchors present (${#ANCHORS[@]} across 10 commands)"
 
 # Summary
 echo
