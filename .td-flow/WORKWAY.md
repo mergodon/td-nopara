@@ -9,10 +9,11 @@ The framework has no application-code test suite (and never will — there's no 
 - Test command:    scripts/smoke.sh
 - Dev server:      none
 - Local URL:       none
-- Pre-ship checks (automated by `scripts/smoke.sh`, OK/WARN/FAIL output, exit 0/1/2 — 10 OK on clean state):
+- Pre-ship checks (automated by `scripts/smoke.sh`, OK/WARN/FAIL output, exit 0/1/2 — 11 OK on clean state):
   - [x] `bash -n install.sh` + `bash -n hooks/pre-commit` (syntax — 2 OKs)
   - [x] All 10 slash commands resolve in `~/.claude/commands/` (`td-flow-init`, `td-flow-clear`, `td-flow-complex-clear`, `td-flow-close`, `td-flow-refresh`, `td-flow-mailbox`, `td-flow-health`, `td-flow-incident`, `td-flow-park`, `td-flow-snapshot`)
   - [x] Templates at `~/.claude/td-templates` and contract at `~/.claude/td-flow-contract.md` both resolve
+  - [x] **Framework pre-commit hook in sync** (v7.3): `hooks/pre-commit` matches `.git/hooks/pre-commit` byte-for-byte (drift catcher — surfaces stale installed hook before `install.sh` idempotency self-heals it silently)
   - [x] `./install.sh` runs idempotently (two consecutive runs both exit 0)
   - [x] AWK extractor in `hooks/pre-commit` returns a non-empty value from `.td-flow/WORKWAY.md § Local testing`
   - [x] **Cross-reference** (v7.1): every `commands/td-flow-*.md` listed in `EXPECTED_COMMANDS` also appears in `CLAUDE.md`'s "Ten commands" trigger map, README's install symlinks list, AND README's slash commands table

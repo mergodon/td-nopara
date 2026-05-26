@@ -105,6 +105,22 @@ fi
 ln -s "$REPO_DIR/CLAUDE.md" "$CONTRACT_LINK"
 echo "  td-flow-contract.md linked"
 
+# 6. Sync the framework repo's own pre-commit hook. install.sh always runs
+#    from the framework repo (which IS a td-flow project), so this dogfoods
+#    the same setup consumer projects get via /td-flow-init Step 5. Without
+#    it, an edit to hooks/pre-commit doesn't take effect on commits to this
+#    repo until someone manually copies — silent drift caught in v7.3.
+HOOK_SRC="$REPO_DIR/hooks/pre-commit"
+HOOK_DST="$REPO_DIR/.git/hooks/pre-commit"
+if [ -f "$HOOK_SRC" ] && [ -d "$REPO_DIR/.git/hooks" ]; then
+  if [ ! -f "$HOOK_DST" ] || ! cmp -s "$HOOK_SRC" "$HOOK_DST"; then
+    cp "$HOOK_SRC" "$HOOK_DST"
+    chmod +x "$HOOK_DST"
+    echo "→ synced framework pre-commit hook"
+    echo "  $HOOK_DST"
+  fi
+fi
+
 echo
 echo "td-flow installed."
 echo

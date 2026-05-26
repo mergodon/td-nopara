@@ -69,6 +69,23 @@ for path in \
   fi
 done
 
+# 3a. Framework pre-commit hook in sync with canonical (drift catcher).
+#     install.sh Step 6 syncs hooks/pre-commit → .git/hooks/pre-commit on
+#     every install. Must run BEFORE check #4 (install.sh idempotency)
+#     because that step self-heals the drift silently. Surfaces "you edited
+#     hooks/pre-commit without re-running install.sh" as a fail-fast cause,
+#     not a hidden auto-fix. Only meaningful in the framework repo (where
+#     hooks/ source lives).
+if [ -f hooks/pre-commit ] && [ -d .git/hooks ]; then
+  if [ ! -f .git/hooks/pre-commit ]; then
+    fail "framework pre-commit hook not installed at .git/hooks/pre-commit (run ./install.sh)"
+  elif ! cmp -s hooks/pre-commit .git/hooks/pre-commit; then
+    fail "framework pre-commit hook drift: hooks/pre-commit differs from .git/hooks/pre-commit (run ./install.sh)"
+  else
+    ok "framework pre-commit hook in sync with canonical"
+  fi
+fi
+
 # 4. install.sh idempotency — run twice, both must exit 0. Runs LAST because
 #    install.sh self-heals symlinks; running it earlier would mask checks 2+3.
 if ./install.sh >/dev/null 2>&1 && ./install.sh >/dev/null 2>&1; then
