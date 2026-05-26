@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-26)
 Blocker:  none
-Last:     2026-05-26 — closed v7.x phase.
+Last:     2026-05-27 — cleaned up v7.0 drift misses (removed cloudflare-static-assets template; fixed README repo-layout `td/` → `td-flow/`; fixed `/td-flow-init` save-template path).
 
 ## Resume note
 

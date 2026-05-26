@@ -149,7 +149,7 @@ Short summary:
 This command also handles the inverse: when the user says "save this as a `<name>` template" (no slash command needed), I:
 
 1. Verify `.td-flow/PROJECT.md` exists.
-2. Copy `.td-flow/*` to `~/projects/td-flow/templates/<name>/td/` (anonymized — strip user-specific values: project_name, live_url, db credentials, etc., back to placeholders).
+2. Copy `.td-flow/*` to `~/projects/td-flow/templates/<name>/td-flow/` (anonymized — strip user-specific values: project_name, live_url, db credentials, etc., back to placeholders).
 3. The template's `CLAUDE.md` is the standard one-line `@import` (already at `templates/CLAUDE.md`) — only copy the project's actual `CLAUDE.md` into `~/projects/td-flow/templates/<name>/CLAUDE.md` if it carries project-specific rules below the import worth keeping in the starter.
 4. Commit the framework repo: `chore: save <name> template`.
 5. Tell the user: "Saved as `<name>`. Future `/td-flow-init --template <name>` will start from this shape."

@@ -269,10 +269,6 @@ cd ~/projects/td-flow && git pull && ./install.sh
 
 When a project's setup is dialed in, say "save this as a `<name>` template." I copy `.td-flow/*` (anonymized — placeholders restored) to `~/projects/td-flow/templates/<name>/`. Future `/td-flow-init --template <name>` starts from that shape so the next project of the same kind is configured out of the gate.
 
-Current templates:
-
-- `templates/cloudflare-static-assets` — Cloudflare Workers Static Assets pattern (R2 for media, `wrangler.jsonc`, custom domain quirks baked in).
-
 ## Frameworks (Laravel Boost, Next, etc.)
 
 Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `.mcp.json`, `boost.json`, `junie/`) on `boost:install`. We:
@@ -292,16 +288,16 @@ commands/             slash commands (td-flow-init, td-flow-clear,
                                       td-flow-park, td-flow-snapshot)
 templates/            files copied into target projects on /td-flow-init
   CLAUDE.md           one-line @import of the canonical contract
-  td/PROJECT.md
-  td/WORKWAY.md       the way-of-work doc with locked sections
-  td/STATE.md
-  td/BACKLOG.md
-  td/DEBUG.md         optional troubleshooting template (not auto-scaffolded)
-  td/health.sh        health-check skeleton (scaffolded by /td-flow-health, not /td-flow-init)
-  td/frameworks/.gitkeep   (overflow dir, rarely needed)
+  td-flow/PROJECT.md
+  td-flow/WORKWAY.md  the way-of-work doc with locked sections
+  td-flow/STATE.md
+  td-flow/BACKLOG.md
+  td-flow/DEBUG.md    optional troubleshooting template (not auto-scaffolded)
+  td-flow/health.sh   health-check skeleton (scaffolded by /td-flow-health, not /td-flow-init)
+  td-flow/frameworks/.gitkeep   (overflow dir, rarely needed)
   .gitignore
   .env.example
-  <name>/             saved starter templates (e.g. cloudflare-static-assets)
+  <name>/             saved starter templates
 CLAUDE.md             the canonical td-flow contract (symlinked as ~/.claude/td-flow-contract.md)
 hooks/pre-commit      test-on-commit hook installed by /td-flow-init
 scripts/smoke.sh      pre-ship sanity checks for this repo (wired as Test command)
