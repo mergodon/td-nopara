@@ -57,9 +57,8 @@ for link in "$HOME/.claude/commands/"*.md; do
   esac
 done
 
-# 3. Skill, templates, contract symlinks
+# 3. Templates + contract symlinks
 for path in \
-  "skills/td-flow" \
   "td-templates" \
   "td-flow-contract.md"; do
   link="$HOME/.claude/$path"

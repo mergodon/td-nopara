@@ -13,13 +13,13 @@ The framework has no application-code test suite (and never will — there's no 
   - [x] `bash -n install.sh` + `bash -n hooks/pre-commit` (syntax)
   - [x] `./install.sh` runs idempotently (two consecutive runs both exit 0)
   - [x] All 10 slash commands resolve in `~/.claude/commands/` (`td-flow-init`, `td-flow-clear`, `td-flow-complex-clear`, `td-flow-close`, `td-flow-refresh`, `td-flow-mailbox`, `td-flow-health`, `td-flow-incident`, `td-flow-park`, `td-flow-snapshot`)
-  - [x] Skill at `~/.claude/skills/td-flow`, templates at `~/.claude/td-templates`, contract at `~/.claude/td-flow-contract.md` all resolve
+  - [x] Templates at `~/.claude/td-templates` and contract at `~/.claude/td-flow-contract.md` both resolve
   - [x] AWK extractor in `hooks/pre-commit` returns a non-empty value from `.td/WORKWAY.md § Local testing`
   - WARN: any unexpected td-flow command symlinked in `~/.claude/commands/` (drift signal — retired command not pruned)
 
 ### When local testing isn't possible
 
-The framework is fully testable locally. If a future change involves a Claude Code-side behavior (e.g. how the skill loads), live-testing means: open Claude Code in another project, run `/td-flow-init`, verify behavior. Document the case in the topic's work file.
+The framework is fully testable locally. If a future change involves a Claude Code-side behavior (e.g. how the contract `@import` resolves, how a command surfaces in autocomplete), live-testing means: open Claude Code in another project, run `/td-flow-init`, verify behavior. Document the case in the topic's work file.
 
 ## Local UAT
 
@@ -32,7 +32,7 @@ The framework is fully testable locally. If a future change involves a Claude Co
 The "live" environment for this framework is `mergodon/td-flow` on GitHub plus the symlinked install on each machine.
 
 - Live URL:        https://github.com/mergodon/td-flow
-- Deploy:          `git push origin main` (immediate; symlinks pick up changes since `templates/`, `commands/`, `skill/`, and the contract are linked, not copied)
+- Deploy:          `git push origin main` (immediate; symlinks pick up changes since `templates/`, `commands/`, and the contract are linked, not copied)
 - Smoke after ship: re-run `./install.sh` on the local machine; verify the new content is visible
 - Logs:            none (this is just files + symlinks)
 - Dashboards:      none
@@ -45,12 +45,11 @@ The "live" environment for this framework is `mergodon/td-flow` on GitHub plus t
 - `hooks/pre-commit` is bash; AWK extracts the Test command from `WORKWAY.md` § Local testing.
 - AWK pattern: section starts at `^## Local testing`, terminates at next `^## ` (so H3 subsections like `### When local testing isn't possible` stay inside the section).
 
-### Claude Code skill / commands
+### Claude Code commands + contract
 
-- Slash commands are markdown files with YAML frontmatter (`---\ndescription: …\n---`).
-- Skill at `skill/SKILL.md` with YAML frontmatter (`name`, `description`).
-- All three are loaded by Claude Code from `~/.claude/commands/` and `~/.claude/skills/`.
+- Slash commands are markdown files with YAML frontmatter (`---\ndescription: …\n---`), loaded by Claude Code from `~/.claude/commands/`.
 - The contract is this repo's root `CLAUDE.md` — the canonical source. `install.sh` links it to `~/.claude/td-flow-contract.md`; every consuming project's `CLAUDE.md` is a one-line `@import` of it (Claude Code expands the import in full at session start). Consuming projects never copy the contract; the td-flow repo's own `CLAUDE.md` is the one full copy.
+- **No skill.** The `td-flow` skill was retired in v6.1 — it duplicated the rhythm + file structure + command list that the contract already covers via `@import`. Existing machines auto-clean the old `~/.claude/skills/td-flow` symlink on next `./install.sh` run (one-time retirement notice).
 
 ### Multi-machine sync
 

@@ -24,7 +24,6 @@ Symlinks created:
 - `~/.claude/commands/td-flow-incident.md`
 - `~/.claude/commands/td-flow-park.md`
 - `~/.claude/commands/td-flow-snapshot.md`
-- `~/.claude/skills/td-flow`
 - `~/.claude/td-templates`
 - `~/.claude/td-flow-contract.md` — the canonical contract, `@import`-ed by every project
 
@@ -301,10 +300,9 @@ templates/            files copied into target projects on /td-flow-init
   .env.example
   <name>/             saved starter templates (e.g. cloudflare-static-assets)
 CLAUDE.md             the canonical td-flow contract (symlinked as ~/.claude/td-flow-contract.md)
-skill/SKILL.md        skill definition (symlinked into ~/.claude/skills/td-flow)
 hooks/pre-commit      test-on-commit hook installed by /td-flow-init
 scripts/smoke.sh      pre-ship sanity checks for this repo (wired as Test command)
-install.sh            symlinks commands, skill, templates, contract into ~/.claude/
+install.sh            symlinks commands, templates, contract into ~/.claude/
 FEEDBACK.md           feedback about td-flow itself, captured from any project
 ```
 

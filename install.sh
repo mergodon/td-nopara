@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# td-flow installer — symlinks slash commands, the skill, and the templates dir into ~/.claude/.
+# td-flow installer — symlinks slash commands, the contract, and the templates dir into ~/.claude/.
 # Idempotent: safe to re-run after pulling updates.
 
 set -euo pipefail
@@ -10,7 +10,7 @@ COMMANDS_DIR="$CLAUDE_DIR/commands"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 TEMPLATES_LINK="$CLAUDE_DIR/td-templates"
 
-mkdir -p "$COMMANDS_DIR" "$SKILLS_DIR"
+mkdir -p "$COMMANDS_DIR"
 
 # Cleanup: prior bus install left ~/bin/td-bus around; drop the orphan symlink.
 if [ -L "$HOME/bin/td-bus" ]; then
@@ -29,6 +29,15 @@ for name in "${V6_RENAMED_FROM[@]}"; do
     break
   fi
 done
+
+# v6.1 skill retirement detection — note whether the old skill symlink exists
+# BEFORE the prune step removes it. Used at the end to print the retirement
+# notice only when a user is upgrading.
+SKILL_LINK="$SKILLS_DIR/td-flow"
+V6_1_SKILL_DETECTED=false
+if [ -L "$SKILL_LINK" ] || [ -d "$SKILL_LINK" ]; then
+  V6_1_SKILL_DETECTED=true
+fi
 
 # 1. Prune stale symlinks pointing into this repo's commands/ dir
 #    (catches retired commands like /td-ship from older versions, and
@@ -58,14 +67,13 @@ for cmd in "$REPO_DIR/commands/"*.md; do
   echo "  /$(basename "$name" .md)"
 done
 
-# 3. Symlink the skill
-echo "→ installing skill to $SKILLS_DIR/td-flow"
-SKILL_LINK="$SKILLS_DIR/td-flow"
+# 3. Retire the td-flow skill (v6.1) — the @import contract covers everything
+#    the skill described, so the skill was vestigial. Prune any existing
+#    symlink; no longer installed.
 if [ -L "$SKILL_LINK" ] || [ -d "$SKILL_LINK" ]; then
   rm -rf "$SKILL_LINK"
+  echo "  pruned stale: ~/.claude/skills/td-flow (skill retired v6.1; contract @import covers it)"
 fi
-ln -s "$REPO_DIR/skill" "$SKILL_LINK"
-echo "  td-flow"
 
 # 4. Symlink templates dir (commands resolve files from here)
 echo "→ linking templates to $TEMPLATES_LINK"
@@ -109,6 +117,24 @@ if [ "$V6_RENAME_DETECTED" = "true" ]; then
 
   Old names removed (clean break — no aliases).
   Update your muscle memory.
+─────────────────────────────────────────────────────
+
+BANNER
+fi
+
+if [ "$V6_1_SKILL_DETECTED" = "true" ]; then
+  cat <<'BANNER'
+─────────────────────────────────────────────────────
+  td-flow v6.1 — skill retired
+─────────────────────────────────────────────────────
+  The `td-flow` skill at ~/.claude/skills/td-flow was
+  vestigial — it duplicated the rhythm + file structure
+  + command list that the contract already covers via
+  `@import` in every td-flow project's CLAUDE.md.
+
+  Old symlink pruned. Nothing to migrate; the contract
+  is unchanged. `/td-flow` will no longer appear in
+  Claude Code's slash-command autocomplete.
 ─────────────────────────────────────────────────────
 
 BANNER
