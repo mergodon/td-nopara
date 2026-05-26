@@ -252,15 +252,18 @@ Unified view across all your repos: `gh search issues --owner <your-org> --state
 
 ## Updating an existing td-flow project
 
-Updating is nearly free now — the contract isn't copied into your project; your `CLAUDE.md` `@import`s the canonical one. So:
+Updating is nearly free for routine contract changes — the contract isn't copied into your project; your `CLAUDE.md` `@import`s the canonical one. Per-machine:
 
 ```
 cd ~/projects/td-flow && git pull && ./install.sh
 ```
 
-That's it — **every** td-flow project picks up the new contract on its next session. Nothing per-project.
+`install.sh` is idempotent + auto-prunes retired commands. It also prints one-time banners for any major version migration the user hasn't ack'd yet on that machine (e.g. v6.0 command rename, v6.1 skill retirement, v7.0 state-dir rename).
 
-If a project still carries a *pre-import* full copy of the contract in its `CLAUDE.md`, run `/td-flow-refresh` in it once — that migrates the `CLAUDE.md` onto the `@import`.
+**Two per-project one-time migrations** that `/td-flow-refresh` handles automatically (idempotent — safe to run on already-migrated projects, skips silently):
+
+- **Pre-v5.0** — project's `CLAUDE.md` still carries a *full copy* of the contract instead of the one-line `@import`. `/td-flow-refresh` Step 1 rewrites it onto the import.
+- **Pre-v7.0** — project's state dir is still `.td/` (the legacy name). `/td-flow-refresh` Step 1.7 runs `git mv .td .td-flow` (history preserved) + creates a `.td → .td-flow` compat symlink so anything that hardcoded `.td/` (IDE bookmarks, scripts, `.gitignore` entries) keeps resolving. The framework's `hooks/pre-commit` + `scripts/smoke.sh` carry a `.td/` fallback as transition safety net — removed in a future v8.0 once the portfolio has settled.
 
 ## Saving and reusing templates
 

@@ -9,12 +9,15 @@ The framework has no application-code test suite (and never will — there's no 
 - Test command:    scripts/smoke.sh
 - Dev server:      none
 - Local URL:       none
-- Pre-ship checks (automated by `scripts/smoke.sh`, OK/WARN/FAIL output, exit 0/1/2):
-  - [x] `bash -n install.sh` + `bash -n hooks/pre-commit` (syntax)
-  - [x] `./install.sh` runs idempotently (two consecutive runs both exit 0)
+- Pre-ship checks (automated by `scripts/smoke.sh`, OK/WARN/FAIL output, exit 0/1/2 — 10 OK on clean state):
+  - [x] `bash -n install.sh` + `bash -n hooks/pre-commit` (syntax — 2 OKs)
   - [x] All 10 slash commands resolve in `~/.claude/commands/` (`td-flow-init`, `td-flow-clear`, `td-flow-complex-clear`, `td-flow-close`, `td-flow-refresh`, `td-flow-mailbox`, `td-flow-health`, `td-flow-incident`, `td-flow-park`, `td-flow-snapshot`)
   - [x] Templates at `~/.claude/td-templates` and contract at `~/.claude/td-flow-contract.md` both resolve
+  - [x] `./install.sh` runs idempotently (two consecutive runs both exit 0)
   - [x] AWK extractor in `hooks/pre-commit` returns a non-empty value from `.td-flow/WORKWAY.md § Local testing`
+  - [x] **Cross-reference** (v7.1): every `commands/td-flow-*.md` listed in `EXPECTED_COMMANDS` also appears in `CLAUDE.md`'s "Ten commands" trigger map, README's install symlinks list, AND README's slash commands table
+  - [x] **Frontmatter validity** (v7.1): every command file has YAML frontmatter with a non-empty `description:` field
+  - [x] **Per-command load-bearing anchors** (v7.2): 31 anchors across all 10 commands (Step headers, commit conventions, protocol fragments, named procedure references) — silent regressions on any anchor fail the pre-commit hook on the spot. Edit the `ANCHORS=(…)` array in `scripts/smoke.sh § 8` to add coverage when a new load-bearing piece lands
   - WARN: any unexpected td-flow command symlinked in `~/.claude/commands/` (drift signal — retired command not pruned)
 
 ### When local testing isn't possible
