@@ -4,24 +4,24 @@ description: Live production fire mode. Drop everything else and focus on the br
 
 You are entering live-fire mode for a production incident. Work in progress pauses — diagnosing and fixing this is the only thing that matters until it's resolved. Stay narrow. No refactors, no optimization, no "while we're here" cleanups.
 
-This command is a **composition**, not a bespoke pivot. Step 1 invokes `/td-snapshot` to preserve any in-flight piece (branch + GH Snapshot issue, fully resumable). Then we set incident-mode STATE on clean main. After the fix ships, the previous work is one `git checkout snapshot/<slug>` away.
+This command is a **composition**, not a bespoke pivot. Step 1 invokes `/td-flow-snapshot` to preserve any in-flight piece (branch + GH Snapshot issue, fully resumable). Then we set incident-mode STATE on clean main. After the fix ships, the previous work is one `git checkout snapshot/<slug>` away.
 
 # Step 0 — Verify we're in a td-flow project
 
-Confirm `./.td/` exists. If missing, abort: "Not a td-flow project — `/td-incident` only runs inside a td-flow project."
+Confirm `./.td/` exists. If missing, abort: "Not a td-flow project — `/td-flow-incident` only runs inside a td-flow project."
 
 # Step 1 — Snapshot any in-flight piece
 
 Read `.td/STATE.md`. Parse `Topic:` line.
 
-- **If `Topic != idle`:** invoke `/td-snapshot incident-pivot` inline (run its full procedure). This commits any uncommitted work to `snapshot/<previous-slug>`, files a Snapshot-type GH issue with the resume command, switches back to main (or wherever you were), resets STATE to idle, pushes. Nothing is lost.
+- **If `Topic != idle`:** invoke `/td-flow-snapshot incident-pivot` inline (run its full procedure). This commits any uncommitted work to `snapshot/<previous-slug>`, files a Snapshot-type GH issue with the resume command, switches back to main (or wherever you were), resets STATE to idle, pushes. Nothing is lost.
 - **If `Topic == idle`:** skip. Nothing to preserve. Proceed to Step 2 on the already-clean main.
 
-This single step replaces the old `/td-incident`'s bespoke "preserve previous topic as a pointer in Resume note" mechanic — the mechanic that caused the #11 failure mode by preserving pointers instead of the actual content.
+This single step replaces the old `/td-flow-incident`'s bespoke "preserve previous topic as a pointer in Resume note" mechanic — the mechanic that caused the #11 failure mode by preserving pointers instead of the actual content.
 
 # Step 2 — Capture what's broken
 
-If `/td-incident` was invoked with an argument (e.g. `/td-incident login is 500ing`), use the argument as the one-liner. Otherwise — and only otherwise — ask: **"What's broken? One-line description."** and wait.
+If `/td-flow-incident` was invoked with an argument (e.g. `/td-flow-incident login is 500ing`), use the argument as the one-liner. Otherwise — and only otherwise — ask: **"What's broken? One-line description."** and wait.
 
 Keep it tight — the headline, not the diagnostic. Detailed context comes in Step 5.
 
@@ -115,7 +115,7 @@ The incident ends in one of three ways:
 1. Create a GH issue in the current repo with Issue Type = `Bug`:
    - Title: the one-liner
    - Body: contents of the work file (Symptom, Context, Hypothesis, what was tried)
-   - Use `gh api graphql` to create with `Bug` type attached (query the org's Issue Type IDs once per run — same as `/td-park` Step 2 — never hardcode them).
+   - Use `gh api graphql` to create with `Bug` type attached (query the org's Issue Type IDs once per run — same as `/td-flow-park` Step 2 — never hardcode them).
 2. Update `STATE.Last` to note the incident parked to GH `#N`. Reset Topic to idle.
 3. Delete the local work file (the GH issue is now the source of truth).
 4. Commit + push STATE update.
@@ -145,4 +145,4 @@ One sentence per resolution path:
 - **STATE updates land in the same commit as the fix** (existing `feat:`/`fix:` contract rule).
 - **DEBUG.md capture happens at close-out** (Step 7's single capture prompt). Don't interrupt the fire with mid-stream "save this?" asks.
 - **Incident mode is exclusive.** Don't switch the conversation back to a previous topic until resolution is complete. The user can break this with an explicit "pause the incident."
-- **Resume of the previous piece is the user's choice, not auto.** After the incident ships, STATE goes idle. The previous piece lives on its snapshot branch + GH Snapshot issue; the user resumes when they want (via `/td-mailbox` or direct `git checkout`).
+- **Resume of the previous piece is the user's choice, not auto.** After the incident ships, STATE goes idle. The previous piece lives on its snapshot branch + GH Snapshot issue; the user resumes when they want (via `/td-flow-mailbox` or direct `git checkout`).

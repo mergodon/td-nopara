@@ -9,7 +9,7 @@ You are syncing this project with the td-flow framework. The contract is no long
 Resolve the framework repo from this command's symlink target (clone-path-independent), falling back to the default clone path:
 
 ```
-TD_REPO=$(cd "$(dirname "$(readlink ~/.claude/commands/td-refresh.md)")/.." 2>/dev/null && pwd)
+TD_REPO=$(cd "$(dirname "$(readlink ~/.claude/commands/td-flow-refresh.md)")/.." 2>/dev/null && pwd)
 [ -d "$TD_REPO/.git" ] || TD_REPO="$HOME/projects/td-flow"
 ```
 
@@ -70,11 +70,11 @@ Two lines:
 
 `Framework synced (<pulled N commits / already current>). CLAUDE.md <migrated to the @import / already on the import model / pruned N deprecated nudge line(s) / no changes>.`
 
-`Slash commands available: ` then list the basename of every `*.md` in `~/.claude/commands/` that resolves into `<TD_REPO>/commands/`. Useful when refreshing from a long-stale state — surfaces commands the user may not have seen before (e.g. `/td-snapshot` was added in v5.2).
+`Slash commands available: ` then list the basename of every `*.md` in `~/.claude/commands/` that resolves into `<TD_REPO>/commands/`. Useful when refreshing from a long-stale state — surfaces commands the user may not have seen before (e.g. `/td-flow-snapshot` was added in v5.2).
 
 # Rules
 
-- `/td-refresh` syncs the framework, migrates a legacy `CLAUDE.md`, and prunes deprecated nudge patterns — nothing else. It never touches `.td/` docs, `BACKLOG.md`, or the cross-repo registry.
+- `/td-flow-refresh` syncs the framework, migrates a legacy `CLAUDE.md`, and prunes deprecated nudge patterns — nothing else. It never touches `.td/` docs, `BACKLOG.md`, or the cross-repo registry.
 - Step 0 may `git pull` the td-flow repo, but only as a clean-tree fast-forward; it never merges or forces.
-- The only commits `/td-refresh` makes are Step 1's one-time migration commit and Step 1.5's prune commit (only if a match was found and cleanly removed); both `--no-verify` so the pre-commit hook's `Test command` doesn't gate doc-only rewrites.
+- The only commits `/td-flow-refresh` makes are Step 1's one-time migration commit and Step 1.5's prune commit (only if a match was found and cleanly removed); both `--no-verify` so the pre-commit hook's `Test command` doesn't gate doc-only rewrites.
 - Never push.

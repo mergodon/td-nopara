@@ -1,17 +1,17 @@
 ---
 name: td-flow
-description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-init, /td-clear, /td-close, /td-refresh, /td-mailbox, /td-health, /td-incident, /td-park, /td-snapshot, or asks how this project works. After /td-init, the user just talks — Claude orchestrates.
+description: Solo-developer project framework. Conversational interface, structured docs in .td/. Use when the user mentions td-flow, /td-flow-init, /td-flow-clear, /td-flow-close, /td-flow-refresh, /td-flow-mailbox, /td-flow-health, /td-flow-incident, /td-flow-park, /td-flow-snapshot, or asks how this project works. After /td-flow-init, the user just talks — Claude orchestrates.
 ---
 
 # td-flow
 
-Same shape every project. Conversational interface. Four standard docs. Nine slash commands.
+Same shape every project. Conversational interface. Four standard docs. Ten slash commands.
 
 The contract — the "Who does what" matrix, the routing map ("where things go"), nudges, drift signals, commit conventions — is the canonical td-flow contract, pulled into every project's root `CLAUDE.md` via a one-line `@import` from the shared install. This skill exists to surface the rhythm when context is heavy or the contract isn't loaded yet. **Read `CLAUDE.md` (it imports the contract) for anything specific.**
 
 ## When to engage
 
-- The user runs `/td-init` and asks how to proceed.
+- The user runs `/td-flow-init` and asks how to proceed.
 - The user mentions td-flow, the rhythm, or any of the structured docs.
 - The user asks "where are we" or "how do I test this" and `.td/` exists.
 - The user says "save this as a `<name>` template" — copy the current `.td/` shape (anonymized) to `~/projects/td-flow/templates/<name>/`.
@@ -47,20 +47,21 @@ CLAUDE.md                ← one-line @import of the shared td-flow contract
 ## The slash commands
 
 ```
-/td-init                    # bootstrap or migrate (brownfield-aware)
-/td-init --template <name>  # bootstrap from a saved template (e.g. laravel)
-/td-clear                   # mid-project: doc-sync + STATE handoff + prune + push. Before /clear.
-/td-close                   # wrap project (or phase): full doc audit + prune + push.
-/td-refresh                 # pull the latest framework + re-run the installer (migrates legacy CLAUDE.md to the @import).
-/td-mailbox                 # unified cross-repo walk: inbound + outbound in one pass.
-/td-health                  # proactive production health check — run .td/health.sh, report.
-/td-incident                # live production fire mode — snapshots in-flight first, then focus, diagnose, fix or park.
-/td-park                    # flush BACKLOG.md to GH Issues (with type + dedupe) mid-session.
-/td-snapshot                # save the current in-flight piece to a snapshot/<slug> branch + GH Snapshot issue. Resumable via the `claude --resume` line in the issue body. Composed by /td-incident; standalone for mid-session pivots.
+/td-flow-init                    # bootstrap or migrate (brownfield-aware)
+/td-flow-init --template <name>  # bootstrap from a saved template (e.g. laravel)
+/td-flow-clear                   # mid-project: doc-sync + STATE handoff + prune + push. Before /clear.
+/td-flow-complex-clear           # rigorous mid-project checkpoint for complex multi-day work. Enhanced /td-flow-clear with required STATE sections + self-validation.
+/td-flow-close                   # wrap project (or phase): full doc audit + prune + push.
+/td-flow-refresh                 # pull the latest framework + re-run the installer (migrates legacy CLAUDE.md to the @import).
+/td-flow-mailbox                 # unified cross-repo walk: inbound + outbound in one pass.
+/td-flow-health                  # proactive production health check — run .td/health.sh, report.
+/td-flow-incident                # live production fire mode — snapshots in-flight first, then focus, diagnose, fix or park.
+/td-flow-park                    # flush BACKLOG.md to GH Issues (with type + dedupe) mid-session.
+/td-flow-snapshot                # save the current in-flight piece to a snapshot/<slug> branch + GH Snapshot issue. Resumable via the `claude --resume` line in the issue body. Composed by /td-flow-incident; standalone for mid-session pivots.
 ```
 
 Shipping individual pieces is conversational: tests pass → commit → push to `origin/main`. No slash command.
 
-Migration: `/td-init` detects existing td-flow v1/v2 or brownfield repos with ad-hoc patterns (`.claude/agreements/`, `BLOCKS.md` and similar) and maps them to the current shape without re-asking.
+Migration: `/td-flow-init` detects existing td-flow v1/v2 or brownfield repos with ad-hoc patterns (`.claude/agreements/`, `BLOCKS.md` and similar) and maps them to the current shape without re-asking.
 
 For the routing map, nudges, drift signals, and commit conventions — read root `CLAUDE.md`.

@@ -18,8 +18,21 @@ if [ -L "$HOME/bin/td-bus" ]; then
   echo "  pruned stale: ~/bin/td-bus (td-bus retired in favor of gh issues)"
 fi
 
+# v6 rename detection — note pre-existing old-name symlinks BEFORE the prune
+# step rewrites them. Used at the end to print the rename banner only when a
+# user is actually upgrading (fresh installs see nothing).
+V6_RENAMED_FROM=(td-init td-clear td-close td-refresh td-mailbox td-health td-incident td-park td-snapshot td-complex-clear)
+V6_RENAME_DETECTED=false
+for name in "${V6_RENAMED_FROM[@]}"; do
+  if [ -L "$COMMANDS_DIR/$name.md" ]; then
+    V6_RENAME_DETECTED=true
+    break
+  fi
+done
+
 # 1. Prune stale symlinks pointing into this repo's commands/ dir
-#    (catches retired commands like /td-ship from older versions)
+#    (catches retired commands like /td-ship from older versions, and
+#    catches the v6 /td-* → /td-flow-* rename automatically)
 for link in "$COMMANDS_DIR"/*.md; do
   [ -L "$link" ] || continue
   resolved=$(readlink "$link")
@@ -76,10 +89,35 @@ echo
 echo "td-flow installed."
 echo
 
+if [ "$V6_RENAME_DETECTED" = "true" ]; then
+  cat <<'BANNER'
+─────────────────────────────────────────────────────
+  td-flow v6.0 — slash commands renamed
+─────────────────────────────────────────────────────
+  All commands now use the /td-flow-* prefix:
+
+    /td-init           →  /td-flow-init
+    /td-clear          →  /td-flow-clear
+    /td-close          →  /td-flow-close
+    /td-refresh        →  /td-flow-refresh
+    /td-mailbox        →  /td-flow-mailbox
+    /td-health         →  /td-flow-health
+    /td-incident       →  /td-flow-incident
+    /td-park           →  /td-flow-park
+    /td-snapshot       →  /td-flow-snapshot
+    /td-complex-clear  →  /td-flow-complex-clear
+
+  Old names removed (clean break — no aliases).
+  Update your muscle memory.
+─────────────────────────────────────────────────────
+
+BANNER
+fi
+
 echo "Try it:"
 echo "  cd ~/projects/some-project"
 echo "  claude"
-echo "  /td-init           # bootstrap td-flow"
+echo "  /td-flow-init           # bootstrap td-flow"
 echo
 echo "Cross-project requests ride on GitHub issues — see CLAUDE.md § Cross-repo."
 echo "Add a \`## Cross-repo\` section to .td/PROJECT.md per project — see CLAUDE.md § Cross-repo."

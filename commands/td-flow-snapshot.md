@@ -4,7 +4,7 @@ description: Snapshot the current in-flight piece — commit current state to a 
 
 You are taking a snapshot of the current in-flight piece so that pivoting (incident, other priority work, stepping away for the day) loses nothing. The snapshot mechanic is **lean by design**: a branch (git-native state), a GitHub issue (visible tracker), and the literal `claude --resume <session-id>` command (Claude Code's native session resume). No bespoke save-state magic.
 
-Optional argument: `/td-snapshot <reason>` — short phrase recorded in the commit message and issue body. Defaults to `user-requested` (or `incident-pivot` when invoked by `/td-incident`).
+Optional argument: `/td-flow-snapshot <reason>` — short phrase recorded in the commit message and issue body. Defaults to `user-requested` (or `incident-pivot` when invoked by `/td-flow-incident`).
 
 # Step 0 — Verify
 
@@ -15,9 +15,9 @@ Optional argument: `/td-snapshot <reason>` — short phrase recorded in the comm
 
 # Step 1 — Resolve identifiers
 
-**Topic slug** — `STATE.Topic` is normally already kebab-case. If it carries an `incident:` prefix (from `/td-incident`'s mode marker), strip the prefix. Lowercase ASCII, replace any non-`[a-z0-9-]` with `-`. Hold as `<slug>`.
+**Topic slug** — `STATE.Topic` is normally already kebab-case. If it carries an `incident:` prefix (from `/td-flow-incident`'s mode marker), strip the prefix. Lowercase ASCII, replace any non-`[a-z0-9-]` with `-`. Hold as `<slug>`.
 
-**Project friendly name** — same rule as `/td-park` Step 3: first H1 in `.td/PROJECT.md`, fall back to directory basename. Hold as `<project-name>`.
+**Project friendly name** — same rule as `/td-flow-park` Step 3: first H1 in `.td/PROJECT.md`, fall back to directory basename. Hold as `<project-name>`.
 
 **Original branch** — `git rev-parse --abbrev-ref HEAD`. Hold as `<original-branch>` (typically `main`; we'll return here after snapshot).
 
@@ -167,5 +167,5 @@ Back on <original-branch> with clean STATE. Ready for the next thing.
 - **Switch back to the original branch** — typically `main`. STATE on the original branch resets to idle; STATE on the snapshot branch stays frozen at the snapshot moment.
 - **`claude --resume` is the resume mechanism** — it's a native Claude Code feature, not magic. Same-machine only (the JSONL transcript is on the originating machine). The branch + issue are portable across machines; the live conversation resume isn't.
 - **Auto-close on merge** — when the snapshot work ships back to `<original-branch>`, the final commit should include `Closes #<N>` so GitHub auto-closes the issue. Standard pattern, nothing new.
-- **No `/td-snapshot resolve` or cleanup command** — when an issue closes, `git branch -d snapshot/<slug>` and `git push origin :snapshot/<slug>` are one line each. Don't invent ceremony.
-- **Composable** — `/td-incident` invokes this internally. `/td-snapshot` can also be invoked standalone whenever the user wants to pivot or step away without losing in-flight context.
+- **No `/td-flow-snapshot resolve` or cleanup command** — when an issue closes, `git branch -d snapshot/<slug>` and `git push origin :snapshot/<slug>` are one line each. Don't invent ceremony.
+- **Composable** — `/td-flow-incident` invokes this internally. `/td-flow-snapshot` can also be invoked standalone whenever the user wants to pivot or step away without losing in-flight context.

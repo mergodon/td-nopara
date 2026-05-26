@@ -1,10 +1,10 @@
 ---
-description: Flush BACKLOG.md to GitHub Issues — consolidate related lines first, then create the issues in one batched pass. Standalone mid-session declutter — no /td-close ceremony.
+description: Flush BACKLOG.md to GitHub Issues — consolidate related lines first, then create the issues in one batched pass. Standalone mid-session declutter — no /td-flow-close ceremony.
 ---
 
 You are flushing `.td/BACKLOG.md` to GitHub Issues. Read every line, consolidate lines that describe the same work, then present the whole proposed issue set as ONE digest — the user reviews and adjusts in a single pass, and you create the batch. No line-by-line interrogation, no blind 1:1 line→issue mapping.
 
-This is the **canonical BACKLOG-flush procedure**. `/td-close` Step 3 runs it too — pointing here rather than re-describing it.
+This is the **canonical BACKLOG-flush procedure**. `/td-flow-close` Step 3 runs it too — pointing here rather than re-describing it.
 
 # Step 0 — Verify
 
@@ -31,7 +31,7 @@ Use the `<owner>` captured in Step 0 — don't hardcode any org name. Parse the 
 
 # Step 3 — Determine this project's friendly name
 
-Same procedure as `/td-mailbox` Step 1: first H1 heading in `.td/PROJECT.md`, fall back to directory basename. Hold as `<sender-name>` (used as the `**From:**` marker if the issue ends up being a self-park — distinguishes work this project parked vs work others filed).
+Same procedure as `/td-flow-mailbox` Step 1: first H1 heading in `.td/PROJECT.md`, fall back to directory basename. Hold as `<sender-name>` (used as the `**From:**` marker if the issue ends up being a self-park — distinguishes work this project parked vs work others filed).
 
 # Step 4 — Consolidate
 
@@ -77,7 +77,7 @@ For each proposed issue:
    - **Match is an `Idea`** → default action is **promote** (re-type Idea → Task). The BACKLOG line means the user committed to it; it's no longer exploration. Don't create a new issue, don't leave a stale Idea sitting next to a new Task.
    - **Match is a `Bug` / `Task` / `Epic`** → default action is **comment** on the existing issue (the user may want to add the BACKLOG context there instead of creating a duplicate).
 
-   One round-trip for the whole pass — never loop a search per proposed issue (that's N serial network calls; this is one, same as `/td-mailbox` Step 2).
+   One round-trip for the whole pass — never loop a search per proposed issue (that's N serial network calls; this is one, same as `/td-flow-mailbox` Step 2).
 
 Then print the **digest** — the whole proposed set as one lettered list:
 
@@ -104,7 +104,7 @@ Wait for the user's single reply. They may:
 
 - **Accept as-is** ("go", "looks good", "create them") → proceed to Step 7 with the proposed set.
 - **Adjust** — retype, unmerge, merge further, drop an issue, reword a title. Apply all adjustments to the proposed set. If the changes are large, re-print the corrected digest once for a final confirm; if small, just proceed.
-- **Ship now** ("ship A now") — drop the flush; pick up that issue's work conversationally (the user is saying "this is the next piece"). The other proposed issues are NOT created — re-run `/td-park` when ready. Note this in the summary.
+- **Ship now** ("ship A now") — drop the flush; pick up that issue's work conversationally (the user is saying "this is the next piece"). The other proposed issues are NOT created — re-run `/td-flow-park` when ready. Note this in the summary.
 - **Skip a line** — that BACKLOG line stays; it's excluded from the created set.
 
 Don't walk the issues one at a time. One digest, one reply, then act.
@@ -127,7 +127,7 @@ Get `<repo-node-id>` once per run: `gh api graphql -f query='query { repository(
 
 The body opens with the `**From:** <sender-name>` marker, then the source content — for a merged issue, fold the source lines into a short checklist so nothing is lost.
 
-**Promote** (dedupe match on Idea, default action) — re-type the existing Idea to Task. Same `updateIssue` mutation as `/td-mailbox`'s `promote`:
+**Promote** (dedupe match on Idea, default action) — re-type the existing Idea to Task. Same `updateIssue` mutation as `/td-flow-mailbox`'s `promote`:
 ```
 gh api graphql -f query='
   mutation($id: ID!, $t: ID!) {
@@ -150,15 +150,15 @@ After the batch, rewrite `.td/BACKLOG.md` containing only the lines the user mar
 Flushed: <L> lines → <N> issues created<if merges: ", <M> merges">. <P> promoted (Idea → Task). <C> commented onto existing. <D> dropped. <S> shipped (rhythm started). <K> skipped (still in BACKLOG).
 ```
 
-If `<S>` > 0: "You shipped <issue>; the rest of the set wasn't created. Run `/td-park` again when ready."
+If `<S>` > 0: "You shipped <issue>; the rest of the set wasn't created. Run `/td-flow-park` again when ready."
 
 # Rules
 
 - **Never auto-create.** The digest + one confirmation gates the whole batch. Within that, no per-issue interrogation.
 - **Every merge is visible.** The digest always shows which source lines feed each issue. Never silently fold lines together — the user can unmerge anything.
-- **Always include the `**From:**` marker** in the issue body — same project-soul rule from cross-repo. Even self-parks deserve the marker so the receiver (next session's `/td-mailbox` inbound walk) sees `From: <this-project>` and knows the source.
+- **Always include the `**From:**` marker** in the issue body — same project-soul rule from cross-repo. Even self-parks deserve the marker so the receiver (next session's `/td-flow-mailbox` inbound walk) sees `From: <this-project>` and knows the source.
 - **GraphQL mutation requires the `sub_issues` header** for issue creation while in preview (even though sub_issues aren't used here, the header keeps the API surface consistent across our commands).
 - **Don't touch BACKLOG.md until the batch completes** — if the user interrupts (Ctrl-C, error), nothing is lost. Only the final rewrite mutates the file.
-- **Don't commit BACKLOG.md** — `/td-park` is doc-hygiene; the user can commit the cleaned BACKLOG alongside other work when ready. (Exception: at `/td-close`, the close command commits.)
+- **Don't commit BACKLOG.md** — `/td-flow-park` is doc-hygiene; the user can commit the cleaned BACKLOG alongside other work when ready. (Exception: at `/td-flow-close`, the close command commits.)
 - **If a "ship now" interrupts**, set STATE.Topic to that issue + start the rhythm. The rest of the set waits for the next invocation.
-- **Optional filter argument:** `/td-park ideas` flushes only Idea-shaped lines; `/td-park bugs` only Bug-shaped lines. Useful for triaging by type when BACKLOG is heavy.
+- **Optional filter argument:** `/td-flow-park ideas` flushes only Idea-shaped lines; `/td-flow-park bugs` only Bug-shaped lines. Useful for triaging by type when BACKLOG is heavy.

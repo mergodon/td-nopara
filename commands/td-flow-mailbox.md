@@ -21,7 +21,7 @@ Friendly name — used to sign comments and closures, and as the body marker val
 
 Hold as `<project-name>` for the run.
 
-Also read `.td/STATE.md` and parse the `Topic:` line. If it's not `idle` and matches a `Closes #<N>` reference in the Resume note (or a `.td/work/<slug>.md` exists referencing an inbound issue), hold the matched issue number as `<active-issue>`. It surfaces as an `[● ACTIVE]` marker in the digest header — so the very first thing /td-mailbox tells you is what's already in flight before you start picking up new things.
+Also read `.td/STATE.md` and parse the `Topic:` line. If it's not `idle` and matches a `Closes #<N>` reference in the Resume note (or a `.td/work/<slug>.md` exists referencing an inbound issue), hold the matched issue number as `<active-issue>`. It surfaces as an `[● ACTIVE]` marker in the digest header — so the very first thing /td-flow-mailbox tells you is what's already in flight before you start picking up new things.
 
 # Step 2 — Inbound query (open issues in this repo)
 
@@ -99,7 +99,7 @@ For each result, an outbound match is any issue where:
 
 Keep only matching issues. That set IS the outbound list. If no matches: outbound is empty; note it in the digest.
 
-**Search index lag.** GitHub's search index lags newly-created issues by a few seconds — observed up to ~5s in testing. A filing made *right before* `/td-mailbox` may not appear in this run; it'll show on the next. If the user expects something to appear and it doesn't, suggest re-running after a few seconds, or fetch the specific issue directly via `repository.issue(number: N)`.
+**Search index lag.** GitHub's search index lags newly-created issues by a few seconds — observed up to ~5s in testing. A filing made *right before* `/td-flow-mailbox` may not appear in this run; it'll show on the next. If the user expects something to appear and it doesn't, suggest re-running after a few seconds, or fetch the specific issue directly via `repository.issue(number: N)`.
 
 Also fetch closed-recently candidates for the "Recently closed (last 30 days)" bucket — re-run the search with `state:closed` and filter by `closedAt > now - 30d`. (Optional — adds one query; skip if the user finds it noisy.)
 
@@ -229,7 +229,7 @@ Post all? (yes / edit N / drop N)
 **2. Run the state-changing actions** once confirmed:
 - **Inbound `close`** — `gh issue close <N> --comment "<text>"` (or `gh issue close <N>` if its drafted comment was dropped).
 - **Inbound `comment`** — `gh issue comment <N> --body "<text>"`.
-- **Inbound `promote`** — re-type an `Idea` to `Task`. Resolve the `Task` Issue Type ID (org `issueTypes` query — same as `/td-park` Step 2), then `gh api graphql -f query='mutation($id: ID!, $t: ID!) { updateIssue(input: {id: $id, issueTypeId: $t}) { issue { number } } }' -F id=<issue node id> -F t=<Task type ID>`. The issue node `id` comes from the Step 2 query. Only meaningful on an `Idea` — if the target isn't one, say so and skip it.
+- **Inbound `promote`** — re-type an `Idea` to `Task`. Resolve the `Task` Issue Type ID (org `issueTypes` query — same as `/td-flow-park` Step 2), then `gh api graphql -f query='mutation($id: ID!, $t: ID!) { updateIssue(input: {id: $id, issueTypeId: $t}) { issue { number } } }' -F id=<issue node id> -F t=<Task type ID>`. The issue node `id` comes from the Step 2 query. Only meaningful on an `Idea` — if the target isn't one, say so and skip it.
 - **Outbound `comment` / `ping`** — `gh issue comment <N> --repo <slug> --body "<text>"`.
 - **Outbound `verify`** — add a closing-verification comment (`Confirmed — works as expected. — <project-name>`), or skip the comment if the user only wanted a visual check. No state change unless asked.
 - **Outbound `close`** (withdrawing our own stale ask) — `gh issue close <N> --repo <slug> --reason "not planned" --comment "<withdrawal text>"`. The `not planned` reason tells GitHub (and any parent Epic's progress bar) this wasn't an abandoned-because-done close. Never close without a comment — zero context for the receiver is rude.
@@ -268,11 +268,11 @@ Mailbox walked: <T> reviewed total.
 - **Outbound scope is the cross-repo registry** in `.td/PROJECT.md § Cross-repo`. Filings into repos not declared there won't show. By design — forces honesty about cross-repo relationships. If you find yourself wanting to widen, the right move is updating PROJECT.md, not bypassing the scope.
 - **The `**From:** <project>` body marker is canonical** — the only identifier of "this is ours" on the outbound side, and the human-readable source signal on the inbound side. Every cross-repo filing gets it.
 - **Sub-issue linkage stays for real planning Epics.** Epics with cross-repo children show progress in the digest. That's a legit GitHub-native use case. One-off CRs don't need it.
-- **Epics are reported, not actioned.** An Epic is a high-level planning surface — the actionable work is its child Bug/Task issues. `/td-mailbox` shows an Epic's state and sub-issue progress for planning context; it never nudges `start` on a parent Epic. (Same stance as `/td-close` Step 2, which gates a close only on Bug/Task.)
+- **Epics are reported, not actioned.** An Epic is a high-level planning surface — the actionable work is its child Bug/Task issues. `/td-flow-mailbox` shows an Epic's state and sub-issue progress for planning context; it never nudges `start` on a parent Epic. (Same stance as `/td-flow-close` Step 2, which gates a close only on Bug/Task.)
 - **Always sign comments and closures with `— <project-name>`** (project-soul rule). Never address GH usernames in cross-repo prose.
 - **Never auto-close, never auto-post.** All drafted text is shown and confirmed once before the batch runs.
 - **GraphQL preview header** `GraphQL-Features: sub_issues` required for `subIssuesSummary` + `subIssues`. Inline on each query that uses them.
 - **If GraphQL errors** (rate limit, auth, schema drift): surface the error and stop. Fall back to `gh issue list --json` for a degraded-mode inbound listing if the user insists.
 - **Cross-org outbound is unsupported** by sub-issue linkage, but the From-marker search still finds it. So a cross-org CR filed with the marker WILL show in outbound if its repo is declared in PROJECT.md § Cross-repo. (Sub-issue parent linkage just won't work for that one.)
-- **Snapshots are a third bucket, never numbered with inbound/outbound.** They're personal lifecycle markers (paused in-flight pieces from `/td-snapshot`), not work to act on. Default behavior is leave-alone — only `resume <N>` or `delete <N>` change anything. The 30-day stale nudge is informational; the user decides.
+- **Snapshots are a third bucket, never numbered with inbound/outbound.** They're personal lifecycle markers (paused in-flight pieces from `/td-flow-snapshot`), not work to act on. Default behavior is leave-alone — only `resume <N>` or `delete <N>` change anything. The 30-day stale nudge is informational; the user decides.
 - **Snapshot `delete` is destructive.** Branches are real work even when paused. Confirm once before the local + remote branch delete. If the snapshot's work shipped via a normal merge to main (with `Closes #<N>`), the issue auto-closed and won't appear here — no manual cleanup needed.

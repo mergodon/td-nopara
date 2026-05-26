@@ -2,7 +2,7 @@
 description: Mid-project context reset. Sync the .td/ docs to this session, write the STATE handoff, push — ready for /clear. Project continues; a checkpoint, not a wrap.
 ---
 
-You are checkpointing the current session so the user can `/clear` and the next session picks up cold. The project is not done — it's mid-flight. Keep it fast: sync the `.td/` docs to what this session did, write the STATE handoff, prune obvious junk, push. Optimization, code review, restructuring, exhaustive doc audits — out of scope (that's `/td-close`). If something invites that, surface it as a backlog item or a future topic and move on.
+You are checkpointing the current session so the user can `/clear` and the next session picks up cold. The project is not done — it's mid-flight. Keep it fast: sync the `.td/` docs to what this session did, write the STATE handoff, prune obvious junk, push. Optimization, code review, restructuring, exhaustive doc audits — out of scope (that's `/td-flow-close`). If something invites that, surface it as a backlog item or a future topic and move on.
 
 # Step 1 — Update memory
 
@@ -57,7 +57,7 @@ Before `/clear` wipes the conversation, make sure the `.td/` docs reflect what t
 - Stack changed this session — a dependency added, removed, or major-version bumped → `PROJECT.md § Stack`. (Quick check: `git log --since="<STATE.Last date>" --name-only -- package.json composer.json pyproject.toml requirements.txt Gemfile go.mod Cargo.toml 2>/dev/null | sort -u`.)
 - A durable framework gotcha, test-command change, deploy detail, or env quirk surfaced → `WORKWAY.md`.
 
-This is **session-scoped** — only what changed *this session*, which you have the context for. It is not the exhaustive whole-doc audit; that's `/td-close`. In-the-moment routing (`CLAUDE.md § Where things go`) stays primary — this is the backstop for things that drifted through the work without a clean action-shaped statement. Anything genuinely ambiguous → note it in the Resume note (Step 6) for `/td-close` or the next session; don't block the checkpoint on it.
+This is **session-scoped** — only what changed *this session*, which you have the context for. It is not the exhaustive whole-doc audit; that's `/td-flow-close`. In-the-moment routing (`CLAUDE.md § Where things go`) stays primary — this is the backstop for things that drifted through the work without a clean action-shaped statement. Anything genuinely ambiguous → note it in the Resume note (Step 6) for `/td-flow-close` or the next session; don't block the checkpoint on it.
 
 **Light prune.** Walk `.td/` for content git already covers:
 
@@ -65,7 +65,7 @@ This is **session-scoped** — only what changed *this session*, which you have 
 - Resolved blockers in `.td/STATE.md` → clear them out.
 - Backlog items that have shipped → delete the line.
 
-**Mailbox snapshot** (status read, always renders unless mailbox is empty). Fetch open issues in this repo and cross-repo filings (same shape as `/td-mailbox` Steps 2+4). Inbound counts **Bugs and Tasks only** — Ideas and Epics aren't handoff to-dos, so they stay out of the snapshot. Format:
+**Mailbox snapshot** (status read, always renders unless mailbox is empty). Fetch open issues in this repo and cross-repo filings (same shape as `/td-flow-mailbox` Steps 2+4). Inbound counts **Bugs and Tasks only** — Ideas and Epics aren't handoff to-dos, so they stay out of the snapshot. Format:
 
 ```
 [mailbox] 📥 <N> inbound (<Bug/Task breakdown>), 📤 <M> outbound (<state-breakdown>)
@@ -73,7 +73,7 @@ This is **session-scoped** — only what changed *this session*, which you have 
 
 Examples: `[mailbox] 📥 3 inbound (1 Bug, 2 Task), 📤 0 outbound` | `[mailbox] empty`. Skip outbound segment if `.td/PROJECT.md § Cross-repo` is missing. No Bugs/Tasks inbound and no outbound → `[mailbox] empty`.
 
-Don't restructure, and don't re-audit doc content that didn't change this session — the exhaustive doc audit is `/td-close`.
+Don't restructure, and don't re-audit doc content that didn't change this session — the exhaustive doc audit is `/td-flow-close`.
 
 # Step 6 — Update STATE.md as a handoff
 
@@ -124,5 +124,5 @@ One sentence: `Cleared. <N> commits pushed. STATE handoff written. Safe to /clea
 - Never force-push. Squashing is for local-only commits.
 - If the user says "discard" for uncommitted changes, ask explicit confirmation — destructive.
 - This command is the only place we rewrite recent local history. Day-to-day shipping never does.
-- Don't run the full doc audit here — that's `/td-close`. Stay fast.
-- Don't run cross-repo registry drift checks here — that's `/td-close` Step 7. Stay fast.
+- Don't run the full doc audit here — that's `/td-flow-close`. Stay fast.
+- Don't run cross-repo registry drift checks here — that's `/td-flow-close` Step 7. Stay fast.

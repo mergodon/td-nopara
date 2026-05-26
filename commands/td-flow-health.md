@@ -1,16 +1,16 @@
 ---
-description: Proactive production health check. Runs the project's .td/health.sh, reports OK/WARN/FAIL — parks warnings to BACKLOG, escalates failures to /td-incident. First run scaffolds the routine.
+description: Proactive production health check. Runs the project's .td/health.sh, reports OK/WARN/FAIL — parks warnings to BACKLOG, escalates failures to /td-flow-incident. First run scaffolds the routine.
 ---
 
-You are running a proactive health check on this project's production deployment. This is the inverse of `/td-incident`: nothing is on fire yet — you are looking *for* fires before users find them. The check is **read-only on production** — observe, never mutate. Anything that needs a mutation to fix is a `/td-incident`, not a `/td-health`.
+You are running a proactive health check on this project's production deployment. This is the inverse of `/td-flow-incident`: nothing is on fire yet — you are looking *for* fires before users find them. The check is **read-only on production** — observe, never mutate. Anything that needs a mutation to fix is a `/td-flow-incident`, not a `/td-flow-health`.
 
 # Step 0 — Verify we're in a td-flow project
 
-Confirm `./.td/` exists. If missing, abort: "Not a td-flow project — `/td-health` only runs inside a td-flow project."
+Confirm `./.td/` exists. If missing, abort: "Not a td-flow project — `/td-flow-health` only runs inside a td-flow project."
 
 # Step 1 — Locate the health routine
 
-The project owns *what* to check; `/td-health` only runs it. The routine is a script — canonical path `./.td/health.sh`, fallback `./.td/ops/health.sh` (some projects keep an `ops/` folder).
+The project owns *what* to check; `/td-flow-health` only runs it. The routine is a script — canonical path `./.td/health.sh`, fallback `./.td/ops/health.sh` (some projects keep an `ops/` folder).
 
 - **Found** → Step 4 (run it).
 - **Not found** → Step 2.
@@ -20,7 +20,7 @@ The project owns *what* to check; `/td-health` only runs it. The routine is a sc
 Check `.td/PROJECT.md` for a `## Health` section.
 
 - **`## Health` says "Not applicable"** → this project has been marked non-production. Report: `Health: n/a — <reason from the section>. Nothing to check.` Stop here, exit clean.
-- **No `## Health` section** → this is the first `/td-health` on this project. Go to Step 3.
+- **No `## Health` section** → this is the first `/td-flow-health` on this project. Go to Step 3.
 
 # Step 3 — First run: set up the routine (or mark non-production)
 
@@ -37,7 +37,7 @@ If **(b)** — add a `## Health` section to `.td/PROJECT.md`:
 Not applicable — <one-line reason, e.g. "local CLI, no production surface">.
 ```
 
-Commit `docs: mark <project> non-production for /td-health`. Done — future runs skip this project cleanly.
+Commit `docs: mark <project> non-production for /td-flow-health`. Done — future runs skip this project cleanly.
 
 If **(a)** — **draft the script, don't interrogate.** Read `.td/WORKWAY.md` § Live (production URL, deploy host, log locations) and `.td/PROJECT.md` § Stack. From those, draft `.td/health.sh` from the template at `~/.claude/td-templates/td/health.sh` (or `~/projects/td-flow/templates/td/health.sh`):
 
@@ -66,14 +66,14 @@ Branch on the exit code:
 
 **Exit 1 — WARN(s).** Not on fire, but worth a look. List the WARN lines. Offer: *"Park the WARN(s) to BACKLOG.md?"* On yes, append each as `- <YYYY-MM-DD> — health WARN: <check> — <detail>` to `.td/BACKLOG.md`, commit `docs: park health warnings to backlog`.
 
-**Exit 2 — FAIL(s).** Something is broken in production. List the FAIL lines. Offer: *"Escalate to /td-incident?"* On yes, invoke `/td-incident` and supply the failing check(s) as its Step 1 one-liner — don't re-ask "what's broken". On no, stop; the user owns the call.
+**Exit 2 — FAIL(s).** Something is broken in production. List the FAIL lines. Offer: *"Escalate to /td-flow-incident?"* On yes, invoke `/td-flow-incident` and supply the failing check(s) as its Step 1 one-liner — don't re-ask "what's broken". On no, stop; the user owns the call.
 
 Close every run (except the non-production Step 2 exit) with a one-line plain verdict — `<project>: all OK` / `<project>: N warn` / `<project>: N fail` — so the outcome is scannable at a glance. The script's own summary line is the detail; this is just the headline.
 
 # Rules
 
-- **Read-only on production, always.** `/td-health` observes. It never restarts, purges, deploys, migrates, or edits production. Fixing is `/td-incident`'s job.
-- **The script is the contract.** `/td-health` hardcodes no checks — every project's `.td/health.sh` owns its own battery. The only fixed contract is the protocol: exit `0`/`1`/`2`, `OK`/`WARN`/`FAIL` lines. A project's checks evolve by editing its script, never this command.
-- **Not a STATE-moving command.** A health run is not a "piece" — it does not touch `STATE.Topic`/`Phase`/`Last`. (If it escalates into `/td-incident`, that command moves STATE itself.)
-- **Confirm at the real branch points only:** Step 3's drafted script + PROJECT.md edit (single accept), Step 5's "park WARNs to BACKLOG?", Step 5's "escalate to /td-incident?". Don't add extra gates around the commits — they follow the normal rhythm.
+- **Read-only on production, always.** `/td-flow-health` observes. It never restarts, purges, deploys, migrates, or edits production. Fixing is `/td-flow-incident`'s job.
+- **The script is the contract.** `/td-flow-health` hardcodes no checks — every project's `.td/health.sh` owns its own battery. The only fixed contract is the protocol: exit `0`/`1`/`2`, `OK`/`WARN`/`FAIL` lines. A project's checks evolve by editing its script, never this command.
+- **Not a STATE-moving command.** A health run is not a "piece" — it does not touch `STATE.Topic`/`Phase`/`Last`. (If it escalates into `/td-flow-incident`, that command moves STATE itself.)
+- **Confirm at the real branch points only:** Step 3's drafted script + PROJECT.md edit (single accept), Step 5's "park WARNs to BACKLOG?", Step 5's "escalate to /td-flow-incident?". Don't add extra gates around the commits — they follow the normal rhythm.
 - **Path drift:** if the routine is found at `.td/ops/health.sh`, run it, and mention once that the canonical path is `.td/health.sh` — don't move it unprompted.

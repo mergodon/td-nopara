@@ -2,9 +2,9 @@
 description: Wrap the project (or a major phase). Park all leftover BACKLOG + work files to GitHub Issues, mechanical stack-reality-check vs PROJECT.md, doc hygiene pass across all .td/ docs (including the load-bearing Cross-repo registry), push. Ends with a read-only td-flow framework-update check.
 ---
 
-You are closing the project (or a major phase). The work is done — shipped, live if it has a live, tested. This is the deeper cleanup that `/td-clear` skips: park leftover thinking to GitHub, walk every doc, validate it against current code and `git log`, prune anything redundant, restructure if drift has crept in. End with a clean, minimal `.td/` that an outsider could read in 2 minutes and understand the project.
+You are closing the project (or a major phase). The work is done — shipped, live if it has a live, tested. This is the deeper cleanup that `/td-flow-clear` skips: park leftover thinking to GitHub, walk every doc, validate it against current code and `git log`, prune anything redundant, restructure if drift has crept in. End with a clean, minimal `.td/` that an outsider could read in 2 minutes and understand the project.
 
-If state shows clearly mid-flight (active `Topic`, `work/<topic>.md` files, unfinished plan in Resume note), still run — projects-per-hour is normal here. The user invoked `/td-close`; take them at their word and proceed.
+If state shows clearly mid-flight (active `Topic`, `work/<topic>.md` files, unfinished plan in Resume note), still run — projects-per-hour is normal here. The user invoked `/td-flow-close`; take them at their word and proceed.
 
 # Step 1 — Update memory
 
@@ -21,7 +21,7 @@ Update existing memory files rather than creating duplicates. If nothing new was
 - Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
 - `git status --short` — uncommitted? If yes: stop, ask "Commit, stash, or discard?" Wait.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
-- **Unresolved-issue gate.** Fetch open issues in this repo (same query as `/td-mailbox` Step 2). Filter to `Bug` + `Task` only — Epics are planning surfaces (track via their Task/Bug children, not the parent itself); Ideas are long-tail by design and don't gate a close. Also fetch awaiting-reply outbound (informational only, no gate — same shape as `/td-mailbox` Step 4).
+- **Unresolved-issue gate.** Fetch open issues in this repo (same query as `/td-flow-mailbox` Step 2). Filter to `Bug` + `Task` only — Epics are planning surfaces (track via their Task/Bug children, not the parent itself); Ideas are long-tail by design and don't gate a close. Also fetch awaiting-reply outbound (informational only, no gate — same shape as `/td-flow-mailbox` Step 4).
 
   If any open Bug or Task exists, surface and ask:
 
@@ -36,7 +36,7 @@ Update existing memory files rather than creating duplicates. If nothing new was
   Continue close? (yes / abort)
   ```
 
-  Wait. `yes` → proceed to Step 3. `abort` → stop, exit. User can `/td-mailbox` separately to triage, then re-run `/td-close`.
+  Wait. `yes` → proceed to Step 3. `abort` → stop, exit. User can `/td-flow-mailbox` separately to triage, then re-run `/td-flow-close`.
 
   If no open Bug/Task exists, skip this prompt silently. The outbound FYI alone isn't enough to gate — surface it as a one-liner heads-up and continue.
 
@@ -44,7 +44,7 @@ Update existing memory files rather than creating duplicates. If nothing new was
 
 Two leftover-thinking surfaces to clear — BACKLOG lines and `.td/work/` files. Present each as a digest, take decisions in one pass, execute the batch. Don't walk items one at a time.
 
-**1. `.td/BACKLOG.md`** — run the **canonical BACKLOG-flush procedure**: `/td-park` Steps 2–8 (cache Issue Type IDs + friendly name → consolidate related lines → digest with Type + dedupe per proposed issue → one decision point → batch-create → rewrite BACKLOG). Don't re-derive it here — that procedure already consolidates instead of blind 1:1 line→issue mapping. Skip `/td-park`'s Step 0/1 (this command already verified and read BACKLOG in Step 2) and its Step 9 summary (this command's Step 12 covers it).
+**1. `.td/BACKLOG.md`** — run the **canonical BACKLOG-flush procedure**: `/td-flow-park` Steps 2–8 (cache Issue Type IDs + friendly name → consolidate related lines → digest with Type + dedupe per proposed issue → one decision point → batch-create → rewrite BACKLOG). Don't re-derive it here — that procedure already consolidates instead of blind 1:1 line→issue mapping. Skip `/td-flow-park`'s Step 0/1 (this command already verified and read BACKLOG in Step 2) and its Step 9 summary (this command's Step 12 covers it).
 
 **2. `.td/work/<topic>.md` files** — gather all work files, then present one digest:
    - For each: `git log --grep="<topic>" --oneline` — shipped or not?
@@ -86,7 +86,7 @@ Don't refactor. Don't optimize. Surface, don't act.
 
 # Step 5 — Squash local-only commits (if any)
 
-If 2+ commits ahead of `origin/main`, offer to squash. Same rules as `/td-clear`:
+If 2+ commits ahead of `origin/main`, offer to squash. Same rules as `/td-flow-clear`:
 
 ```
 git reset --soft origin/main
@@ -136,7 +136,7 @@ Run every check below across all docs, then surface the findings as one numbered
 - **PROJECT.md § Active scope** — anything actually shipped? Move to "Shipped". Anything quietly abandoned? Ask before deleting.
 - **PROJECT.md § What this is / Who for** — re-read against what actually got built. If the one-liner no longer fits, propose a new one and ask.
 - **PROJECT.md § Stack** — drift items from Step 6 already handled. Now check: is anything here just a copy of the dep file? Prune to the human-curated layer.
-- **PROJECT.md § Cross-repo** — load-bearing for `/td-mailbox` outbound. Cross-repo drift check: an org-wide `**From:**` marker search → diff observed-vs-declared → propose add/remove per delta, apply confirmed deltas inline. (Optional cleanup — if you'd rather not, leave the registry as-is and say so; don't block the close on it.)
+- **PROJECT.md § Cross-repo** — load-bearing for `/td-flow-mailbox` outbound. Cross-repo drift check: an org-wide `**From:**` marker search → diff observed-vs-declared → propose add/remove per delta, apply confirmed deltas inline. (Optional cleanup — if you'd rather not, leave the registry as-is and say so; don't block the close on it.)
 - **WORKWAY.md § Local testing** — does `Test command` still exist in `package.json` / equivalent? Run it. If removed, flag.
 - **WORKWAY.md § Local UAT / Live** — live URL still up? Smoke command works? Anything that reads as guesswork ("probably deploys via...") → verify or clear.
 - **WORKWAY.md § Framework specifics** — anything for a framework we removed? Prune.
@@ -161,7 +161,7 @@ Last:     <YYYY-MM-DD HH:MM> — closed.
 
 <One short paragraph: what got built, where it lives, what to know if you come
 back later. Not a changelog — git is the changelog. Just enough that a future
-session knows whether to /td-init fresh or pick up from here.>
+session knows whether to /td-flow-init fresh or pick up from here.>
 ```
 
 If the user said in Step 2 they're wrapping a phase (not the whole project), use a different `Topic` and `Phase` to reflect that — but the Resume note still summarizes what just wrapped, not what's coming next. The next session writes the next plan.
@@ -194,7 +194,7 @@ The close succeeded — an infrequent, natural checkpoint to surface whether the
 Resolve the framework repo from this command file — `install.sh` symlinks it out of the repo, so this is clone-path-independent:
 
 ```
-TD_REPO=$(cd "$(dirname "$(readlink ~/.claude/commands/td-close.md)")/.." && pwd)
+TD_REPO=$(cd "$(dirname "$(readlink ~/.claude/commands/td-flow-close.md)")/.." && pwd)
 ```
 
 Check `main` against its remote:

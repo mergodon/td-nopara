@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # td-flow smoke check — automates the WORKWAY § Local testing pre-ship list.
-# Output protocol mirrors /td-health: OK/WARN/FAIL lines, exit 0/1/2.
+# Output protocol mirrors /td-flow-health: OK/WARN/FAIL lines, exit 0/1/2.
 
 set -uo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
@@ -30,7 +30,7 @@ fi
 # install.sh idempotency runs last for that reason.
 
 # 2. All 10 slash commands resolve in ~/.claude/commands/
-EXPECTED_COMMANDS=(td-init td-clear td-close td-complex-clear td-refresh td-mailbox td-health td-incident td-park td-snapshot)
+EXPECTED_COMMANDS=(td-flow-init td-flow-clear td-flow-complex-clear td-flow-close td-flow-refresh td-flow-mailbox td-flow-health td-flow-incident td-flow-park td-flow-snapshot)
 missing=0
 for c in "${EXPECTED_COMMANDS[@]}"; do
   link="$HOME/.claude/commands/$c.md"

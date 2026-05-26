@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # {{PROJECT}} — production health check.
 #
-# Run it:  .td/health.sh   (directly, or via the /td-health command)
+# Run it:  .td/health.sh   (directly, or via the /td-flow-health command)
 #
-# CONTRACT — /td-health depends on this, keep it intact:
+# CONTRACT — /td-flow-health depends on this, keep it intact:
 #   * every check prints ONE line via ok / warn / fail below
 #   * exit 0 = all OK   ·   exit 1 = any WARN   ·   exit 2 = any FAIL
 #   * read-only: this script observes production, it never mutates it

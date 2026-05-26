@@ -29,8 +29,8 @@ Another project's repo is another team's territory, even when the same human wea
 
 Two pieces of human-curated state, no external tracker:
 
-1. **`.td/PROJECT.md § Cross-repo`** — per-project registry of repos this project files into. Opt-in (only present when there's a real relationship to declare). **IS the outbound scope for `/td-mailbox`** — load-bearing.
-2. **`**From:** <friendly-name>` body marker** — every cross-repo filing's body opens with this. Canonical "this is ours" identifier for `/td-mailbox` outbound; canonical "who sent this" signal for inbound walks.
+1. **`.td/PROJECT.md § Cross-repo`** — per-project registry of repos this project files into. Opt-in (only present when there's a real relationship to declare). **IS the outbound scope for `/td-flow-mailbox`** — load-bearing.
+2. **`**From:** <friendly-name>` body marker** — every cross-repo filing's body opens with this. Canonical "this is ours" identifier for `/td-flow-mailbox` outbound; canonical "who sent this" signal for inbound walks.
 
 **Friendly-name resolution:** first H1 in `.td/PROJECT.md`, fall back to local directory basename. Keep PROJECT.md's H1 set per project. GH slugs change on rename, GH identities vary by machine — friendly names stay stable across sessions. **Exception:** `Closes <slug>#N` in commit messages keeps the full GH slug — that's GitHub's mechanical auto-close syntax, not a message.
 
@@ -40,7 +40,7 @@ Two pieces of human-curated state, no external tracker:
 
 1. Check `.td/PROJECT.md § Cross-repo`. If target isn't listed, ask the user — one-line edit to declare it.
 2. `gh repo view <slug>` for access + context. Read README (and `.td/PROJECT.md` if it's a td-flow project).
-3. `gh api graphql` `createIssue` mutation against `<slug>` with the fitting Issue Type — body opens `**From:** <friendly-name>`, then ask + why. (`gh issue create` can't set an Issue Type; use the mutation, same as `/td-park` and `/td-mailbox`.)
+3. `gh api graphql` `createIssue` mutation against `<slug>` with the fitting Issue Type — body opens `**From:** <friendly-name>`, then ask + why. (`gh issue create` can't set an Issue Type; use the mutation, same as `/td-flow-park` and `/td-flow-mailbox`.)
 4. Discuss via `gh issue comment --repo <slug>`. Receiver closes via `Closes <slug>#N` in a commit message — auto-links both sides.
 
 ### Naming convention
@@ -53,7 +53,7 @@ A parent `Epic` can have sub-issues in other mergodon repos via the `addSubIssue
 
 ### Inbox scope
 
-**Repo-scoped by default.** "CRs?" / "any incoming?" checks the current repo only — open Bugs and Tasks (see § Where things go). Cross-repo widening requires an explicit ask ("all repos", "global inbox") or invoking `/td-mailbox` (which walks both directions in one pass — inbound + outbound). `## Cross-repo` registry tells me which repos this project *files into*, not which to *poll*.
+**Repo-scoped by default.** "CRs?" / "any incoming?" checks the current repo only — open Bugs and Tasks (see § Where things go). Cross-repo widening requires an explicit ask ("all repos", "global inbox") or invoking `/td-flow-mailbox` (which walks both directions in one pass — inbound + outbound). `## Cross-repo` registry tells me which repos this project *files into*, not which to *poll*.
 
 No labels, no status enum. Open = pending; closed = done.
 
@@ -62,20 +62,20 @@ No labels, no status enum. Open = pending; closed = done.
 - `PROJECT.md` — what this is, who for, stack, active scope, shipped.
 - `WORKWAY.md` — how to test locally (and the workaround when I can't), how to UAT, how to ship to production, framework-specific notes. The single source for "how do we do things in this project."
 - `STATE.md` — current phase, current topic, blocker, resume note. Resume note can be as long as needed — that's where planning lives.
-- `BACKLOG.md` — session-scoped parking. During work, append items I want to defer (`- YYYY-MM-DD — <item>`). At `/td-close`, BACKLOG flushes to GitHub Issues (with the appropriate type per the org's Issue Types) and the file ends empty. Starts empty each session.
+- `BACKLOG.md` — session-scoped parking. During work, append items I want to defer (`- YYYY-MM-DD — <item>`). At `/td-flow-close`, BACKLOG flushes to GitHub Issues (with the appropriate type per the org's Issue Types) and the file ends empty. Starts empty each session.
 - `work/<topic>.md` — active work; deleted at close.
-- `DEBUG.md` *(optional)* — project-specific troubleshooting reference. Tooling URLs, symptom→diagnostic paths, gotchas, production debug commands. Read only when something's on fire. Created on demand (typically during a `/td-incident` close-out when a non-obvious diagnostic surfaced), not scaffolded at `/td-init`. Same opt-in pattern as `PROJECT.md § Cross-repo`. Template structure at `~/projects/td-flow/templates/td/DEBUG.md`.
+- `DEBUG.md` *(optional)* — project-specific troubleshooting reference. Tooling URLs, symptom→diagnostic paths, gotchas, production debug commands. Read only when something's on fire. Created on demand (typically during a `/td-flow-incident` close-out when a non-obvious diagnostic surfaced), not scaffolded at `/td-flow-init`. Same opt-in pattern as `PROJECT.md § Cross-repo`. Template structure at `~/projects/td-flow/templates/td/DEBUG.md`.
 
 If something doesn't fit one of those docs, it probably doesn't need a doc — git or the existing docs cover it.
 
-**Doc hygiene.** The next session loads these docs cold and assumes everything in them is true. So the bar is sharp: **keep what (a) matters for next session, (b) isn't derivable from code or `git log`, (c) we actually know to be true.** Clear speculation, clear placeholders, clear anything the codebase already says authoritatively (the stack list shouldn't duplicate `composer.json`). `/td-clear` syncs the docs to the current session at handoff — scope, stack, gotchas, the STATE handoff. `/td-close` applies the full audit across all docs (mechanical stack diff + per-doc pass).
+**Doc hygiene.** The next session loads these docs cold and assumes everything in them is true. So the bar is sharp: **keep what (a) matters for next session, (b) isn't derivable from code or `git log`, (c) we actually know to be true.** Clear speculation, clear placeholders, clear anything the codebase already says authoritatively (the stack list shouldn't duplicate `composer.json`). `/td-flow-clear` syncs the docs to the current session at handoff — scope, stack, gotchas, the STATE handoff. `/td-flow-close` applies the full audit across all docs (mechanical stack diff + per-doc pass).
 
 ## Nudges I do without being asked
 
-- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Alongside it, I surface open **Bugs and Tasks** in this repo — one line, or "(inbox clear)". (Type filtering needs `gh api graphql`, not `gh issue list`.) Ideas and Epics aren't surfaced unprompted — Ideas are browse-on-request (`/td-mailbox`, or "show me the ideas"), Epics are planning surfaces; neither is a to-do.
+- At the first message of a fresh session: if `STATE.Topic` is not idle, I summarize where we are (one line: topic, last, next step) before answering. Alongside it, I surface open **Bugs and Tasks** in this repo — one line, or "(inbox clear)". (Type filtering needs `gh api graphql`, not `gh issue list`.) Ideas and Epics aren't surfaced unprompted — Ideas are browse-on-request (`/td-flow-mailbox`, or "show me the ideas"), Epics are planning surfaces; neither is a to-do.
 - After a piece is done: I commit and push without re-asking every time — that's the rhythm. The user can say "wait, don't push yet" to break it.
-- When context is getting heavy mid-project: I suggest `/td-clear`.
-- When a project (or major phase) is genuinely wrapping: I suggest `/td-close`.
+- When context is getting heavy mid-project: I suggest `/td-flow-clear`.
+- When a project (or major phase) is genuinely wrapping: I suggest `/td-flow-close`.
 
 ## Before I commit a piece
 
@@ -105,10 +105,10 @@ I watch for these and flag with one line — the user decides:
 - `STATE.Topic` and `work/<topic>.md` disagree → ask which is right.
 - PROJECT.md "Active scope" item has shipping commits → propose moving to Shipped.
 - WORKWAY test command no longer exists in `package.json`/equivalent → flag.
-- BACKLOG > 15 items mid-session → flag session bloat; suggest flushing to GitHub Issues before `/td-close` (mid-session flush is a single conversational ask — "park the backlog to GH").
+- BACKLOG > 15 items mid-session → flag session bloat; suggest flushing to GitHub Issues before `/td-flow-close` (mid-session flush is a single conversational ask — "park the backlog to GH").
 - 5+ local commits ahead of `origin/main` → ask if holding for a reason.
 - A project's `CLAUDE.md` is missing its `@~/.claude/td-flow-contract.md` import line (Boost, Cursor, `/init`, or a manual edit replaced it) → the contract isn't loading; flag it and restore the import line.
-- Stack drift (a dep added/removed/major-version bumped that I notice in conversation) → flag, route to `WORKWAY.md` § Framework specifics or PROJECT.md § Stack. Catching this at the moment is best; the safety net runs at `/td-clear` (this-session stack changes synced into PROJECT.md § Stack) and `/td-close` (full mechanical diff of dep files vs PROJECT.md § Stack).
+- Stack drift (a dep added/removed/major-version bumped that I notice in conversation) → flag, route to `WORKWAY.md` § Framework specifics or PROJECT.md § Stack. Catching this at the moment is best; the safety net runs at `/td-flow-clear` (this-session stack changes synced into PROJECT.md § Stack) and `/td-flow-close` (full mechanical diff of dep files vs PROJECT.md § Stack).
 - I've fixed the same kind of issue 3+ times → ask about root cause.
 - About to commit a file that looks like a secret (`.env`, token, key) → stop and confirm.
 
@@ -121,23 +121,23 @@ When the user tells me something at the start of a message, action-shaped:
 - "live URL is X" / "deploy is X" / "logs are at X" → `.td/WORKWAY.md` § Live
 - "we use Laravel/Next/X" / framework-specific gotcha → `.td/WORKWAY.md` § Framework specifics
 - "stack changes to X" / "scope is X" → `.td/PROJECT.md`
-- "remember to X later" / "park this" → append `.td/BACKLOG.md` (session-scoped scratch; flushes to GitHub Issues at `/td-close`).
-- "park this to GH" / "create an issue for X" / "file this as Bug/Task/Idea" → `gh api graphql createIssue` mutation in current repo. Suggest Type from phrasing (vague defaults to `Idea`, not `Task`); show suggestion + the trigger phrase; dedupe against open issues; confirm before posting. Body opens `**From:** <this-project>`. Direct path — skip BACKLOG, track in GH immediately. **Dedupe-match handling matches `/td-park`:** if the matched issue is an `Idea`, default action is **promote** (re-type Idea → Task via `updateIssue`) — don't create a duplicate; if the match is `Bug`/`Task`/`Epic`, default is **comment** on the existing issue.
-- "flush the backlog" / "park the backlog to GH" / "empty BACKLOG" → invoke `/td-park` (or run its procedure inline if mid-conversation).
+- "remember to X later" / "park this" → append `.td/BACKLOG.md` (session-scoped scratch; flushes to GitHub Issues at `/td-flow-close`).
+- "park this to GH" / "create an issue for X" / "file this as Bug/Task/Idea" → `gh api graphql createIssue` mutation in current repo. Suggest Type from phrasing (vague defaults to `Idea`, not `Task`); show suggestion + the trigger phrase; dedupe against open issues; confirm before posting. Body opens `**From:** <this-project>`. Direct path — skip BACKLOG, track in GH immediately. **Dedupe-match handling matches `/td-flow-park`:** if the matched issue is an `Idea`, default action is **promote** (re-type Idea → Task via `updateIssue`) — don't create a duplicate; if the match is `Bug`/`Task`/`Epic`, default is **comment** on the existing issue.
+- "flush the backlog" / "park the backlog to GH" / "empty BACKLOG" → invoke `/td-flow-park` (or run its procedure inline if mid-conversation).
 - "let's plan X" / "start an Epic for X" / "I want to work on a big thing" → create `.td/work/<slug>.md` as planning scratch. When the plan is solid, promote: parent `Epic` via `gh api graphql createIssue` in this repo; concrete pieces as sub-issues via `addSubIssue` mutation (cross-repo within mergodon org supported). Fold-and-delete the work file at promotion.
 - "feedback on td-flow" → append `~/projects/td-flow/FEEDBACK.md`
 - "add to DEBUG" / "save this debug trick" / "this gotcha goes in the runbook" → write to `.td/DEBUG.md`. Create from `~/projects/td-flow/templates/td/DEBUG.md` template if missing.
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td/STATE.md` § Resume note (or `.td/work/<topic>.md` if multi-step)
-- "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`. **If the target isn't listed, ask the user first** — it's a real cross-repo relationship that needs declaring (one-line edit to PROJECT.md). Then `gh api graphql createIssue` against the target repo with body opening `**From:** <friendly-name>` followed by ask + why. Use the `Bug`/`Task`/`Idea` type that fits. **If the work belongs to an existing Epic in this repo (planning surface), also `addSubIssue` to that Epic** so cross-repo progress rolls up natively. Otherwise no extra step — `/td-mailbox`'s outbound query finds the filing via the `**From:**` marker scoped to the connected-repos list.
-- "any incoming?" / "check the inbox" / "CRs?" → surface open **Bugs and Tasks** in this repo (`gh api graphql` by Issue Type — current repo ONLY, never widen here). Ideas and Epics aren't included — "show me the ideas" or `/td-mailbox` for those. `/td-mailbox` does the full walk (both directions).
-- "show me the ideas" / "review the ideas" → list open `Idea` issues in this repo (`gh api graphql` by Issue Type) for triage. Promoting an Idea to `Task` is a one-shot `updateIssue` re-type (the `issueTypeId` field) — same as `/td-mailbox`'s `promote`. When work actually starts on an Idea, promote it first: committing to an Idea makes it real work, not exploration.
-- "what did we file?" / "show our outbox" / "any updates from the issues we filed?" → `/td-mailbox` (the outbound section). For a specific repo question like "did <repo> respond?", optional shortcut: inline GraphQL query on the relevant parent issue's `subIssues`, no full walk.
+- "file an issue for X" / "ask X to do Y" / "send a CR to X" → check `.td/PROJECT.md § Cross-repo`. **If the target isn't listed, ask the user first** — it's a real cross-repo relationship that needs declaring (one-line edit to PROJECT.md). Then `gh api graphql createIssue` against the target repo with body opening `**From:** <friendly-name>` followed by ask + why. Use the `Bug`/`Task`/`Idea` type that fits. **If the work belongs to an existing Epic in this repo (planning surface), also `addSubIssue` to that Epic** so cross-repo progress rolls up natively. Otherwise no extra step — `/td-flow-mailbox`'s outbound query finds the filing via the `**From:**` marker scoped to the connected-repos list.
+- "any incoming?" / "check the inbox" / "CRs?" → surface open **Bugs and Tasks** in this repo (`gh api graphql` by Issue Type — current repo ONLY, never widen here). Ideas and Epics aren't included — "show me the ideas" or `/td-flow-mailbox` for those. `/td-flow-mailbox` does the full walk (both directions).
+- "show me the ideas" / "review the ideas" → list open `Idea` issues in this repo (`gh api graphql` by Issue Type) for triage. Promoting an Idea to `Task` is a one-shot `updateIssue` re-type (the `issueTypeId` field) — same as `/td-flow-mailbox`'s `promote`. When work actually starts on an Idea, promote it first: committing to an Idea makes it real work, not exploration.
+- "what did we file?" / "show our outbox" / "any updates from the issues we filed?" → `/td-flow-mailbox` (the outbound section). For a specific repo question like "did <repo> respond?", optional shortcut: inline GraphQL query on the relevant parent issue's `subIssues`, no full walk.
 - "all repos?" / "global inbox" / "everything open" / "what's open across the board?" → `gh search issues --owner <owner> --involves @me --state open` (cross-repo, only on explicit ask; flag form, not quoted-string).
-- "snapshot this" / "save and switch" / "step away mid-flight" / "pause this, work on X" → invoke `/td-snapshot` (commits in-flight to `snapshot/<slug>` branch, files `Snapshot`-type GH issue with the resume command, resets STATE to idle). Resume later by `git checkout snapshot/<slug>` plus the `claude --resume <session-id>` line from the issue body. **`/td-park` vs `/td-snapshot`:** `/td-park` flushes BACKLOG.md (ideas/brainstorm) to GH Issues — doesn't touch code or STATE.Topic. `/td-snapshot` requires an in-flight piece (STATE.Topic != idle, possibly uncommitted edits, work file) — preserves the actual code-in-progress to a branch + issue. If you have both accumulated ideas AND active code-in-progress, run `/td-snapshot` first to preserve code, then `/td-park` to flush ideas.
+- "snapshot this" / "save and switch" / "step away mid-flight" / "pause this, work on X" → invoke `/td-flow-snapshot` (commits in-flight to `snapshot/<slug>` branch, files `Snapshot`-type GH issue with the resume command, resets STATE to idle). Resume later by `git checkout snapshot/<slug>` plus the `claude --resume <session-id>` line from the issue body. **`/td-flow-park` vs `/td-flow-snapshot`:** `/td-flow-park` flushes BACKLOG.md (ideas/brainstorm) to GH Issues — doesn't touch code or STATE.Topic. `/td-flow-snapshot` requires an in-flight piece (STATE.Topic != idle, possibly uncommitted edits, work file) — preserves the actual code-in-progress to a branch + issue. If you have both accumulated ideas AND active code-in-progress, run `/td-flow-snapshot` first to preserve code, then `/td-flow-park` to flush ideas.
 - "ship it" / "we're done" / "push it" → tests pass, commit the piece, push to `origin/main`. Conversational — no slash command.
-- "let's clear" / "save it" / about to /clear mid-project → `/td-clear`
-- "wrap the project" / "we're done with this" / project actually finished → `/td-close`
-- "health check" / "is prod healthy?" / "check production health" → invoke `/td-health`
+- "let's clear" / "save it" / about to /clear mid-project → `/td-flow-clear`
+- "wrap the project" / "we're done with this" / project actually finished → `/td-flow-close`
+- "health check" / "is prod healthy?" / "check production health" → invoke `/td-flow-health`
 - "where are we" → read STATE.md, summarize
 - "save this as a `<name>` template" → copy current `.td/` shape (anonymized) to `~/projects/td-flow/templates/<name>/`
 
@@ -155,7 +155,7 @@ Mid-conversation mentions don't trigger updates — only explicit, action-shaped
 
 Framework-specific instructions (Laravel Boost, Next.js, Tailwind, shadcn) live in `.td/WORKWAY.md` § Framework specifics. If a framework writes guidelines into `CLAUDE.md`, the user notices and tells me; I restore the project's `CLAUDE.md` — its one-line `@import` of the contract — and move salvageable notes to WORKWAY.md.
 
-**Never run Claude Code's built-in `/init` in a td-flow project.** It auto-generates a codebase-snapshot CLAUDE.md and overwrites the contract — same pollution problem as Boost. If the user wants a codebase overview, I do the scan and report back without touching `CLAUDE.md`. `/td-init` is the td-flow equivalent and is the only one to use here.
+**Never run Claude Code's built-in `/init` in a td-flow project.** It auto-generates a codebase-snapshot CLAUDE.md and overwrites the contract — same pollution problem as Boost. If the user wants a codebase overview, I do the scan and report back without touching `CLAUDE.md`. `/td-flow-init` is the td-flow equivalent and is the only one to use here.
 
 ## Digging into history
 
@@ -184,16 +184,17 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 
 ## The slash commands
 
-Nine commands, each with a distinct trigger. Full procedure lives in `commands/<name>.md` — the one-liners below are the trigger map.
+Ten commands, each with a distinct trigger. Full procedure lives in `commands/<name>.md` — the one-liners below are the trigger map.
 
-- `/td-init` — bootstrap or migrate a project (one-time per project).
-- `/td-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
-- `/td-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
-- `/td-refresh` — pull the latest framework and re-run the installer; one-time, migrate a project off the old copied-contract model onto the `@import`.
-- `/td-mailbox` — unified cross-repo work walk (inbound + outbound + snapshots, one batched digest).
-- `/td-health` — proactive production health check. Runs `.td/health.sh`, reports OK/WARN/FAIL.
-- `/td-incident` — live production fire mode. Snapshots any in-flight piece first, then drops everything else.
-- `/td-park` — mid-session `BACKLOG.md` → GitHub Issues flush.
-- `/td-snapshot` — save the current in-flight piece to a `snapshot/<slug>` branch + `Snapshot`-type GH issue. Resumable via the `claude --resume` line in the issue body. Composed by `/td-incident`; standalone for mid-session pivots.
+- `/td-flow-init` — bootstrap or migrate a project (one-time per project).
+- `/td-flow-clear` — mid-project checkpoint. Run before `/clear` when the project continues.
+- `/td-flow-complex-clear` — rigorous mid-project checkpoint for complex multi-day work. Enhanced `/td-flow-clear` with required STATE sections, self-validation, and explicit handoff scaffolding.
+- `/td-flow-close` — wrap the project (or major phase). Park leftovers, doc hygiene, push.
+- `/td-flow-refresh` — pull the latest framework and re-run the installer; one-time, migrate a project off the old copied-contract model onto the `@import`.
+- `/td-flow-mailbox` — unified cross-repo work walk (inbound + outbound + snapshots, one batched digest).
+- `/td-flow-health` — proactive production health check. Runs `.td/health.sh`, reports OK/WARN/FAIL.
+- `/td-flow-incident` — live production fire mode. Snapshots any in-flight piece first, then drops everything else.
+- `/td-flow-park` — mid-session `BACKLOG.md` → GitHub Issues flush.
+- `/td-flow-snapshot` — save the current in-flight piece to a `snapshot/<slug>` branch + `Snapshot`-type GH issue. Resumable via the `claude --resume` line in the issue body. Composed by `/td-flow-incident`; standalone for mid-session pivots.
 
 Everything else — including shipping individual pieces — is conversational.

@@ -1,6 +1,6 @@
 # Debug
 
-Project-specific troubleshooting reference. Read only when something's on fire — not part of normal flow. Populated organically as incidents surface non-obvious tricks. Optional per project — created on demand (typically during a `/td-incident` close-out), not scaffolded at `/td-init`.
+Project-specific troubleshooting reference. Read only when something's on fire — not part of normal flow. Populated organically as incidents surface non-obvious tricks. Optional per project — created on demand (typically during a `/td-flow-incident` close-out), not scaffolded at `/td-flow-init`.
 
 ## Tooling
 
@@ -54,6 +54,6 @@ One-liners meant for incident mode only — these touch live state and require d
 
 ## When to add to this file
 
-During or right after an incident (typically the `/td-incident` close-out step). If a diagnostic walk or tool trick took more than a few minutes to figure out, capture it here — symptom + diagnostic steps + root cause + fix or workaround. Future-you (or another developer) hitting the same fire will thank current-you.
+During or right after an incident (typically the `/td-flow-incident` close-out step). If a diagnostic walk or tool trick took more than a few minutes to figure out, capture it here — symptom + diagnostic steps + root cause + fix or workaround. Future-you (or another developer) hitting the same fire will thank current-you.
 
 Don't add speculative content — only document what an actual incident proved out.

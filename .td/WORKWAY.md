@@ -19,13 +19,13 @@ The framework has no application-code test suite (and never will — there's no 
 
 ### When local testing isn't possible
 
-The framework is fully testable locally. If a future change involves a Claude Code-side behavior (e.g. how the skill loads), live-testing means: open Claude Code in another project, run `/td-init`, verify behavior. Document the case in the topic's work file.
+The framework is fully testable locally. If a future change involves a Claude Code-side behavior (e.g. how the skill loads), live-testing means: open Claude Code in another project, run `/td-flow-init`, verify behavior. Document the case in the topic's work file.
 
 ## Local UAT
 
 - Who runs it: Claude (smoke checks) + the maintainer (real-world use across portfolio projects).
-- What to verify: after a change, run a fresh `./install.sh`, then in a throwaway directory run `/td-init`. Walk through any flow affected by the change.
-- How: `mkdir /tmp/td-test && cd /tmp/td-test && claude` → `/td-init` → exercise the change.
+- What to verify: after a change, run a fresh `./install.sh`, then in a throwaway directory run `/td-flow-init`. Walk through any flow affected by the change.
+- How: `mkdir /tmp/td-test && cd /tmp/td-test && claude` → `/td-flow-init` → exercise the change.
 
 ## Live
 
@@ -55,12 +55,12 @@ The "live" environment for this framework is `mergodon/td-flow` on GitHub plus t
 ### Multi-machine sync
 
 - Each machine gets a fresh `git clone https://github.com/mergodon/td-flow ~/projects/td-flow` then `./install.sh`.
-- Updates: `git pull` then `./install.sh` — `install.sh` is idempotent; re-run it whenever command files are added/renamed, even without a pull (`/td-refresh` does this automatically).
+- Updates: `git pull` then `./install.sh` — `install.sh` is idempotent; re-run it whenever command files are added/renamed, even without a pull (`/td-flow-refresh` does this automatically).
 - No global memory dependency — everything ships through git.
 
 ## Notes
 
 - The framework went through three rewrites in two days (v1 → v2 → v3). This is fine for a personal tool with a single user, but signals: don't over-engineer; build for what's actually used. The shape stabilized only after looking at real portfolio projects.
-- Eat-own-dog-food: this very repo IS a td-flow project. Confirms the framework is self-consistent. If `/td-clear` and `/td-close` work here, they work in general.
-- Boost-style framework pollution is handled as a manual edge case, NOT engineered around in the default flow. Per Laravel team's own docs, gitignoring Boost's outputs is the recommended path; td-flow's `/td-init` does this for Laravel projects when detected.
-- Test harness: `mergodon/td-flow-test1` + `td-flow-test2` (private, kept). Two scaffolded td-flow projects with cross-declared `Cross-repo` registries — re-run td-flow command tests against them: cross-repo, `/td-mailbox`, `/td-park`, and the lifecycle commands (`git clone` for local copies). Created + exercised 2026-05-22; the org disallows issue deletion, so each run leaves closed issues behind.
+- Eat-own-dog-food: this very repo IS a td-flow project. Confirms the framework is self-consistent. If `/td-flow-clear` and `/td-flow-close` work here, they work in general.
+- Boost-style framework pollution is handled as a manual edge case, NOT engineered around in the default flow. Per Laravel team's own docs, gitignoring Boost's outputs is the recommended path; td-flow's `/td-flow-init` does this for Laravel projects when detected.
+- Test harness: `mergodon/td-flow-test1` + `td-flow-test2` (private, kept). Two scaffolded td-flow projects with cross-declared `Cross-repo` registries — re-run td-flow command tests against them: cross-repo, `/td-flow-mailbox`, `/td-flow-park`, and the lifecycle commands (`git clone` for local copies). Created + exercised 2026-05-22; the org disallows issue deletion, so each run leaves closed issues behind.

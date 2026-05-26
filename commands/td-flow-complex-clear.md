@@ -1,32 +1,32 @@
 ---
-description: Rigorous mid-project checkpoint for complex multi-day work. Enhanced version of /td-clear with required STATE sections, self-validation, and explicit handoff scaffolding. Use when /td-clear isn't enough (multi-phase work, lots of in-flight decisions, partial deliverables, external dependencies). Project continues — this is a checkpoint, not a wrap.
+description: Rigorous mid-project checkpoint for complex multi-day work. Enhanced version of /td-flow-clear with required STATE sections, self-validation, and explicit handoff scaffolding. Use when /td-flow-clear isn't enough (multi-phase work, lots of in-flight decisions, partial deliverables, external dependencies). Project continues — this is a checkpoint, not a wrap.
 ---
 
-You are checkpointing a complex session where standard `/td-clear` is too loose. The user wears this command when the work spans multiple phases, decisions, partial human-in-loop deliverables, parallel runs, or external dependencies — situations where a state-of-the-world dump misses operational substance (who-does-what-next, what's-running-now, what-disappears-on-reboot).
+You are checkpointing a complex session where standard `/td-flow-clear` is too loose. The user wears this command when the work spans multiple phases, decisions, partial human-in-loop deliverables, parallel runs, or external dependencies — situations where a state-of-the-world dump misses operational substance (who-does-what-next, what's-running-now, what-disappears-on-reboot).
 
-Same baseline rhythm as `/td-clear` (steps 1–6, 8, 9). The differences are **Step 7** (STATE rewrite — now structurally enforced), **Step 7.5** (self-validation gate), and an expanded **Step 5** (capture decisions + conversation-only context).
+Same baseline rhythm as `/td-flow-clear` (steps 1–6, 8, 9). The differences are **Step 7** (STATE rewrite — now structurally enforced), **Step 7.5** (self-validation gate), and an expanded **Step 5** (capture decisions + conversation-only context).
 
 # Step 1 — Update memory
 
-Identical to `/td-clear` Step 1. Scan the session for things worth keeping in the auto-memory system. Update existing memory files rather than creating duplicates.
+Identical to `/td-flow-clear` Step 1. Scan the session for things worth keeping in the auto-memory system. Update existing memory files rather than creating duplicates.
 
 # Step 2 — Audit current state
 
-Identical to `/td-clear` Step 2. Read `.td/STATE.md`, `.td/work/` listing, `.td/PROJECT.md`. Check `git status --short` and `git log origin/main..HEAD --oneline`. Working tree must be clean before proceeding.
+Identical to `/td-flow-clear` Step 2. Read `.td/STATE.md`, `.td/work/` listing, `.td/PROJECT.md`. Check `git status --short` and `git log origin/main..HEAD --oneline`. Working tree must be clean before proceeding.
 
 # Step 3 — Quick code sanity check
 
-Identical to `/td-clear` Step 3. Skim recent changes for accidentally committed secrets or obvious leftovers. Don't refactor.
+Identical to `/td-flow-clear` Step 3. Skim recent changes for accidentally committed secrets or obvious leftovers. Don't refactor.
 
 # Step 4 — Squash local-only commits (if any)
 
-Identical to `/td-clear` Step 4.
+Identical to `/td-flow-clear` Step 4.
 
 # Step 5 — Capture BACKLOG + conversation-only context
 
 Two sub-steps:
 
-**5a. Backlog**: ask the user "Anything to add to the backlog before we clear?" — same as `/td-clear`.
+**5a. Backlog**: ask the user "Anything to add to the backlog before we clear?" — same as `/td-flow-clear`.
 
 **5b. Conversation-only context** (new, REQUIRED): scan the session for **decisions whose rationale lived only in chat, not in any committed doc**. Common patterns:
 
@@ -40,15 +40,15 @@ These don't belong in BACKLOG (they're not future work) but they DO belong in ST
 
 # Step 6 — Light prune + handoff signals
 
-Identical to `/td-clear` Step 6. Walk `.td/` for stale topic files, resolved blockers, shipped backlog lines. Fetch the mailbox snapshot. Fire the drift heads-up if a stack file changed.
+Identical to `/td-flow-clear` Step 6. Walk `.td/` for stale topic files, resolved blockers, shipped backlog lines. Fetch the mailbox snapshot. Fire the drift heads-up if a stack file changed.
 
 # Step 7 — Write a structured STATE handoff
 
 Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context will load this and assume it's true.
 
-**The /td-complex-clear contract is stricter than /td-clear.** STATE.md must have the structured sections below. Length is not capped — write what's needed, not less.
+**The /td-flow-complex-clear contract is stricter than /td-flow-clear.** STATE.md must have the structured sections below. Length is not capped — write what's needed, not less.
 
-### Top section (field-shaped, same as /td-clear)
+### Top section (field-shaped, same as /td-flow-clear)
 
 ```
 Project:  <name>
@@ -124,17 +124,17 @@ Cleared. <N> commits pushed. STATE handoff written (<line-count> lines).
 Self-validation: Q1 ✓ Q2 ✓ Q3 ✓ Q4 ✓. Safe to /clear.
 ```
 
-# Rules (same as /td-clear, plus)
+# Rules (same as /td-flow-clear, plus)
 
 - Working tree must be clean before pushing.
 - Never force-push. Squashing is for local-only commits.
-- Don't run the full doc audit — that's `/td-close`. Stay focused on handoff.
-- **The structured sections in Step 7 are not optional.** A `/td-complex-clear` STATE that's missing the **Resume — start here** lead block, the action list, the dependency graph, or the volatile-artifacts table is not done. Iterate.
+- Don't run the full doc audit — that's `/td-flow-close`. Stay focused on handoff.
+- **The structured sections in Step 7 are not optional.** A `/td-flow-complex-clear` STATE that's missing the **Resume — start here** lead block, the action list, the dependency graph, or the volatile-artifacts table is not done. Iterate.
 - **The self-validation in Step 7.5 must be surfaced to the user** in the final response. Don't quietly self-pass — make the gate visible.
 - If the session genuinely doesn't have material for a required section (e.g. no LLM spend, no volatile artifacts), say "§ X N/A this session" explicitly rather than skipping silently.
-- This skill is heavier than `/td-clear` by design — use it when the complexity warrants the rigor. Simple sessions stick with `/td-clear`.
+- This skill is heavier than `/td-flow-clear` by design — use it when the complexity warrants the rigor. Simple sessions stick with `/td-flow-clear`.
 
 # When to use which
 
-- **`/td-clear`**: single-topic session, decisions captured in commits, no partial human-in-loop deliverables, no volatile artifacts, no parallel runs. Fast.
-- **`/td-complex-clear`**: multi-phase session, decisions taken conversationally (not all in commits), partial deliverables awaiting external input, volatile state on disk, parallel work streams, multiple owners involved. Slower but produces a handoff that survives complexity.
+- **`/td-flow-clear`**: single-topic session, decisions captured in commits, no partial human-in-loop deliverables, no volatile artifacts, no parallel runs. Fast.
+- **`/td-flow-complex-clear`**: multi-phase session, decisions taken conversationally (not all in commits), partial deliverables awaiting external input, volatile state on disk, parallel work streams, multiple owners involved. Slower but produces a handoff that survives complexity.
