@@ -86,11 +86,11 @@ extracted=$(awk '
     print
     exit
   }
-' .td/WORKWAY.md | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
+' .td-flow/WORKWAY.md | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
 if [ -n "$extracted" ]; then
   ok "AWK extractor returns Test command value: '$extracted'"
 else
-  fail "AWK extractor produced no value from .td/WORKWAY.md § Local testing"
+  fail "AWK extractor produced no value from .td-flow/WORKWAY.md § Local testing"
 fi
 
 # Summary

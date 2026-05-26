@@ -8,16 +8,16 @@ Optional argument: `/td-flow-snapshot <reason>` — short phrase recorded in the
 
 # Step 0 — Verify
 
-- Confirm `./.td/` exists. If missing: abort, "Not a td-flow project."
+- Confirm `./.td-flow/` exists. If missing: abort, "Not a td-flow project."
 - Confirm `$CLAUDE_CODE_SESSION_ID` is set. If missing: abort, "No Claude Code session ID in env — can't capture resume command."
 - Verify `gh` is authenticated with a remote: `gh repo view --json name,owner 2>/dev/null`. Capture `<owner>/<name>`.
-- Read `.td/STATE.md`. Parse `Topic:` line. **If `Topic == idle`: abort, "Nothing in flight to snapshot."**
+- Read `.td-flow/STATE.md`. Parse `Topic:` line. **If `Topic == idle`: abort, "Nothing in flight to snapshot."**
 
 # Step 1 — Resolve identifiers
 
 **Topic slug** — `STATE.Topic` is normally already kebab-case. If it carries an `incident:` prefix (from `/td-flow-incident`'s mode marker), strip the prefix. Lowercase ASCII, replace any non-`[a-z0-9-]` with `-`. Hold as `<slug>`.
 
-**Project friendly name** — same rule as `/td-flow-park` Step 3: first H1 in `.td/PROJECT.md`, fall back to directory basename. Hold as `<project-name>`.
+**Project friendly name** — same rule as `/td-flow-park` Step 3: first H1 in `.td-flow/PROJECT.md`, fall back to directory basename. Hold as `<project-name>`.
 
 **Original branch** — `git rev-parse --abbrev-ref HEAD`. Hold as `<original-branch>` (typically `main`; we'll return here after snapshot).
 
@@ -25,7 +25,7 @@ Optional argument: `/td-flow-snapshot <reason>` — short phrase recorded in the
 
 **Transcript path** — derive: `~/.claude/projects/$(pwd | tr '/' '-')/${CLAUDE_CODE_SESSION_ID}.jsonl`. Hold as `<transcript-path>`. Sanity check that the file exists; if not, still include the path in the issue body but note "(transcript file not found at snapshot time — Claude Code session may not have flushed yet)".
 
-**Original STATE fields** — from `.td/STATE.md`, hold the current values of `Topic:`, `Phase:`, `Last:` lines as `<original-topic>`, `<original-phase>`, `<original-last>`. They're used in Step 6's issue body to freeze the STATE at the snapshot moment. Capture them **before** Step 7 rewrites STATE.
+**Original STATE fields** — from `.td-flow/STATE.md`, hold the current values of `Topic:`, `Phase:`, `Last:` lines as `<original-topic>`, `<original-phase>`, `<original-last>`. They're used in Step 6's issue body to freeze the STATE at the snapshot moment. Capture them **before** Step 7 rewrites STATE.
 
 **Reason** — the optional argument, or `user-requested` if none.
 
@@ -42,7 +42,7 @@ Also resolve `<repo-node-id>`: `gh api graphql -f query='query { repository(owne
 
 # Step 3 — Capture work file content (for issue body)
 
-If `.td/work/<slug>.md` exists, read its full content — held as `<work-file-content>` for the issue body. If it doesn't (e.g., a single-piece topic with no work file), capture STATE.md's Resume note instead. Either way the snapshot issue body contains the durable design context.
+If `.td-flow/work/<slug>.md` exists, read its full content — held as `<work-file-content>` for the issue body. If it doesn't (e.g., a single-piece topic with no work file), capture STATE.md's Resume note instead. Either way the snapshot issue body contains the durable design context.
 
 This is why **Fix D** (the "materialise topic to disk before designing" contract rule) matters: it ensures there's always something real to capture here.
 
@@ -124,7 +124,7 @@ Hold the issue's `<N>` and `url` from the mutation response.
 git checkout <original-branch>
 ```
 
-Rewrite `.td/STATE.md`:
+Rewrite `.td-flow/STATE.md`:
 
 ```
 # State
@@ -143,7 +143,7 @@ Last:     YYYY-MM-DD — snapshotted <slug> → #<N> (snapshot/<slug>).
 Then commit and push:
 
 ```
-git add .td/STATE.md
+git add .td-flow/STATE.md
 git commit -m "chore: snapshot <slug> → #<N>"
 git push origin <original-branch>
 ```

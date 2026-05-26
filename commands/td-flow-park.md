@@ -2,13 +2,13 @@
 description: Flush BACKLOG.md to GitHub Issues — consolidate related lines first, then create the issues in one batched pass. Standalone mid-session declutter — no /td-flow-close ceremony.
 ---
 
-You are flushing `.td/BACKLOG.md` to GitHub Issues. Read every line, consolidate lines that describe the same work, then present the whole proposed issue set as ONE digest — the user reviews and adjusts in a single pass, and you create the batch. No line-by-line interrogation, no blind 1:1 line→issue mapping.
+You are flushing `.td-flow/BACKLOG.md` to GitHub Issues. Read every line, consolidate lines that describe the same work, then present the whole proposed issue set as ONE digest — the user reviews and adjusts in a single pass, and you create the batch. No line-by-line interrogation, no blind 1:1 line→issue mapping.
 
 This is the **canonical BACKLOG-flush procedure**. `/td-flow-close` Step 3 runs it too — pointing here rather than re-describing it.
 
 # Step 0 — Verify
 
-- Confirm `./.td/BACKLOG.md` exists. If missing: abort, "No BACKLOG.md in this project."
+- Confirm `./.td-flow/BACKLOG.md` exists. If missing: abort, "No BACKLOG.md in this project."
 - Confirm `gh` is authenticated with a remote: `gh repo view --json name,owner 2>/dev/null`. If fails: abort.
 - Capture `<owner>/<name>` for GraphQL.
 
@@ -31,7 +31,7 @@ Use the `<owner>` captured in Step 0 — don't hardcode any org name. Parse the 
 
 # Step 3 — Determine this project's friendly name
 
-Same procedure as `/td-flow-mailbox` Step 1: first H1 heading in `.td/PROJECT.md`, fall back to directory basename. Hold as `<sender-name>` (used as the `**From:**` marker if the issue ends up being a self-park — distinguishes work this project parked vs work others filed).
+Same procedure as `/td-flow-mailbox` Step 1: first H1 heading in `.td-flow/PROJECT.md`, fall back to directory basename. Hold as `<sender-name>` (used as the `**From:**` marker if the issue ends up being a self-park — distinguishes work this project parked vs work others filed).
 
 # Step 4 — Consolidate
 
@@ -142,7 +142,7 @@ Print each result: `Created <repo>#<N> (Type: X)`, `Promoted <repo>#<N> Idea →
 
 # Step 8 — Rewrite BACKLOG.md
 
-After the batch, rewrite `.td/BACKLOG.md` containing only the lines the user marked "skip" (plus any lines a "ship now" interruption never reached). If every line was synced/dropped/shipped, the body becomes `(empty)` (preamble preserved).
+After the batch, rewrite `.td-flow/BACKLOG.md` containing only the lines the user marked "skip" (plus any lines a "ship now" interruption never reached). If every line was synced/dropped/shipped, the body becomes `(empty)` (preamble preserved).
 
 # Step 9 — Tell the user
 

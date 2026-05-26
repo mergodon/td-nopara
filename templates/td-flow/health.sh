@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # {{PROJECT}} — production health check.
 #
-# Run it:  .td/health.sh   (directly, or via the /td-flow-health command)
+# Run it:  .td-flow/health.sh   (directly, or via the /td-flow-health command)
 #
 # CONTRACT — /td-flow-health depends on this, keep it intact:
 #   * every check prints ONE line via ok / warn / fail below

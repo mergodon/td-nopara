@@ -8,11 +8,11 @@ This command is a **composition**, not a bespoke pivot. Step 1 invokes `/td-flow
 
 # Step 0 — Verify we're in a td-flow project
 
-Confirm `./.td/` exists. If missing, abort: "Not a td-flow project — `/td-flow-incident` only runs inside a td-flow project."
+Confirm `./.td-flow/` exists. If missing, abort: "Not a td-flow project — `/td-flow-incident` only runs inside a td-flow project."
 
 # Step 1 — Snapshot any in-flight piece
 
-Read `.td/STATE.md`. Parse `Topic:` line.
+Read `.td-flow/STATE.md`. Parse `Topic:` line.
 
 - **If `Topic != idle`:** invoke `/td-flow-snapshot incident-pivot` inline (run its full procedure). This commits any uncommitted work to `snapshot/<previous-slug>`, files a Snapshot-type GH issue with the resume command, switches back to main (or wherever you were), resets STATE to idle, pushes. Nothing is lost.
 - **If `Topic == idle`:** skip. Nothing to preserve. Proceed to Step 2 on the already-clean main.
@@ -29,7 +29,7 @@ Keep it tight — the headline, not the diagnostic. Detailed context comes in St
 
 Slugify the one-liner (kebab-case, 3–5 words, lowercase ASCII). Hold as `<incident-slug>`.
 
-Rewrite `.td/STATE.md`:
+Rewrite `.td-flow/STATE.md`:
 
 ```
 # State
@@ -42,14 +42,14 @@ Last:     <YYYY-MM-DD HH:MM> — incident opened: <one-liner>.
 
 ## Resume note
 
-Production incident: <one-liner>. Work file at `.td/work/incident-<incident-slug>.md`. <if prior snapshot in Step 1: "Previous piece snapshotted as #<N> on `snapshot/<previous-slug>` — resume via the issue's resume command after the incident closes.">
+Production incident: <one-liner>. Work file at `.td-flow/work/incident-<incident-slug>.md`. <if prior snapshot in Step 1: "Previous piece snapshotted as #<N> on `snapshot/<previous-slug>` — resume via the issue's resume command after the incident closes.">
 ```
 
 Don't commit yet — the work file is the next thing to create, and STATE + work file land together with the eventual fix.
 
 # Step 4 — Open the incident work file
 
-Create `.td/work/incident-<incident-slug>.md`:
+Create `.td-flow/work/incident-<incident-slug>.md`:
 
 ```
 # Incident: <one-liner>
@@ -76,9 +76,9 @@ Status: open
 
 # Step 5 — Surface DEBUG.md if it exists
 
-If `./.td/DEBUG.md` exists, read it and surface the relevant sections — project-specific troubleshooting tools (Forge tail commands, Cloudflare cache invalidation, Sentry correlation chasing, etc.). One line to the user: "DEBUG.md found — pulling diagnostic tools for this project."
+If `./.td-flow/DEBUG.md` exists, read it and surface the relevant sections — project-specific troubleshooting tools (Forge tail commands, Cloudflare cache invalidation, Sentry correlation chasing, etc.). One line to the user: "DEBUG.md found — pulling diagnostic tools for this project."
 
-If `./.td/DEBUG.md` does **not** exist, tell the user: "No DEBUG.md yet. We'll capture useful diagnostics as we go and offer to save them at close-out." Continue.
+If `./.td-flow/DEBUG.md` does **not** exist, tell the user: "No DEBUG.md yet. We'll capture useful diagnostics as we go and offer to save them at close-out." Continue.
 
 # Step 6 — Walk the diagnosis
 
@@ -102,8 +102,8 @@ The incident ends in one of three ways:
 1. Apply the fix.
 2. Run pre-ship checks per project's `WORKWAY.md § Local testing`. If there's a live URL, smoke after deploy.
 3. **Single capture prompt:** ask **"Anything from this fire worth keeping? (`debug: <text>` / `backlog: <text>` / `no`)"**. Route by prefix — the user just fought a fire, one decision point is enough. Multiple prefixes per response are OK (one per line). What each routes to:
-   - `debug:` → append to `.td/DEBUG.md` under the right section (symptom → diagnostic / gotchas / production commands per content). Create from template if missing.
-   - `backlog:` → append to `.td/BACKLOG.md` (follow-up work surfaced during the fire — not the fire itself).
+   - `debug:` → append to `.td-flow/DEBUG.md` under the right section (symptom → diagnostic / gotchas / production commands per content). Create from template if missing.
+   - `backlog:` → append to `.td-flow/BACKLOG.md` (follow-up work surfaced during the fire — not the fire itself).
    - `no` → continue.
 4. Reset STATE: `Topic: idle`, `Phase: idle`, `Last:` notes incident closed. If a previous snapshot was taken in Step 1, mention in Resume note: "Previous piece on `snapshot/<previous-slug>` (#<N>) is ready to resume."
 5. Fold-and-delete the incident work file (per the contract's fold-and-delete rule).
@@ -122,7 +122,7 @@ The incident ends in one of three ways:
 
 **(c) Actually another repo's problem — file cross-repo.**
 
-1. Per `CLAUDE.md § Cross-repo`: check `.td/PROJECT.md § Cross-repo` for the target repo. If not listed, ask the user before filing.
+1. Per `CLAUDE.md § Cross-repo`: check `.td-flow/PROJECT.md § Cross-repo` for the target repo. If not listed, ask the user before filing.
 2. `gh api graphql` mutation to create issue in `<other-repo>` with Type = `Bug`, body opening with `**From:** <this-project-friendly-name>` followed by Symptom/Context/Hypothesis from the work file.
 3. Update `STATE.Last`. Reset Topic to idle.
 4. Delete the local work file.

@@ -1,11 +1,20 @@
 #!/usr/bin/env bash
-# td-flow pre-commit hook — runs the project's Test command from .td/WORKWAY.md § Local testing.
-# Installed by /td-init. Don't skip it with --no-verify on code commits.
+# td-flow pre-commit hook — runs the project's Test command from <td-dir>/WORKWAY.md § Local testing.
+# Installed by /td-flow-init. Don't skip it with --no-verify on code commits.
+#
+# Path resolution: prefers .td-flow/ (v7.0 canonical) and falls back to .td/
+# (pre-v7.0 layout). The fallback is a transition safety net — projects that
+# pulled v7.0 framework but haven't run /td-flow-refresh yet still work.
+# Drop the fallback in a future v8.0 once all projects have migrated.
 
 set -e
 
-if [ ! -f .td/WORKWAY.md ]; then
-  echo "td-flow: .td/WORKWAY.md not found — skipping test check"
+if [ -f .td-flow/WORKWAY.md ]; then
+  WORKWAY=.td-flow/WORKWAY.md
+elif [ -f .td/WORKWAY.md ]; then
+  WORKWAY=.td/WORKWAY.md
+else
+  echo "td-flow: no WORKWAY.md found in .td-flow/ or .td/ — skipping test check"
   exit 0
 fi
 
@@ -17,10 +26,10 @@ CMD=$(awk '
     print
     exit
   }
-' .td/WORKWAY.md | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
+' "$WORKWAY" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
 
 if [ -z "$CMD" ] || [ "$CMD" = "none" ] || [ "$CMD" = "{{test_command}}" ]; then
-  echo "td-flow: no runnable Test command in .td/WORKWAY.md § Local testing — skipping"
+  echo "td-flow: no runnable Test command in $WORKWAY § Local testing — skipping"
   exit 0
 fi
 

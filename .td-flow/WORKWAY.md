@@ -14,7 +14,7 @@ The framework has no application-code test suite (and never will — there's no 
   - [x] `./install.sh` runs idempotently (two consecutive runs both exit 0)
   - [x] All 10 slash commands resolve in `~/.claude/commands/` (`td-flow-init`, `td-flow-clear`, `td-flow-complex-clear`, `td-flow-close`, `td-flow-refresh`, `td-flow-mailbox`, `td-flow-health`, `td-flow-incident`, `td-flow-park`, `td-flow-snapshot`)
   - [x] Templates at `~/.claude/td-templates` and contract at `~/.claude/td-flow-contract.md` both resolve
-  - [x] AWK extractor in `hooks/pre-commit` returns a non-empty value from `.td/WORKWAY.md § Local testing`
+  - [x] AWK extractor in `hooks/pre-commit` returns a non-empty value from `.td-flow/WORKWAY.md § Local testing`
   - WARN: any unexpected td-flow command symlinked in `~/.claude/commands/` (drift signal — retired command not pruned)
 
 ### When local testing isn't possible

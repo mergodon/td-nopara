@@ -1,8 +1,8 @@
 ---
-description: Mid-project context reset. Sync the .td/ docs to this session, write the STATE handoff, push — ready for /clear. Project continues; a checkpoint, not a wrap.
+description: Mid-project context reset. Sync the .td-flow/ docs to this session, write the STATE handoff, push — ready for /clear. Project continues; a checkpoint, not a wrap.
 ---
 
-You are checkpointing the current session so the user can `/clear` and the next session picks up cold. The project is not done — it's mid-flight. Keep it fast: sync the `.td/` docs to what this session did, write the STATE handoff, prune obvious junk, push. Optimization, code review, restructuring, exhaustive doc audits — out of scope (that's `/td-flow-close`). If something invites that, surface it as a backlog item or a future topic and move on.
+You are checkpointing the current session so the user can `/clear` and the next session picks up cold. The project is not done — it's mid-flight. Keep it fast: sync the `.td-flow/` docs to what this session did, write the STATE handoff, prune obvious junk, push. Optimization, code review, restructuring, exhaustive doc audits — out of scope (that's `/td-flow-close`). If something invites that, surface it as a backlog item or a future topic and move on.
 
 # Step 1 — Update memory
 
@@ -16,7 +16,7 @@ Update existing memory files rather than creating duplicates. If nothing new was
 
 # Step 2 — Audit current state
 
-- Read `.td/STATE.md`, `.td/work/` listing, `.td/PROJECT.md`.
+- Read `.td-flow/STATE.md`, `.td-flow/work/` listing, `.td-flow/PROJECT.md`.
 - `git status --short` — uncommitted changes? If yes: stop, ask the user "Commit them as a checkpoint, stash, or discard?" and wait. Do not proceed until working tree is clean.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
 
@@ -49,7 +49,7 @@ Never squash commits already on `origin/main`. Never force-push.
 
 # Step 5 — Sync the docs to this session, then prune
 
-Before `/clear` wipes the conversation, make sure the `.td/` docs reflect what this session actually did — the next session loads them cold and treats them as true.
+Before `/clear` wipes the conversation, make sure the `.td-flow/` docs reflect what this session actually did — the next session loads them cold and treats them as true.
 
 **Doc-sync.** Scan this session for anything that changed what a doc should say and isn't in it yet, and write it now:
 
@@ -59,10 +59,10 @@ Before `/clear` wipes the conversation, make sure the `.td/` docs reflect what t
 
 This is **session-scoped** — only what changed *this session*, which you have the context for. It is not the exhaustive whole-doc audit; that's `/td-flow-close`. In-the-moment routing (`CLAUDE.md § Where things go`) stays primary — this is the backstop for things that drifted through the work without a clean action-shaped statement. Anything genuinely ambiguous → note it in the Resume note (Step 6) for `/td-flow-close` or the next session; don't block the checkpoint on it.
 
-**Light prune.** Walk `.td/` for content git already covers:
+**Light prune.** Walk `.td-flow/` for content git already covers:
 
-- A `.td/work/<topic>.md` for a topic that's been shipped (its commits are in `git log`) → delete.
-- Resolved blockers in `.td/STATE.md` → clear them out.
+- A `.td-flow/work/<topic>.md` for a topic that's been shipped (its commits are in `git log`) → delete.
+- Resolved blockers in `.td-flow/STATE.md` → clear them out.
 - Backlog items that have shipped → delete the line.
 
 **Mailbox snapshot** (status read, always renders unless mailbox is empty). Fetch open issues in this repo and cross-repo filings (same shape as `/td-flow-mailbox` Steps 2+4). Inbound counts **Bugs and Tasks only** — Ideas and Epics aren't handoff to-dos, so they stay out of the snapshot. Format:
@@ -71,13 +71,13 @@ This is **session-scoped** — only what changed *this session*, which you have 
 [mailbox] 📥 <N> inbound (<Bug/Task breakdown>), 📤 <M> outbound (<state-breakdown>)
 ```
 
-Examples: `[mailbox] 📥 3 inbound (1 Bug, 2 Task), 📤 0 outbound` | `[mailbox] empty`. Skip outbound segment if `.td/PROJECT.md § Cross-repo` is missing. No Bugs/Tasks inbound and no outbound → `[mailbox] empty`.
+Examples: `[mailbox] 📥 3 inbound (1 Bug, 2 Task), 📤 0 outbound` | `[mailbox] empty`. Skip outbound segment if `.td-flow/PROJECT.md § Cross-repo` is missing. No Bugs/Tasks inbound and no outbound → `[mailbox] empty`.
 
 Don't restructure, and don't re-audit doc content that didn't change this session — the exhaustive doc audit is `/td-flow-close`.
 
 # Step 6 — Update STATE.md as a handoff
 
-Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context will load this and assume it's true — so the filter is sharp: **keep what matters and isn't derivable; clear everything else.**
+Rewrite `.td-flow/STATE.md` so a fresh conversation picks up cold. The next context will load this and assume it's true — so the filter is sharp: **keep what matters and isn't derivable; clear everything else.**
 
 - **Keep** in-flight specifics the next session can't reconstruct: current decision, current blocker, mid-thinking, the gotcha you just hit.
 - **Clear** speculation ("we might want to..."), anything `git log` already says, or claims you haven't actually verified.
@@ -104,10 +104,10 @@ Resume note is the load-bearing part. During execution I'll skim it; for fresh-c
 
 # Step 7 — Commit, then push
 
-Steps 5–6 edited the `.td/` docs and rewrote `STATE.md` — those changes are uncommitted. Commit them, then push:
+Steps 5–6 edited the `.td-flow/` docs and rewrote `STATE.md` — those changes are uncommitted. Commit them, then push:
 
 ```
-git add .td/ <any other docs touched in Step 5>
+git add .td-flow/ <any other docs touched in Step 5>
 git commit -m "chore: clear <topic>"
 git push origin main
 ```

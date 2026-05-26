@@ -64,17 +64,49 @@ Procedure:
 2. For each hit, locate the bounding chunk (the bullet, line, or short paragraph that contains it). If the chunk is cleanly delimited (a single bullet or sentence), remove it. If the phrase sits inside a longer paragraph where removal would mangle surrounding meaning, surface the line to the user with the exact text and ask once before editing.
 3. If any change was made, commit: `git add CLAUDE.md` then `git commit --no-verify -m "chore: prune deprecated nudge language from CLAUDE.md"`. Same `--no-verify` rationale as Step 1 — doc-only rewrite. Don't push.
 
+# Step 1.7 — Migrate `.td/` → `.td-flow/` (one-time, only if needed)
+
+The v7.0 rename moved the per-project state dir from `.td/` to `.td-flow/` (consistent with the rest of the namespace: `td-flow`, `/td-flow-*`, `td-flow-contract.md`). Migrate any project still on `.td/`.
+
+Procedure:
+
+1. **Detect the state**:
+   ```
+   has_td_dir=false      # .td/ exists as a real directory
+   has_td_symlink=false  # .td/ exists as a symlink (already migrated)
+   has_td_flow=false     # .td-flow/ exists
+   [ -d .td ] && [ ! -L .td ] && has_td_dir=true
+   [ -L .td ] && has_td_symlink=true
+   [ -d .td-flow ] && has_td_flow=true
+   ```
+2. **Decide**:
+   - Neither `.td/` nor `.td-flow/` → not a td-flow project (or never initialized). Skip silently.
+   - `.td-flow/` exists AND `.td/` is a symlink → already migrated. Skip silently.
+   - `.td-flow/` exists AND `.td/` is a real directory → conflict (both layouts present). Abort: "Both `.td/` and `.td-flow/` exist as real directories. Resolve manually before refreshing — pick which one is canonical, move any content over, delete the loser."
+   - `.td-flow/` doesn't exist AND `.td/` is a real directory → **migrate**.
+3. **Migrate** (only when the "migrate" branch fires):
+   ```
+   git mv .td .td-flow                                     # preserves history
+   ln -s .td-flow .td                                      # compat symlink for any user-side .td/ refs
+   git add .td .td-flow                                    # stage the move + the symlink
+   git commit --no-verify -m "chore: migrate .td/ → .td-flow/ (td-flow v7.0)"
+   ```
+   Same `--no-verify` rationale as Steps 1 + 1.5: doc/structure-only change, the pre-commit hook's `Test command` shouldn't gate it. Don't push — the user pushes when ready.
+4. **Tell the user** what was done (renamed dir + compat symlink).
+
+The compat symlink stays until v8.0 (a future framework version drops the `.td/` fallback from `hooks/pre-commit` and `scripts/smoke.sh`; existing symlinks in user projects stay until the user removes them manually).
+
 # Step 2 — Tell the user
 
 Two lines:
 
-`Framework synced (<pulled N commits / already current>). CLAUDE.md <migrated to the @import / already on the import model / pruned N deprecated nudge line(s) / no changes>.`
+`Framework synced (<pulled N commits / already current>). CLAUDE.md <migrated to the @import / already on the import model / pruned N deprecated nudge line(s) / no changes>. State dir <migrated .td → .td-flow + compat symlink / already on .td-flow/ / N/A — not a td-flow project>.`
 
 `Slash commands available: ` then list the basename of every `*.md` in `~/.claude/commands/` that resolves into `<TD_REPO>/commands/`. Useful when refreshing from a long-stale state — surfaces commands the user may not have seen before (e.g. `/td-flow-snapshot` was added in v5.2).
 
 # Rules
 
-- `/td-flow-refresh` syncs the framework, migrates a legacy `CLAUDE.md`, and prunes deprecated nudge patterns — nothing else. It never touches `.td/` docs, `BACKLOG.md`, or the cross-repo registry.
+- `/td-flow-refresh` syncs the framework, migrates a legacy `CLAUDE.md`, prunes deprecated nudge patterns, and (one-time per project) migrates the state dir from `.td/` to `.td-flow/` — nothing else. It never touches `.td-flow/` doc *contents*, `BACKLOG.md`, or the cross-repo registry.
 - Step 0 may `git pull` the td-flow repo, but only as a clean-tree fast-forward; it never merges or forces.
-- The only commits `/td-flow-refresh` makes are Step 1's one-time migration commit and Step 1.5's prune commit (only if a match was found and cleanly removed); both `--no-verify` so the pre-commit hook's `Test command` doesn't gate doc-only rewrites.
+- The only commits `/td-flow-refresh` makes are Step 1's one-time `CLAUDE.md` migration, Step 1.5's nudge prune (only if a match was found and cleanly removed), and Step 1.7's one-time `.td → .td-flow` rename; all `--no-verify` so the pre-commit hook's `Test command` doesn't gate structural rewrites.
 - Never push.

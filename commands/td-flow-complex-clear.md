@@ -12,7 +12,7 @@ Identical to `/td-flow-clear` Step 1. Scan the session for things worth keeping 
 
 # Step 2 — Audit current state
 
-Identical to `/td-flow-clear` Step 2. Read `.td/STATE.md`, `.td/work/` listing, `.td/PROJECT.md`. Check `git status --short` and `git log origin/main..HEAD --oneline`. Working tree must be clean before proceeding.
+Identical to `/td-flow-clear` Step 2. Read `.td-flow/STATE.md`, `.td-flow/work/` listing, `.td-flow/PROJECT.md`. Check `git status --short` and `git log origin/main..HEAD --oneline`. Working tree must be clean before proceeding.
 
 # Step 3 — Quick code sanity check
 
@@ -40,11 +40,11 @@ These don't belong in BACKLOG (they're not future work) but they DO belong in ST
 
 # Step 6 — Light prune + handoff signals
 
-Identical to `/td-flow-clear` Step 6. Walk `.td/` for stale topic files, resolved blockers, shipped backlog lines. Fetch the mailbox snapshot. Fire the drift heads-up if a stack file changed.
+Identical to `/td-flow-clear` Step 6. Walk `.td-flow/` for stale topic files, resolved blockers, shipped backlog lines. Fetch the mailbox snapshot. Fire the drift heads-up if a stack file changed.
 
 # Step 7 — Write a structured STATE handoff
 
-Rewrite `.td/STATE.md` so a fresh conversation picks up cold. The next context will load this and assume it's true.
+Rewrite `.td-flow/STATE.md` so a fresh conversation picks up cold. The next context will load this and assume it's true.
 
 **The /td-flow-complex-clear contract is stricter than /td-flow-clear.** STATE.md must have the structured sections below. Length is not capped — write what's needed, not less.
 
@@ -64,7 +64,7 @@ The resume note **opens with the "Resume — start here" block**, then the detai
 
 **Lead block — REQUIRED, must be physically FIRST in the resume note (before § 1):**
 
-- **Resume — start here.** The single first-action pointer ("the very next thing to do on resume", one sentence), followed by the ordered first 2–4 steps the next session should take. If a `.td/work/<topic>.md` section (or any other doc) must be read on resume, **name it here explicitly** — don't assume the reader reaches a later section. A fresh reader scans the top fields, then this block, and must know exactly what to do, by whom, in what order, *without reading further*. Everything below is reference; this block is the entry point.
+- **Resume — start here.** The single first-action pointer ("the very next thing to do on resume", one sentence), followed by the ordered first 2–4 steps the next session should take. If a `.td-flow/work/<topic>.md` section (or any other doc) must be read on resume, **name it here explicitly** — don't assume the reader reaches a later section. A fresh reader scans the top fields, then this block, and must know exactly what to do, by whom, in what order, *without reading further*. Everything below is reference; this block is the entry point.
 - **Why it leads, not trails:** a first-action pointer placed at the bottom of a long handoff gets skipped — the reader forms the gist from the top sections and stops. Putting the next step where the eye lands first is the whole point of the structured handoff. Do not bury it.
 
 **Required sections — these are the contract (in approximately this order, after the lead block):**

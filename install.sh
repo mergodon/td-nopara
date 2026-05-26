@@ -39,6 +39,18 @@ if [ -L "$SKILL_LINK" ] || [ -d "$SKILL_LINK" ]; then
   V6_1_SKILL_DETECTED=true
 fi
 
+# v7.0 dir-rename announcement — banner fires once per machine for users
+# upgrading from pre-v7.0 (state dir renamed .td/ → .td-flow/, per-project
+# migration via /td-flow-refresh). Detected by absence of the ack marker
+# AND presence of a pre-existing contract symlink (signals "this is an
+# upgrade", not a fresh install). Either way, the marker is created at the
+# end so future installs see it and never re-fire.
+V7_MARKER="$CLAUDE_DIR/.td-flow-v7-acked"
+V7_DIR_RENAME_DETECTED=false
+if [ ! -f "$V7_MARKER" ] && [ -L "$CLAUDE_DIR/td-flow-contract.md" ]; then
+  V7_DIR_RENAME_DETECTED=true
+fi
+
 # 1. Prune stale symlinks pointing into this repo's commands/ dir
 #    (catches retired commands like /td-ship from older versions, and
 #    catches the v6 /td-* → /td-flow-* rename automatically)
@@ -140,12 +152,47 @@ if [ "$V6_1_SKILL_DETECTED" = "true" ]; then
 BANNER
 fi
 
+if [ "$V7_DIR_RENAME_DETECTED" = "true" ]; then
+  cat <<'BANNER'
+─────────────────────────────────────────────────────
+  td-flow v7.0 — state dir renamed .td/ → .td-flow/
+─────────────────────────────────────────────────────
+  The per-project state directory is now `.td-flow/`
+  (matches the framework name: `td-flow`, `/td-flow-*`,
+  `td-flow-contract.md`). Last spot where the name
+  didn't carry the prefix.
+
+  Framework code now reads from `.td-flow/`, with a
+  `.td/` fallback (transition safety net — keeps
+  pre-migration projects working until you refresh
+  them).
+
+  Per-project migration:
+
+    cd <your td-flow project>
+    /td-flow-refresh
+
+  → `git mv .td .td-flow` (history preserved) +
+    creates `.td → .td-flow` compat symlink so any
+    user-side `.td/` references keep resolving.
+
+  Idempotent: skips projects already on .td-flow/.
+  The fallback + compat symlink stay until v8.0.
+─────────────────────────────────────────────────────
+
+BANNER
+fi
+
+# Create the v7.0 ack marker so future installs skip the banner — runs
+# regardless of whether the banner fired (silent on fresh installs).
+touch "$V7_MARKER"
+
 echo "Try it:"
 echo "  cd ~/projects/some-project"
 echo "  claude"
 echo "  /td-flow-init           # bootstrap td-flow"
 echo
 echo "Cross-project requests ride on GitHub issues — see CLAUDE.md § Cross-repo."
-echo "Add a \`## Cross-repo\` section to .td/PROJECT.md per project — see CLAUDE.md § Cross-repo."
+echo "Add a \`## Cross-repo\` section to .td-flow/PROJECT.md per project — see CLAUDE.md § Cross-repo."
 echo
 echo "To update later: pull this repo, then re-run ./install.sh"

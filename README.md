@@ -2,7 +2,7 @@
 
 A minimal, file-based, repo-portable framework for solo development.
 
-Same shape every project. Conversational interface — after `/td-flow-init`, you just talk and I orchestrate. **GitHub Issues are the source of truth for parked work; `git log` is the source of truth for done work.** Local `.td/` is the workbench, not an archive.
+Same shape every project. Conversational interface — after `/td-flow-init`, you just talk and I orchestrate. **GitHub Issues are the source of truth for parked work; `git log` is the source of truth for done work.** Local `.td-flow/` is the workbench, not an archive.
 
 ## Install
 
@@ -38,8 +38,8 @@ To update on any machine: `git pull && ./install.sh`.
 | `/td-flow-complex-clear` | Mid-session checkpoint, but for multi-day complex work | Enhanced `/td-flow-clear` with required STATE sections (lead "Resume — start here" block, pending-action list by owner, dependency graph, volatile artifacts, credentials state, safe-vs-needs-approval boundary) + self-validation gate. Use when standard `/td-flow-clear` is too loose for the complexity. |
 | `/td-flow-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
 | `/td-flow-refresh` | When the framework has moved on | Pulls the latest framework + re-runs the installer. One-time: migrates a legacy project's `CLAUDE.md` onto the `@import`. |
-| `/td-flow-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
-| `/td-flow-health` | Proactive production check | Run the project's `.td/health.sh` routine. Reports `OK`/`WARN`/`FAIL`; parks warnings to `BACKLOG.md`, escalates failures to `/td-flow-incident`. First run scaffolds the routine (or marks the project non-production). |
+| `/td-flow-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td-flow/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
+| `/td-flow-health` | Proactive production check | Run the project's `.td-flow/health.sh` routine. Reports `OK`/`WARN`/`FAIL`; parks warnings to `BACKLOG.md`, escalates failures to `/td-flow-incident`. First run scaffolds the routine (or marks the project non-production). |
 | `/td-flow-incident` | Live production fire | Drop everything else. Snapshots any in-flight piece first (so nothing is lost), then focus, diagnose with read-only-by-default constraint, fix or park as `Bug`. Surfaces `DEBUG.md` if present. |
 | `/td-flow-park` | Mid-session BACKLOG bloat | Flush `BACKLOG.md` to GitHub Issues — consolidate related lines into a proposed issue set, then batch-create with type + dedupe. The canonical BACKLOG-flush procedure; `/td-flow-close` runs it too. |
 | `/td-flow-snapshot` | Save the in-flight piece, switch focus | Commits current state to `snapshot/<slug>`, files a `Snapshot`-type GitHub issue with the resume command (`git checkout` + `claude --resume <session-id>`), resets STATE to idle. Resume by checking out the branch + running the resume line. Used standalone for mid-session pivots, or composed by `/td-flow-incident`. |
@@ -53,9 +53,9 @@ Most work is conversational. Here's what gets routed where:
 ```
 "let's add a search bar"              → starts the rhythm
 "fix X"                               → starts the rhythm on a fix
-"test command is npm test"            → .td/WORKWAY.md § Local testing
-"live URL is myapp.pages.dev"         → .td/WORKWAY.md § Live
-"remember to debounce later"          → appends .td/BACKLOG.md
+"test command is npm test"            → .td-flow/WORKWAY.md § Local testing
+"live URL is myapp.pages.dev"         → .td-flow/WORKWAY.md § Live
+"remember to debounce later"          → appends .td-flow/BACKLOG.md
 "park this to GH as Bug"              → creates GH issue directly with Type
 "flush the backlog to GH"             → invokes /td-flow-park
 "snapshot this" / "save and switch"   → invokes /td-flow-snapshot (branch + GH Snapshot issue)
@@ -70,7 +70,7 @@ Most work is conversational. Here's what gets routed where:
 #                  mid-work and need to pivot (incident, other priority, stepping away).
 # Both can run in sequence: /td-flow-snapshot first to preserve code, /td-flow-park to flush ideas.
 "let's plan a big redesign"           → starts a planning work file (later → Epic)
-"add to DEBUG: Sentry filter trick"   → writes to .td/DEBUG.md (creates if missing)
+"add to DEBUG: Sentry filter trick"   → writes to .td-flow/DEBUG.md (creates if missing)
 "file an issue for rgb-api to ..."    → cross-repo issue with `**From:**` marker
 "any incoming?" / "check inbox"       → open Bugs/Tasks in this repo (or /td-flow-mailbox)
 "show me the ideas"                   → lists open Ideas to triage / promote to Task
@@ -81,16 +81,16 @@ Most work is conversational. Here's what gets routed where:
 "where are we?"                       → summarizes STATE.md
 "let's clear" / about to /clear       → runs /td-flow-clear
 "wrap the project"                    → runs /td-flow-close
-"save this as a 'laravel' template"   → extracts current .td/ shape
+"save this as a 'laravel' template"   → extracts current .td-flow/ shape
 ```
 
 ## The rhythm
 
 ```
-1. Plan      — single-shot OR multi-step in .td/work/<topic>.md
-2. Park      — out-of-scope items → .td/BACKLOG.md (flushes to GitHub at /td-flow-close)
+1. Plan      — single-shot OR multi-step in .td-flow/work/<topic>.md
+2. Park      — out-of-scope items → .td-flow/BACKLOG.md (flushes to GitHub at /td-flow-close)
 3. Work      — implement
-4. Test      — follow .td/WORKWAY.md (Local testing → Local UAT → Live)
+4. Test      — follow .td-flow/WORKWAY.md (Local testing → Local UAT → Live)
 5. Ship      — commit + push to origin/main when green
 6. Close     — review, validate, prune redundant docs, park leftovers to GH, push
 ```
@@ -103,7 +103,7 @@ Four standard docs, one optional, plus scratch:
 
 ```
 CLAUDE.md                ← one-line @import of the shared td-flow contract
-.td/
+.td-flow/
   PROJECT.md             ← what / who / stack / scope
   WORKWAY.md             ← Local testing + Local UAT + Live + Framework specifics
   STATE.md               ← current phase, current topic, blocker, resume note
@@ -136,7 +136,7 @@ Me:  tests pass, commits as fix(navbar): close dropdown on outside click, pushes
 
 ```
 You: "let's plan the user dashboard redesign"
-Me:  creates .td/work/user-dashboard-redesign.md, we sketch the plan together.
+Me:  creates .td-flow/work/user-dashboard-redesign.md, we sketch the plan together.
 You: "plan looks solid, commit it"
 Me:  creates an Epic in this repo with the plan as body. Breaks out 4 sub-issues
      (Task type) for concrete pieces. Fold-and-deletes the work file in the
@@ -172,7 +172,7 @@ Me:  appends to DEBUG.md (creates from template if missing), commits.
 
 ```
 You: /td-flow-health
-Me:  runs .td/health.sh — app reachable, disk, queues, deploy in sync.
+Me:  runs .td-flow/health.sh — app reachable, disk, queues, deploy in sync.
      "myapp: 1 warn — queue 'default' wait 80s. Park to BACKLOG?"
 You: "yes — park it"
 Me:  appends the warning to BACKLOG.md, commits.
@@ -186,7 +186,7 @@ Me:  drops into incident mode, "worker process down" pre-filled as the symptom.
 
 ```
 You: "file a CR to rgb-api: please add a timestamp to the /X endpoint"
-Me:  checks this project's .td/PROJECT.md § Cross-repo for the target repo,
+Me:  checks this project's .td-flow/PROJECT.md § Cross-repo for the target repo,
      drafts:
        Title: Add timestamp field to /X endpoint
        Body:  **From:** <this-project>
@@ -199,7 +199,7 @@ Me:  checks this project's .td/PROJECT.md § Cross-repo for the target repo,
 [a few days later, this project]
 You: /td-flow-mailbox
 Me:  inbound: open issues in this repo, Epics with sub-issue progress.
-     Outbound: search bounded to .td/PROJECT.md § Cross-repo repos, filter
+     Outbound: search bounded to .td-flow/PROJECT.md § Cross-repo repos, filter
      by **From:** marker. Shows rgb-api#42 as "Awaiting reply (3 days)".
 You: "comment back: we can wait one more sprint"
 Me:  drafts comment, signs as <this-project>, confirms, posts.
@@ -236,7 +236,7 @@ Epics can have formal sub-issues across repos in the same org. Per-project Epics
 
 Projects sometimes need things from other projects. Convention:
 
-1. Each `.td/PROJECT.md` keeps an opt-in `## Cross-repo` section listing the repos this project legitimately files against. **This list IS the outbound scope** for `/td-flow-mailbox`.
+1. Each `.td-flow/PROJECT.md` keeps an opt-in `## Cross-repo` section listing the repos this project legitimately files against. **This list IS the outbound scope** for `/td-flow-mailbox`.
 2. To file: `gh api graphql createIssue` (with the appropriate Type) against the target repo. Body opens with `**From:** <this-project>` so the receiver identifies the source mechanically — independent of which GH account opened the issue.
 3. **If the work belongs to a planning Epic in this repo, also `addSubIssue`** to that Epic so cross-repo progress rolls up natively. Otherwise no extra step — `/td-flow-mailbox`'s outbound query finds the filing via the body marker scoped to declared repos.
 4. The receiving project sees it via `/td-flow-mailbox` (inbound section), walks the CR alongside their own queue.
@@ -244,11 +244,11 @@ Projects sometimes need things from other projects. Convention:
 
 No labels, no status enum, no separate inbox. Open = pending; closed = done.
 
-**`/td-flow-mailbox` is the unified view, minimum-dependency.** One command walks both directions: inbound (open issues in this repo, Epics with sub-issue progress inline) and outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:** <project>` body marker). No tracker Epic, no sentinel logic. The connected-repos list bounds the search; the body marker identifies our filings. That's all.
+**`/td-flow-mailbox` is the unified view, minimum-dependency.** One command walks both directions: inbound (open issues in this repo, Epics with sub-issue progress inline) and outbound (open cross-repo issues we filed, scoped by `.td-flow/PROJECT.md § Cross-repo` and filtered by the `**From:** <project>` body marker). No tracker Epic, no sentinel logic. The connected-repos list bounds the search; the body marker identifies our filings. That's all.
 
 Unified view across all your repos: `gh search issues --owner <your-org> --state open` (REPO is the unit of interest; no author filter — works regardless of which GH identity you're using).
 
-**Use friendly project names in cross-repo messages, not GH slugs.** When filing/commenting cross-repo, reference projects by their friendly name (e.g. "filed from `<consumer-app>`"). Resolution: first H1 in `.td/PROJECT.md`, fall back to directory basename. Keep PROJECT.md's H1 set to the project's friendly name on every td-flow project. GH slugs change on rename; friendly names stay stable and identity-agnostic across machines.
+**Use friendly project names in cross-repo messages, not GH slugs.** When filing/commenting cross-repo, reference projects by their friendly name (e.g. "filed from `<consumer-app>`"). Resolution: first H1 in `.td-flow/PROJECT.md`, fall back to directory basename. Keep PROJECT.md's H1 set to the project's friendly name on every td-flow project. GH slugs change on rename; friendly names stay stable and identity-agnostic across machines.
 
 ## Updating an existing td-flow project
 
@@ -264,7 +264,7 @@ If a project still carries a *pre-import* full copy of the contract in its `CLAU
 
 ## Saving and reusing templates
 
-When a project's setup is dialed in, say "save this as a `<name>` template." I copy `.td/*` (anonymized — placeholders restored) to `~/projects/td-flow/templates/<name>/`. Future `/td-flow-init --template <name>` starts from that shape so the next project of the same kind is configured out of the gate.
+When a project's setup is dialed in, say "save this as a `<name>` template." I copy `.td-flow/*` (anonymized — placeholders restored) to `~/projects/td-flow/templates/<name>/`. Future `/td-flow-init --template <name>` starts from that shape so the next project of the same kind is configured out of the gate.
 
 Current templates:
 
@@ -275,7 +275,7 @@ Current templates:
 Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `.mcp.json`, `boost.json`, `junie/`) on `boost:install`. We:
 
 1. Use Boost's MCP server (the genuinely useful part — `.mcp.json` is gitignored, regenerated, and that's fine).
-2. Note the framework in `.td/WORKWAY.md` § Framework specifics so I know how to use it.
+2. Note the framework in `.td-flow/WORKWAY.md` § Framework specifics so I know how to use it.
 3. Gitignore Boost's auto-generated guideline files.
 4. If Boost overwrites root `CLAUDE.md`, you tell me; I restore it — it's just the one `@import` line. An edge case, not the default.
 

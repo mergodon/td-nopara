@@ -1,8 +1,8 @@
 ---
-description: Wrap the project (or a major phase). Park all leftover BACKLOG + work files to GitHub Issues, mechanical stack-reality-check vs PROJECT.md, doc hygiene pass across all .td/ docs (including the load-bearing Cross-repo registry), push. Ends with a read-only td-flow framework-update check.
+description: Wrap the project (or a major phase). Park all leftover BACKLOG + work files to GitHub Issues, mechanical stack-reality-check vs PROJECT.md, doc hygiene pass across all .td-flow/ docs (including the load-bearing Cross-repo registry), push. Ends with a read-only td-flow framework-update check.
 ---
 
-You are closing the project (or a major phase). The work is done — shipped, live if it has a live, tested. This is the deeper cleanup that `/td-flow-clear` skips: park leftover thinking to GitHub, walk every doc, validate it against current code and `git log`, prune anything redundant, restructure if drift has crept in. End with a clean, minimal `.td/` that an outsider could read in 2 minutes and understand the project.
+You are closing the project (or a major phase). The work is done — shipped, live if it has a live, tested. This is the deeper cleanup that `/td-flow-clear` skips: park leftover thinking to GitHub, walk every doc, validate it against current code and `git log`, prune anything redundant, restructure if drift has crept in. End with a clean, minimal `.td-flow/` that an outsider could read in 2 minutes and understand the project.
 
 If state shows clearly mid-flight (active `Topic`, `work/<topic>.md` files, unfinished plan in Resume note), still run — projects-per-hour is normal here. The user invoked `/td-flow-close`; take them at their word and proceed.
 
@@ -18,7 +18,7 @@ Update existing memory files rather than creating duplicates. If nothing new was
 
 # Step 2 — Confirm intent and audit state
 
-- Read `.td/STATE.md`, `.td/PROJECT.md`, `.td/WORKWAY.md`, `.td/BACKLOG.md`, every `.td/work/*.md`.
+- Read `.td-flow/STATE.md`, `.td-flow/PROJECT.md`, `.td-flow/WORKWAY.md`, `.td-flow/BACKLOG.md`, every `.td-flow/work/*.md`.
 - `git status --short` — uncommitted? If yes: stop, ask "Commit, stash, or discard?" Wait.
 - `git log origin/main..HEAD --oneline` — local commits ahead of remote.
 - **Unresolved-issue gate.** Fetch open issues in this repo (same query as `/td-flow-mailbox` Step 2). Filter to `Bug` + `Task` only — Epics are planning surfaces (track via their Task/Bug children, not the parent itself); Ideas are long-tail by design and don't gate a close. Also fetch awaiting-reply outbound (informational only, no gate — same shape as `/td-flow-mailbox` Step 4).
@@ -42,16 +42,16 @@ Update existing memory files rather than creating duplicates. If nothing new was
 
 # Step 3 — Park leftovers to GitHub
 
-Two leftover-thinking surfaces to clear — BACKLOG lines and `.td/work/` files. Present each as a digest, take decisions in one pass, execute the batch. Don't walk items one at a time.
+Two leftover-thinking surfaces to clear — BACKLOG lines and `.td-flow/work/` files. Present each as a digest, take decisions in one pass, execute the batch. Don't walk items one at a time.
 
-**1. `.td/BACKLOG.md`** — run the **canonical BACKLOG-flush procedure**: `/td-flow-park` Steps 2–8 (cache Issue Type IDs + friendly name → consolidate related lines → digest with Type + dedupe per proposed issue → one decision point → batch-create → rewrite BACKLOG). Don't re-derive it here — that procedure already consolidates instead of blind 1:1 line→issue mapping. Skip `/td-flow-park`'s Step 0/1 (this command already verified and read BACKLOG in Step 2) and its Step 9 summary (this command's Step 12 covers it).
+**1. `.td-flow/BACKLOG.md`** — run the **canonical BACKLOG-flush procedure**: `/td-flow-park` Steps 2–8 (cache Issue Type IDs + friendly name → consolidate related lines → digest with Type + dedupe per proposed issue → one decision point → batch-create → rewrite BACKLOG). Don't re-derive it here — that procedure already consolidates instead of blind 1:1 line→issue mapping. Skip `/td-flow-park`'s Step 0/1 (this command already verified and read BACKLOG in Step 2) and its Step 9 summary (this command's Step 12 covers it).
 
-**2. `.td/work/<topic>.md` files** — gather all work files, then present one digest:
+**2. `.td-flow/work/<topic>.md` files** — gather all work files, then present one digest:
    - For each: `git log --grep="<topic>" --oneline` — shipped or not?
    - Recommendation per file: shipped → "delete (work done)"; unshipped → "ship now / park as <Type> / drop", where Type is `Bug` for incident files, `Epic` for planning files that decompose into sub-issues, `Task` otherwise.
 
    ```
-   .td/work/ — <N> file(s)
+   .td-flow/work/ — <N> file(s)
      1. incident-foo.md   shipped (3 commits)   → delete
      2. plan-bar.md       unshipped             → park as Epic, or ship now?
    Reply with decisions, e.g. "delete 1, park 2 as Epic".
@@ -60,8 +60,8 @@ Two leftover-thinking surfaces to clear — BACKLOG lines and `.td/work/` files.
    One decision point, then execute the batch: parked files → `gh api graphql createIssue` (work file content as body, `**From:** <sender-name>` marker); shipped/dropped files → delete; "ship now" → close aborts, the rhythm resumes on that file.
 
 After this step:
-- `.td/BACKLOG.md` is empty (`(empty)` placeholder restored).
-- `.td/work/` is empty (or near-empty if the user said "ship now" on something).
+- `.td-flow/BACKLOG.md` is empty (`(empty)` placeholder restored).
+- `.td-flow/work/` is empty (or near-empty if the user said "ship now" on something).
 - Any synced items are tracked in GitHub Issues with the right Type.
 
 # Step 4 — Code sanity sweep
@@ -126,7 +126,7 @@ If no stack files exist (pure-markdown repo, etc.): say so out loud (`no stack f
 
 The next conversation will load whatever these docs say and assume it's true. So: **keep what matters and is not derivable; clear everything else.**
 
-Apply this filter to every `.td/` doc:
+Apply this filter to every `.td-flow/` doc:
 
 - **Keep** if all three hold: (a) it matters for next session, (b) it's not derivable from code or `git log`, (c) we actually know it to be true.
 - **Clear** if: it's speculative ("might want to..."), it duplicates what `git log` or the codebase already says, or it's a placeholder that was never filled in.
@@ -171,13 +171,13 @@ If the user said in Step 2 they're wrapping a phase (not the whole project), use
 One commit, explicit paths:
 
 ```
-git add .td/ <any other touched docs>
+git add .td-flow/ <any other touched docs>
 git commit -m "chore: close <project-or-phase-name>"
 ```
 
 If nothing changed in Steps 6–8, skip this commit (don't make empty commits).
 
-Note: items synced to GitHub Issues in Step 3 didn't touch the working tree (they were GH-side mutations), so the close commit captures only doc changes here. The `.td/BACKLOG.md` going from filled to empty IS a working-tree change and ships in this commit.
+Note: items synced to GitHub Issues in Step 3 didn't touch the working tree (they were GH-side mutations), so the close commit captures only doc changes here. The `.td-flow/BACKLOG.md` going from filled to empty IS a working-tree change and ships in this commit.
 
 # Step 10 — Push
 
@@ -217,7 +217,7 @@ Don't run the update. Each project picks up any contract change on its next sess
 
 # Step 12 — Tell the user
 
-**One sentence summary line:** `Closed. <N> commits pushed. <P> items parked to GitHub. <.td/ prune summary>.`
+**One sentence summary line:** `Closed. <N> commits pushed. <P> items parked to GitHub. <.td-flow/ prune summary>.`
 
 **One short paragraph:** What got built and shipped, any meaningful decisions made, and the single most important thing to know if someone (or a future session) picks this up later. Not a changelog — git has that. Just the things that aren't obvious from reading the code.
 

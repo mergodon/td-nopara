@@ -1,14 +1,14 @@
 ---
-description: Unified cross-repo work check — gathers inbound issues (filed INTO this repo, grouped by Issue Type) and outbound issues (filed FROM this repo into others, scoped by .td/PROJECT.md § Cross-repo and identified by the **From:** body marker), presents both directions as one batched digest with a recommended action each, and executes your decisions in a single pass. Replaces /td-inbox + /td-outbox.
+description: Unified cross-repo work check — gathers inbound issues (filed INTO this repo, grouped by Issue Type) and outbound issues (filed FROM this repo into others, scoped by .td-flow/PROJECT.md § Cross-repo and identified by the **From:** body marker), presents both directions as one batched digest with a recommended action each, and executes your decisions in a single pass. Replaces /td-inbox + /td-outbox.
 ---
 
 You are running the unified mailbox check. The job: gather every cross-repo work item — both directions — present them as ONE digest with a recommended action each, take the user's decisions in a single pass, then execute the batch. No walking issues one at a time.
 
-The outbound side uses **minimum-dependency** mechanics: a human-curated list of connected projects (`.td/PROJECT.md § Cross-repo`) bounds the search, and the canonical `**From:** <project>` body marker identifies our own filings. No tracker Epic. No sub-issue linkage required for one-off cross-repo CRs. Epics with cross-repo sub-issues (real planning surface) keep their sub-issue linkage — that's a separate, legitimate use case.
+The outbound side uses **minimum-dependency** mechanics: a human-curated list of connected projects (`.td-flow/PROJECT.md § Cross-repo`) bounds the search, and the canonical `**From:** <project>` body marker identifies our own filings. No tracker Epic. No sub-issue linkage required for one-off cross-repo CRs. Epics with cross-repo sub-issues (real planning surface) keep their sub-issue linkage — that's a separate, legitimate use case.
 
 # Step 0 — Verify we're in a td-flow project with GH access
 
-- Confirm `./.td/` exists. If missing: abort, "Not a td-flow project."
+- Confirm `./.td-flow/` exists. If missing: abort, "Not a td-flow project."
 - Verify `gh` is authenticated and has a remote: `gh repo view --json name,owner 2>/dev/null`. If it fails: abort, "No GitHub remote or `gh` not authenticated."
 - Capture the slug as `<owner>/<name>` for the queries below.
 
@@ -16,12 +16,12 @@ The outbound side uses **minimum-dependency** mechanics: a human-curated list of
 
 Friendly name — used to sign comments and closures, and as the body marker value to filter on:
 
-1. First H1 heading in `.td/PROJECT.md`.
+1. First H1 heading in `.td-flow/PROJECT.md`.
 2. Fall back to directory basename.
 
 Hold as `<project-name>` for the run.
 
-Also read `.td/STATE.md` and parse the `Topic:` line. If it's not `idle` and matches a `Closes #<N>` reference in the Resume note (or a `.td/work/<slug>.md` exists referencing an inbound issue), hold the matched issue number as `<active-issue>`. It surfaces as an `[● ACTIVE]` marker in the digest header — so the very first thing /td-flow-mailbox tells you is what's already in flight before you start picking up new things.
+Also read `.td-flow/STATE.md` and parse the `Topic:` line. If it's not `idle` and matches a `Closes #<N>` reference in the Resume note (or a `.td-flow/work/<slug>.md` exists referencing an inbound issue), hold the matched issue number as `<active-issue>`. It surfaces as an `[● ACTIVE]` marker in the digest header — so the very first thing /td-flow-mailbox tells you is what's already in flight before you start picking up new things.
 
 # Step 2 — Inbound query (open issues in this repo)
 
@@ -57,7 +57,7 @@ Then, for each inbound issue, gather related commits — `git log --grep="#<N>" 
 
 # Step 3 — Read the cross-repo registry
 
-Read `.td/PROJECT.md § Cross-repo`. It's the human-curated list of repos this project files into (slug + optional one-line context per repo).
+Read `.td-flow/PROJECT.md § Cross-repo`. It's the human-curated list of repos this project files into (slug + optional one-line context per repo).
 
 - **Section missing or empty:** the project hasn't declared any cross-repo relationships. Outbound is empty. Skip Step 4; in the digest, say `Outbound: no cross-repo registry declared in PROJECT.md § Cross-repo`.
 - **Section present:** parse out the GH slugs (e.g., `mergodon/rgb-ggbuddy`, …). Hold as `<connected-repos>`.
@@ -154,7 +154,7 @@ Mailbox: <I> inbound + <M> outbound + <S> snapshots
          → <recommendation>
   2. …
 
-📤 Outbound (cross-repo — scoped by .td/PROJECT.md § Cross-repo) — by intent state
+📤 Outbound (cross-repo — scoped by .td-flow/PROJECT.md § Cross-repo) — by intent state
   3. <repo>#<N>  <Type>  <title>   <bucket>   <age>
          → <recommendation>
   4. …
@@ -241,13 +241,13 @@ Post all? (yes / edit N / drop N)
 **3. Handle `start` last** (at most one per batch — a Topic is singular). If the user said `start` on an **Epic**, don't activate it — an Epic isn't a single piece of work; offer to `start` one of its open child issues instead. If `start` targets an **Idea**, promote it to `Task` first (per the `promote` handler above) — starting work commits to it, so it's no longer exploration — then activate the now-`Task`. To activate an issue:
 
 1. Derive a kebab-case `<slug>` from the title (3–5 words, lowercase ASCII). Use it; the user can rename later if it doesn't fit.
-2. Infer multi-step vs single-piece from the issue body — multi-paragraph or checklist body → multi-step (create `.td/work/<slug>.md`); short one-edit body → single-piece (STATE Resume note only).
-3. Update `.td/STATE.md`:
+2. Infer multi-step vs single-piece from the issue body — multi-paragraph or checklist body → multi-step (create `.td-flow/work/<slug>.md`); short one-edit body → single-piece (STATE Resume note only).
+3. Update `.td-flow/STATE.md`:
    - `Topic: <slug>`
    - `Phase: planning` (multi-step) or `working` (single-piece)
    - `Last: YYYY-MM-DD — picked up #<N> from mailbox`
    - Append/replace Resume note line: `Active piece: #<N> <title> — Closes #<N> on ship.`
-4. If multi-step: create `.td/work/<slug>.md` with a short header (`# <title>`, link to `#<N>`, the issue body folded in as initial context).
+4. If multi-step: create `.td-flow/work/<slug>.md` with a short header (`# <title>`, link to `#<N>`, the issue body folded in as initial context).
 5. Tell the user: `STATE.Topic is now <slug> (<multi-step|single-piece>). First commit on this piece must include "Closes #<N>" so GitHub auto-closes the issue when it ships.`
 
 # Step 9 — Single end-summary
@@ -265,7 +265,7 @@ Mailbox walked: <T> reviewed total.
 
 - **Single command for both directions.** Don't suggest a second command for the other side — this IS both.
 - **One digest, one decision point.** Gather everything, present it once, take decisions in a single pass, execute the batch. No issue-by-issue walking.
-- **Outbound scope is the cross-repo registry** in `.td/PROJECT.md § Cross-repo`. Filings into repos not declared there won't show. By design — forces honesty about cross-repo relationships. If you find yourself wanting to widen, the right move is updating PROJECT.md, not bypassing the scope.
+- **Outbound scope is the cross-repo registry** in `.td-flow/PROJECT.md § Cross-repo`. Filings into repos not declared there won't show. By design — forces honesty about cross-repo relationships. If you find yourself wanting to widen, the right move is updating PROJECT.md, not bypassing the scope.
 - **The `**From:** <project>` body marker is canonical** — the only identifier of "this is ours" on the outbound side, and the human-readable source signal on the inbound side. Every cross-repo filing gets it.
 - **Sub-issue linkage stays for real planning Epics.** Epics with cross-repo children show progress in the digest. That's a legit GitHub-native use case. One-off CRs don't need it.
 - **Epics are reported, not actioned.** An Epic is a high-level planning surface — the actionable work is its child Bug/Task issues. `/td-flow-mailbox` shows an Epic's state and sub-issue progress for planning context; it never nudges `start` on a parent Epic. (Same stance as `/td-flow-close` Step 2, which gates a close only on Bug/Task.)
