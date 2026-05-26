@@ -16,6 +16,7 @@ Symlinks created:
 
 - `~/.claude/commands/td-flow-init.md`
 - `~/.claude/commands/td-flow-clear.md`
+- `~/.claude/commands/td-flow-complex-clear.md`
 - `~/.claude/commands/td-flow-close.md`
 - `~/.claude/commands/td-flow-refresh.md`
 - `~/.claude/commands/td-flow-mailbox.md`
@@ -35,6 +36,7 @@ To update on any machine: `git pull && ./install.sh`.
 |---|---|---|
 | `/td-flow-init` | Once per project | Bootstrap or migrate (brownfield-aware). `--template <name>` to start from a saved starter. |
 | `/td-flow-clear` | Mid-session checkpoint | Memory scan → doc-sync → light prune → STATE handoff → push. Ready for `/clear`. Fast. |
+| `/td-flow-complex-clear` | Mid-session checkpoint, but for multi-day complex work | Enhanced `/td-flow-clear` with required STATE sections (lead "Resume — start here" block, pending-action list by owner, dependency graph, volatile artifacts, credentials state, safe-vs-needs-approval boundary) + self-validation gate. Use when standard `/td-flow-clear` is too loose for the complexity. |
 | `/td-flow-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
 | `/td-flow-refresh` | When the framework has moved on | Pulls the latest framework + re-runs the installer. One-time: migrates a legacy project's `CLAUDE.md` onto the `@import`. |
 | `/td-flow-mailbox` | Unified cross-repo check | One pass over both directions: inbound (filed INTO this repo, grouped by Issue Type) AND outbound (open cross-repo issues we filed, scoped by `.td/PROJECT.md § Cross-repo` and filtered by the `**From:**` body marker). Close/comment/skip inbound, comment/verify/close-stale/reopen/skip outbound. |
@@ -281,9 +283,11 @@ Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `
 ## Repo layout (this repo)
 
 ```
-commands/             slash commands (td-init, td-clear, td-close, td-refresh,
-                                      td-mailbox, td-health, td-incident,
-                                      td-park, td-snapshot)
+commands/             slash commands (td-flow-init, td-flow-clear,
+                                      td-flow-complex-clear, td-flow-close,
+                                      td-flow-refresh, td-flow-mailbox,
+                                      td-flow-health, td-flow-incident,
+                                      td-flow-park, td-flow-snapshot)
 templates/            files copied into target projects on /td-flow-init
   CLAUDE.md           one-line @import of the canonical contract
   td/PROJECT.md

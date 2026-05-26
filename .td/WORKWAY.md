@@ -12,7 +12,7 @@ The framework has no application-code test suite (and never will — there's no 
 - Pre-ship checks (automated by `scripts/smoke.sh`, OK/WARN/FAIL output, exit 0/1/2):
   - [x] `bash -n install.sh` + `bash -n hooks/pre-commit` (syntax)
   - [x] `./install.sh` runs idempotently (two consecutive runs both exit 0)
-  - [x] All 9 slash commands resolve in `~/.claude/commands/` (`td-init`, `td-clear`, `td-close`, `td-refresh`, `td-mailbox`, `td-health`, `td-incident`, `td-park`, `td-snapshot`)
+  - [x] All 10 slash commands resolve in `~/.claude/commands/` (`td-flow-init`, `td-flow-clear`, `td-flow-complex-clear`, `td-flow-close`, `td-flow-refresh`, `td-flow-mailbox`, `td-flow-health`, `td-flow-incident`, `td-flow-park`, `td-flow-snapshot`)
   - [x] Skill at `~/.claude/skills/td-flow`, templates at `~/.claude/td-templates`, contract at `~/.claude/td-flow-contract.md` all resolve
   - [x] AWK extractor in `hooks/pre-commit` returns a non-empty value from `.td/WORKWAY.md § Local testing`
   - WARN: any unexpected td-flow command symlinked in `~/.claude/commands/` (drift signal — retired command not pruned)

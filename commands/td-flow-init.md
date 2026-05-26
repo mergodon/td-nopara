@@ -140,7 +140,7 @@ Short summary:
 - Frameworks detected and pre-noted in WORKWAY.md
 - Pre-commit hook installed (reads `Test command` from `.td/WORKWAY.md § Local testing`)
 - Git: init/exists/pushed
-- How to use from here: just talk. Say what you want to build, fix, or change. I'll start the rhythm. The 9 slash commands (`/td-flow-init`, `/td-flow-clear`, `/td-flow-close`, `/td-flow-refresh`, `/td-flow-mailbox`, `/td-flow-health`, `/td-flow-incident`, `/td-flow-park`, `/td-flow-snapshot`) are listed in the contract — everything else is conversational.
+- How to use from here: just talk. Say what you want to build, fix, or change. I'll start the rhythm. The 10 slash commands (`/td-flow-init`, `/td-flow-clear`, `/td-flow-complex-clear`, `/td-flow-close`, `/td-flow-refresh`, `/td-flow-mailbox`, `/td-flow-health`, `/td-flow-incident`, `/td-flow-park`, `/td-flow-snapshot`) are listed in the contract — everything else is conversational.
 
 # Save-as-template path
 
