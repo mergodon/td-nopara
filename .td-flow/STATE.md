@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-26)
 Blocker:  none
-Last:     2026-05-27 — removed saved-starter template functionality entirely (--template flag, save-as-template path, templates/<name>/ subdirs). Closes #13.
+Last:     2026-05-27 — softened over-confirmation pattern: mailbox Step 8 + Rules now reversibility-gate the confirm round (skip when directive came with reason+shape; surface drafts only when bare or adding material content); new "Action over questions" principle in contract.
 
 ## Resume note
 

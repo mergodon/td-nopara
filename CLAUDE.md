@@ -180,6 +180,7 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 - GitHub is the memory. Don't duplicate.
 - Cleanup is part of the work — fix incidental drift in the same atomic commit.
 - Present results — every assumption, fix, and decision visible in the response. No opaque "done."
+- Action over questions. When the user expressed clear intent, act and describe what happened — don't ask "should I?" twice. Confirmation is for genuinely irreversible operations (force push, deploy, delete remote branches, send to external party). Reversible work (comments, code edits, parked issues) is just done; the result is shown and the user can revert.
 
 ## The slash commands
 

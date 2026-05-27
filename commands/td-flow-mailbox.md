@@ -215,7 +215,12 @@ The user can `show` several items before giving decisions. No action is taken in
 
 Process the user's decisions as a batch, not a walk.
 
-**1. Resolve all drafts first.** For every action that needs text — inbound `comment`, inbound `close`, outbound `comment`/`ping`, outbound `verify`, outbound `close` (a withdrawal note) — draft the text now, each signed `— <project-name>`. Every inbound `close` gets a short closing comment by default; to close an issue bare, the user `drop`s its comment in the confirm below. Show ALL drafts together and confirm once:
+**1. Resolve all drafts.** For every action that needs text — inbound `comment`, inbound `close`, outbound `comment`/`ping`, outbound `verify`, outbound `close` (a withdrawal note) — draft the text now, each signed `— <project-name>`. Every inbound `close` gets a short closing comment by default.
+
+**When to confirm vs just post** — reversibility-gated:
+
+- **Directive came with reason + shape** (e.g. user said "close 3 — not supported anymore" or "comment 2 saying we'll wait one more sprint"): draft derives directly from the directive, **post without a separate confirm round**. The draft appears in the end-summary; comments and closures are trivially reversible (`gh issue comment --edit` / delete, `gh issue reopen`).
+- **Directive is bare** ("close 3") **or the draft adds material content the user hasn't seen**: show ALL drafts together and confirm once:
 
 ```
 About to post:
@@ -270,7 +275,7 @@ Mailbox walked: <T> reviewed total.
 - **Sub-issue linkage stays for real planning Epics.** Epics with cross-repo children show progress in the digest. That's a legit GitHub-native use case. One-off CRs don't need it.
 - **Epics are reported, not actioned.** An Epic is a high-level planning surface — the actionable work is its child Bug/Task issues. `/td-flow-mailbox` shows an Epic's state and sub-issue progress for planning context; it never nudges `start` on a parent Epic. (Same stance as `/td-flow-close` Step 2, which gates a close only on Bug/Task.)
 - **Always sign comments and closures with `— <project-name>`** (project-soul rule). Never address GH usernames in cross-repo prose.
-- **Never auto-close, never auto-post.** All drafted text is shown and confirmed once before the batch runs.
+- **Confirmation is reversibility-gated.** Comments and closures-with-comment are reversible (`gh issue comment --edit` / delete, `gh issue reopen`) — when the directive came with reason + shape, draft and execute, show the post inline in the result; surface a draft to confirm only when the directive is bare or the draft adds content the user hasn't seen. Destructive ops (snapshot branch delete local+remote, outbound `reopen` of another project's issue) still confirm.
 - **GraphQL preview header** `GraphQL-Features: sub_issues` required for `subIssuesSummary` + `subIssues`. Inline on each query that uses them.
 - **If GraphQL errors** (rate limit, auth, schema drift): surface the error and stop. Fall back to `gh issue list --json` for a degraded-mode inbound listing if the user insists.
 - **Cross-org outbound is unsupported** by sub-issue linkage, but the From-marker search still finds it. So a cross-org CR filed with the marker WILL show in outbound if its repo is declared in PROJECT.md § Cross-repo. (Sub-issue parent linkage just won't work for that one.)
