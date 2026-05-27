@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-26)
 Blocker:  none
-Last:     2026-05-27 — new "Presenting decisions" section in contract (numbering convention: 1,2,3 for decisions + action verbs, A,B,C for option blocks, plain prose for reports); extended "Action over questions" principle (pick interpretation when ambiguous; don't end turns with offered-next-steps questions). Behavior moved from per-user memory into the framework so every td-flow project gets it.
+Last:     2026-05-27 — tightened "Presenting decisions" rule in contract: numbers are the default for ALL decision lists (including options); letters (A,B,C) only when there's genuine nesting (each letter has its own 1/2/3 underneath).
 
 ## Resume note
 

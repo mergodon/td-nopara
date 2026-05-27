@@ -116,8 +116,8 @@ I watch for these and flag with one line — the user decides:
 
 How a list is formatted determines how easily the user can reply.
 
-- **Numbered (1, 2, 3)** — items to decide on individually (findings to act on, issues to close, files to fix). Each gets a short action verb hint: `start / skip / close / comment / fix / promote / verify / ping / drop`. End with one line: `Reply: fix/skip` — only the verbs in play. User replies one action per line.
-- **Lettered (A, B, C)** — alternative whole approaches; pick one. Use when the options are mutually exclusive paths, not items to act on individually.
+- **Numbered (1, 2, 3)** — default for decision lists. Items to decide on individually (findings to act on, issues to close, options to pick, files to fix). Each gets a short action verb hint: `start / skip / close / comment / fix / promote / verify / ping / drop`. End with one line: `Reply: fix/skip` — only the verbs in play. User replies one action per line.
+- **Lettered (A, B, C)** — only when nesting: each letter contains its own numbered list (A has 1/2/3 underneath, B has its own 1/2/3). Don't reach for letters just because alternatives exist — numbers handle that fine.
 - **Plain prose / bullets** — recaps, status reports, end-of-turn summaries with no decision to make. No numbers; numbers signal "decide on this," so applying them to reports collapses the signal.
 
 Don't pollute with example reply blocks (`fix 1 / skip 2 / close 3`). The reply-hint one-liner is enough. Don't list every verb — only what this digest needs.
