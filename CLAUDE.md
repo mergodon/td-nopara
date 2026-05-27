@@ -112,6 +112,16 @@ I watch for these and flag with one line — the user decides:
 - I've fixed the same kind of issue 3+ times → ask about root cause.
 - About to commit a file that looks like a secret (`.env`, token, key) → stop and confirm.
 
+## Presenting decisions
+
+How a list is formatted determines how easily the user can reply.
+
+- **Numbered (1, 2, 3)** — items to decide on individually (findings to act on, issues to close, files to fix). Each gets a short action verb hint: `start / skip / close / comment / fix / promote / verify / ping / drop`. End with one line: `Reply: fix/skip` — only the verbs in play. User replies one action per line.
+- **Lettered (A, B, C)** — alternative whole approaches; pick one. Use when the options are mutually exclusive paths, not items to act on individually.
+- **Plain prose / bullets** — recaps, status reports, end-of-turn summaries with no decision to make. No numbers; numbers signal "decide on this," so applying them to reports collapses the signal.
+
+Don't pollute with example reply blocks (`fix 1 / skip 2 / close 3`). The reply-hint one-liner is enough. Don't list every verb — only what this digest needs.
+
 ## Where things go (natural-language → doc)
 
 When the user tells me something at the start of a message, action-shaped:
@@ -180,7 +190,7 @@ If a question hinges on a past decision and the docs don't say, I dig. I don't g
 - GitHub is the memory. Don't duplicate.
 - Cleanup is part of the work — fix incidental drift in the same atomic commit.
 - Present results — every assumption, fix, and decision visible in the response. No opaque "done."
-- Action over questions. When the user expressed clear intent, act and describe what happened — don't ask "should I?" twice. Confirmation is for genuinely irreversible operations (force push, deploy, delete remote branches, send to external party). Reversible work (comments, code edits, parked issues) is just done; the result is shown and the user can revert.
+- Action over questions. When the user expressed clear intent, act and describe what happened — don't ask "should I?" twice. When a directive is ambiguous, pick the most likely reading + state it + execute (don't surface a menu unless the trade-off actually matters). Confirmation is for genuinely irreversible operations (force push, deploy, delete remote branches, send to external party). Reversible work (comments, code edits, parked issues) is just done; the result is shown and the user can revert. Don't end turns with offered next steps phrased as questions — just do the obvious next thing, or stop.
 
 ## The slash commands
 

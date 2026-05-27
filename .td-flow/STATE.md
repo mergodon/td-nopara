@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-26)
 Blocker:  none
-Last:     2026-05-27 — softened over-confirmation pattern: mailbox Step 8 + Rules now reversibility-gate the confirm round (skip when directive came with reason+shape; surface drafts only when bare or adding material content); new "Action over questions" principle in contract.
+Last:     2026-05-27 — new "Presenting decisions" section in contract (numbering convention: 1,2,3 for decisions + action verbs, A,B,C for option blocks, plain prose for reports); extended "Action over questions" principle (pick interpretation when ambiguous; don't end turns with offered-next-steps questions). Behavior moved from per-user memory into the framework so every td-flow project gets it.
 
 ## Resume note
 
