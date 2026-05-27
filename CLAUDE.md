@@ -139,7 +139,6 @@ When the user tells me something at the start of a message, action-shaped:
 - "wrap the project" / "we're done with this" / project actually finished → `/td-flow-close`
 - "health check" / "is prod healthy?" / "check production health" → invoke `/td-flow-health`
 - "where are we" → read STATE.md, summarize
-- "save this as a `<name>` template" → copy current `.td-flow/` shape (anonymized) to `~/projects/td-flow/templates/<name>/`
 
 Mid-conversation mentions don't trigger updates — only explicit, action-shaped statements at the start of a message do.
 

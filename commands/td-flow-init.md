@@ -1,10 +1,8 @@
 ---
-description: Bootstrap td-flow in the current directory. Brownfield-aware. Detects stack and pre-fills WORKWAY.md framework awareness. Optional --template <name> to start from a saved starter.
+description: Bootstrap td-flow in the current directory. Brownfield-aware. Detects stack and pre-fills WORKWAY.md framework awareness.
 ---
 
 You are initializing td-flow. After this runs, the user just talks. The other slash commands are `/td-flow-clear` (mid-project context reset) and `/td-flow-close` (project/phase wrap). Shipping pieces is conversational — no slash command.
-
-The argument may be `--template <name>` to start from a saved template at `~/projects/td-flow/templates/<name>/` instead of the default `~/.claude/td-templates/`. If `<name>` doesn't exist, abort and list available templates.
 
 # Step 0 — Detect existing td-flow or td-flow-like conventions
 
@@ -78,7 +76,7 @@ Group by destination so the user knows where each answer lands. Skip any answere
 
 # Step 3 — Write the docs
 
-Source templates from `~/.claude/td-templates/` (or `~/projects/td-flow/templates/<name>/` if `--template <name>` was passed). State-dir scaffolds live at `~/.claude/td-templates/td-flow/`:
+Source templates from `~/.claude/td-templates/`. State-dir scaffolds live at `~/.claude/td-templates/td-flow/`:
 
 - `CLAUDE.md` → root: copy `~/.claude/td-templates/CLAUDE.md` (a one-line `@import` of the canonical contract). It imports `~/.claude/td-flow-contract.md` — confirm that exists; if it doesn't, td-flow isn't fully installed, so tell the user to run `~/projects/td-flow/install.sh`, then continue.
 - `mkdir -p .td-flow/work .td-flow/frameworks` — create the state dir + subdirs
@@ -143,16 +141,6 @@ Short summary:
 - Pre-commit hook installed (reads `Test command` from `.td-flow/WORKWAY.md § Local testing`)
 - Git: init/exists/pushed
 - How to use from here: just talk. Say what you want to build, fix, or change. I'll start the rhythm. The 10 slash commands (`/td-flow-init`, `/td-flow-clear`, `/td-flow-complex-clear`, `/td-flow-close`, `/td-flow-refresh`, `/td-flow-mailbox`, `/td-flow-health`, `/td-flow-incident`, `/td-flow-park`, `/td-flow-snapshot`) are listed in the contract — everything else is conversational.
-
-# Save-as-template path
-
-This command also handles the inverse: when the user says "save this as a `<name>` template" (no slash command needed), I:
-
-1. Verify `.td-flow/PROJECT.md` exists.
-2. Copy `.td-flow/*` to `~/projects/td-flow/templates/<name>/td-flow/` (anonymized — strip user-specific values: project_name, live_url, db credentials, etc., back to placeholders).
-3. The template's `CLAUDE.md` is the standard one-line `@import` (already at `templates/CLAUDE.md`) — only copy the project's actual `CLAUDE.md` into `~/projects/td-flow/templates/<name>/CLAUDE.md` if it carries project-specific rules below the import worth keeping in the starter.
-4. Commit the framework repo: `chore: save <name> template`.
-5. Tell the user: "Saved as `<name>`. Future `/td-flow-init --template <name>` will start from this shape."
 
 # Rules
 

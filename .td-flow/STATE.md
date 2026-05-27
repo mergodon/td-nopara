@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-26)
 Blocker:  none
-Last:     2026-05-27 — install.sh Step 6 now syncs the framework repo's own `.git/hooks/pre-commit` from `hooks/pre-commit` on every install; smoke check #3a fail-fasts on drift before #4 self-heals. Closes the "hook stale on framework repo until manual cp" gap caught during /td-flow-refresh testing.
+Last:     2026-05-27 — removed saved-starter template functionality entirely (--template flag, save-as-template path, templates/<name>/ subdirs). Closes #13.
 
 ## Resume note
 

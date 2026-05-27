@@ -33,7 +33,7 @@ To update on any machine: `git pull && ./install.sh`.
 
 | Command | When you reach for it | What it does |
 |---|---|---|
-| `/td-flow-init` | Once per project | Bootstrap or migrate (brownfield-aware). `--template <name>` to start from a saved starter. |
+| `/td-flow-init` | Once per project | Bootstrap or migrate (brownfield-aware). |
 | `/td-flow-clear` | Mid-session checkpoint | Memory scan → doc-sync → light prune → STATE handoff → push. Ready for `/clear`. Fast. |
 | `/td-flow-complex-clear` | Mid-session checkpoint, but for multi-day complex work | Enhanced `/td-flow-clear` with required STATE sections (lead "Resume — start here" block, pending-action list by owner, dependency graph, volatile artifacts, credentials state, safe-vs-needs-approval boundary) + self-validation gate. Use when standard `/td-flow-clear` is too loose for the complexity. |
 | `/td-flow-close` | End of project (or phase) | Park leftover BACKLOG + work files to GitHub Issues, full doc audit, validate PROJECT, push. |
@@ -81,7 +81,6 @@ Most work is conversational. Here's what gets routed where:
 "where are we?"                       → summarizes STATE.md
 "let's clear" / about to /clear       → runs /td-flow-clear
 "wrap the project"                    → runs /td-flow-close
-"save this as a 'laravel' template"   → extracts current .td-flow/ shape
 ```
 
 ## The rhythm
@@ -265,10 +264,6 @@ cd ~/projects/td-flow && git pull && ./install.sh
 - **Pre-v5.0** — project's `CLAUDE.md` still carries a *full copy* of the contract instead of the one-line `@import`. `/td-flow-refresh` Step 1 rewrites it onto the import.
 - **Pre-v7.0** — project's state dir is still `.td/` (the legacy name). `/td-flow-refresh` Step 1.7 runs `git mv .td .td-flow` (history preserved) + creates a `.td → .td-flow` compat symlink so anything that hardcoded `.td/` (IDE bookmarks, scripts, `.gitignore` entries) keeps resolving. The framework's `hooks/pre-commit` + `scripts/smoke.sh` carry a `.td/` fallback as transition safety net — removed in a future v8.0 once the portfolio has settled.
 
-## Saving and reusing templates
-
-When a project's setup is dialed in, say "save this as a `<name>` template." I copy `.td-flow/*` (anonymized — placeholders restored) to `~/projects/td-flow/templates/<name>/`. Future `/td-flow-init --template <name>` starts from that shape so the next project of the same kind is configured out of the gate.
-
 ## Frameworks (Laravel Boost, Next, etc.)
 
 Frameworks like Laravel Boost regenerate root files (`CLAUDE.md`, `AGENTS.md`, `.mcp.json`, `boost.json`, `junie/`) on `boost:install`. We:
@@ -297,7 +292,6 @@ templates/            files copied into target projects on /td-flow-init
   td-flow/frameworks/.gitkeep   (overflow dir, rarely needed)
   .gitignore
   .env.example
-  <name>/             saved starter templates
 CLAUDE.md             the canonical td-flow contract (symlinked as ~/.claude/td-flow-contract.md)
 hooks/pre-commit      test-on-commit hook installed by /td-flow-init
 scripts/smoke.sh      pre-ship sanity checks for this repo (wired as Test command)
