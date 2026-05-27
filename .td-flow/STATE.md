@@ -2,15 +2,15 @@
 
 Project:  td-flow
 Topic:    idle
-Phase:    closed (2026-05-26)
+Phase:    closed (2026-05-27)
 Blocker:  none
-Last:     2026-05-27 — tightened "Presenting decisions" rule in contract: numbers are the default for ALL decision lists (including options); letters (A,B,C) only when there's genuine nesting (each letter has its own 1/2/3 underneath).
+Last:     2026-05-27 — closed v7.4.
 
 ## Resume note
 
-Framework consolidated around the `td-flow` namespace across the whole surface — project name, GH slug, local clone path, contract file, slash commands (`/td-flow-*`), per-project state dir (`.td-flow/`), template scaffold (`templates/td-flow/`). Ten slash commands; contract delivered via one-line `@import` per project; no skill (retired v6.1). Pre-commit hook gated by `scripts/smoke.sh` — 11 OK on clean state, including 31 per-command load-bearing anchors that fail-fast on silent structural regressions and a drift-catcher that surfaces stale `.git/hooks/pre-commit` before install.sh idempotency self-heals it.
+Framework consolidated around the `td-flow` namespace across the whole surface — project name, GH slug, local clone path, contract file, slash commands (`/td-flow-*`), per-project state dir (`.td-flow/`), template scaffold (`templates/td-flow/`). Ten slash commands; contract delivered via one-line `@import` per project; no skill (retired v6.1); no saved-starter templates (removed v7.4 — module pattern via sibling repos wins). Pre-commit hook gated by `scripts/smoke.sh`: 11 OK on clean state. Contract codifies presentation conventions (`§ Presenting decisions`) and autonomy principles (`§ Principles § Action over questions`) so the framework — not personal memory — carries them across all projects.
 
-If a future session opens here: this is the framework repo itself. It IS a td-flow project. Read `CLAUDE.md` for the contract, `.td-flow/PROJECT.md § Shipped` for the version arc, `WORKWAY.md` for how to test/ship. Nothing pending — pick up whatever the user brings.
+If a future session opens here: this is the framework repo itself, and it IS a td-flow project. Read `CLAUDE.md` for the contract, `.td-flow/PROJECT.md § Shipped` for the version arc, `WORKWAY.md` for how to test/ship. Nothing pending — pick up whatever the user brings.
 
 Two transition pieces still live on disk, scheduled for v8.0 cleanup:
 
