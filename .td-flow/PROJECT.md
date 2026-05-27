@@ -2,7 +2,7 @@
 
 ## What this is
 
-The **td-flow** framework itself: a minimal, file-based, repo-portable working agreement for solo development. Same shape every project, conversational interface, structured docs in `.td-flow/`, GitHub commits as memory. Ten slash commands (`/td-flow-init`, `/td-flow-clear`, `/td-flow-complex-clear`, `/td-flow-close`, `/td-flow-refresh`, `/td-flow-mailbox`, `/td-flow-health`, `/td-flow-incident`, `/td-flow-park`, `/td-flow-snapshot`) — everything else is conversational.
+The **td-flow** framework itself: a minimal, file-based, repo-portable working agreement for solo development. Same shape every project, conversational interface, structured docs in `.td-flow/`, GitHub commits as memory. Slash commands (`/td-flow-init`, `/td-flow-clear`, `/td-flow-complex-clear`, `/td-flow-close`, `/td-flow-refresh`, `/td-flow-mailbox`, `/td-flow-health`, `/td-flow-incident`, `/td-flow-park`, `/td-flow-snapshot`) — everything else is conversational.
 
 ## Who it's for
 
