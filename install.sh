@@ -8,7 +8,6 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_DIR="$HOME/.claude"
 COMMANDS_DIR="$CLAUDE_DIR/commands"
 SKILLS_DIR="$CLAUDE_DIR/skills"
-TEMPLATES_LINK="$CLAUDE_DIR/td-templates"
 
 mkdir -p "$COMMANDS_DIR"
 
@@ -87,13 +86,14 @@ if [ -L "$SKILL_LINK" ] || [ -d "$SKILL_LINK" ]; then
   echo "  pruned stale: ~/.claude/skills/td-flow (skill retired v6.1; contract @import covers it)"
 fi
 
-# 4. Symlink templates dir (commands resolve files from here)
-echo "→ linking templates to $TEMPLATES_LINK"
+# 4. Prune the retired td-templates symlink — commands now read templates
+#    directly from the repo (~/projects/td-flow/templates/), so the
+#    ~/.claude/td-templates indirection is gone. Remove any existing link.
+TEMPLATES_LINK="$CLAUDE_DIR/td-templates"
 if [ -L "$TEMPLATES_LINK" ] || [ -d "$TEMPLATES_LINK" ]; then
   rm -rf "$TEMPLATES_LINK"
+  echo "  pruned stale: ~/.claude/td-templates (templates now read from repo)"
 fi
-ln -s "$REPO_DIR/templates" "$TEMPLATES_LINK"
-echo "  templates linked"
 
 # 5. Symlink the canonical contract — projects @import this, instead of each
 #    carrying its own full copy in CLAUDE.md.

@@ -64,7 +64,7 @@ No labels, no status enum. Open = pending; closed = done.
 - `STATE.md` — current phase, current topic, blocker, resume note. Resume note can be as long as needed — that's where planning lives.
 - `BACKLOG.md` — session-scoped parking. During work, append items I want to defer (`- YYYY-MM-DD — <item>`). At `/td-flow-close`, BACKLOG flushes to GitHub Issues (with the appropriate type per the org's Issue Types) and the file ends empty. Starts empty each session.
 - `work/<topic>.md` — active work; deleted at close.
-- `DEBUG.md` *(optional)* — project-specific troubleshooting reference. Tooling URLs, symptom→diagnostic paths, gotchas, production debug commands. Read only when something's on fire. Created on demand (typically during a `/td-flow-incident` close-out when a non-obvious diagnostic surfaced), not scaffolded at `/td-flow-init`. Same opt-in pattern as `PROJECT.md § Cross-repo`. Template structure at `~/projects/td-flow/templates/td/DEBUG.md`.
+- `DEBUG.md` *(optional)* — project-specific troubleshooting reference. Tooling URLs, symptom→diagnostic paths, gotchas, production debug commands. Read only when something's on fire. Created on demand (typically during a `/td-flow-incident` close-out when a non-obvious diagnostic surfaced), not scaffolded at `/td-flow-init`. Same opt-in pattern as `PROJECT.md § Cross-repo`. Template structure at `~/projects/td-flow/templates/td-flow/DEBUG.md`.
 
 If something doesn't fit one of those docs, it probably doesn't need a doc — git or the existing docs cover it.
 
@@ -136,7 +136,7 @@ When the user tells me something at the start of a message, action-shaped:
 - "flush the backlog" / "park the backlog to GH" / "empty BACKLOG" → invoke `/td-flow-park` (or run its procedure inline if mid-conversation).
 - "let's plan X" / "start an Epic for X" / "I want to work on a big thing" → create `.td-flow/work/<slug>.md` as planning scratch. When the plan is solid, promote: parent `Epic` via `gh api graphql createIssue` in this repo; concrete pieces as sub-issues via `addSubIssue` mutation (cross-repo within mergodon org supported). Fold-and-delete the work file at promotion.
 - "feedback on td-flow" → append `~/projects/td-flow/FEEDBACK.md`
-- "add to DEBUG" / "save this debug trick" / "this gotcha goes in the runbook" → write to `.td-flow/DEBUG.md`. Create from `~/projects/td-flow/templates/td/DEBUG.md` template if missing.
+- "add to DEBUG" / "save this debug trick" / "this gotcha goes in the runbook" → write to `.td-flow/DEBUG.md`. Create from `~/projects/td-flow/templates/td-flow/DEBUG.md` template if missing.
 - "let's add X" / "fix X" / "build X" → start the rhythm; planning goes in `.td-flow/STATE.md` § Resume note (or `.td-flow/work/<topic>.md` if multi-step)
 - "file an issue for X" / "ask X to do Y" / "send a CR to X" → per `## Cross-repo § Filing workflow`. If parented by an Epic in this repo, also `addSubIssue` to it (per `## Cross-repo § Epics with cross-repo children`) so cross-repo progress rolls up.
 - "any incoming?" / "check the inbox" / "CRs?" → surface open **Bugs and Tasks** in this repo (`gh api graphql` by Issue Type — current repo ONLY, never widen here). Ideas and Epics aren't included — "show me the ideas" or `/td-flow-mailbox` for those. `/td-flow-mailbox` does the full walk (both directions).

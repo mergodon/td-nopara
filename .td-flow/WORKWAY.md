@@ -12,7 +12,7 @@ The framework has no application-code test suite (and never will — there's no 
 - Pre-ship checks (automated by `scripts/smoke.sh`, OK/WARN/FAIL output, exit 0/1/2):
   - [x] `bash -n install.sh` + `bash -n hooks/pre-commit` (syntax — 2 OKs)
   - [x] All 10 slash commands resolve in `~/.claude/commands/` (`td-flow-init`, `td-flow-clear`, `td-flow-complex-clear`, `td-flow-close`, `td-flow-refresh`, `td-flow-mailbox`, `td-flow-health`, `td-flow-incident`, `td-flow-park`, `td-flow-snapshot`)
-  - [x] Templates at `~/.claude/td-templates` and contract at `~/.claude/td-flow-contract.md` both resolve
+  - [x] Contract at `~/.claude/td-flow-contract.md` resolves
   - [x] **Framework pre-commit hook in sync** (v7.3): `hooks/pre-commit` matches `.git/hooks/pre-commit` byte-for-byte (drift catcher — surfaces stale installed hook before `install.sh` idempotency self-heals it silently)
   - [x] `./install.sh` runs idempotently (two consecutive runs both exit 0)
   - [x] AWK extractor in `hooks/pre-commit` returns a non-empty value from `.td-flow/WORKWAY.md § Local testing`
@@ -36,7 +36,7 @@ The framework is fully testable locally. If a future change involves a Claude Co
 The "live" environment for this framework is `mergodon/td-flow` on GitHub plus the symlinked install on each machine.
 
 - Live URL:        https://github.com/mergodon/td-flow
-- Deploy:          `git push origin main` (immediate; symlinks pick up changes since `templates/`, `commands/`, and the contract are linked, not copied)
+- Deploy:          `git push origin main` (immediate; `commands/` and the contract are symlinked into `~/.claude/`, `templates/` is read straight from the repo clone — all pick up changes on `git pull`, nothing is copied)
 - Smoke after ship: re-run `./install.sh` on the local machine; verify the new content is visible
 - Logs:            none (this is just files + symlinks)
 - Dashboards:      none

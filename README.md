@@ -24,7 +24,6 @@ Symlinks created:
 - `~/.claude/commands/td-flow-incident.md`
 - `~/.claude/commands/td-flow-park.md`
 - `~/.claude/commands/td-flow-snapshot.md`
-- `~/.claude/td-templates`
 - `~/.claude/td-flow-contract.md` — the canonical contract, `@import`-ed by every project
 
 To update on any machine: `git pull && ./install.sh`.

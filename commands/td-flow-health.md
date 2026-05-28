@@ -39,7 +39,7 @@ Not applicable — <one-line reason, e.g. "local CLI, no production surface">.
 
 Commit `docs: mark <project> non-production for /td-flow-health`. Done — future runs skip this project cleanly.
 
-If **(a)** — **draft the script, don't interrogate.** Read `.td-flow/WORKWAY.md` § Live (production URL, deploy host, log locations) and `.td-flow/PROJECT.md` § Stack. From those, draft `.td-flow/health.sh` from the template at `~/.claude/td-templates/td/health.sh` (or `~/projects/td-flow/templates/td/health.sh`):
+If **(a)** — **draft the script, don't interrogate.** Read `.td-flow/WORKWAY.md` § Live (production URL, deploy host, log locations) and `.td-flow/PROJECT.md` § Stack. From those, draft `.td-flow/health.sh` from the template at `~/projects/td-flow/templates/td-flow/health.sh`:
 
 - Always include the **app-reachable** check, pointed at the production URL + the cheapest health route (Laravel ships `/up`; otherwise the homepage or a known-light route).
 - Add the checks the docs justify: deploy-in-sync, disk on the deploy box, worker/queue liveness, failed-job count, TLS cert expiry, a critical cron's last run — only the ones this project's stack actually has.

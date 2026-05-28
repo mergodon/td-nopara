@@ -57,17 +57,13 @@ for link in "$HOME/.claude/commands/"*.md; do
   esac
 done
 
-# 3. Templates + contract symlinks
-for path in \
-  "td-templates" \
-  "td-flow-contract.md"; do
-  link="$HOME/.claude/$path"
-  if [ -L "$link" ] && [ -e "$link" ]; then
-    ok "~/.claude/$path resolves"
-  else
-    fail "~/.claude/$path missing or broken"
-  fi
-done
+# 3. Contract symlink
+link="$HOME/.claude/td-flow-contract.md"
+if [ -L "$link" ] && [ -e "$link" ]; then
+  ok "~/.claude/td-flow-contract.md resolves"
+else
+  fail "~/.claude/td-flow-contract.md missing or broken"
+fi
 
 # 3a. Framework pre-commit hook in sync with canonical (drift catcher).
 #     install.sh Step 6 syncs hooks/pre-commit → .git/hooks/pre-commit on
