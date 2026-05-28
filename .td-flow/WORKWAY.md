@@ -6,7 +6,7 @@ How the td-flow framework itself gets tested, verified, and shipped. This repo i
 
 The framework has no application-code test suite (and never will — there's no application code). The pre-ship checks are mechanical sanity checks automated by `scripts/smoke.sh`, which the pre-commit hook runs on every commit.
 
-- Test command:    scripts/smoke.sh
+- Test command:    `scripts/smoke.sh`
 - Dev server:      none
 - Local URL:       none
 - Pre-ship checks (automated by `scripts/smoke.sh`, OK/WARN/FAIL output, exit 0/1/2):

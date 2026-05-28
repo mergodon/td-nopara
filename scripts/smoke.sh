@@ -103,7 +103,7 @@ extracted=$(awk '
     print
     exit
   }
-' .td-flow/WORKWAY.md | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
+' .td-flow/WORKWAY.md | sed -E 's/^[[:space:]`]+//; s/[[:space:]`]+$//')
 if [ -n "$extracted" ]; then
   ok "AWK extractor returns Test command value: '$extracted'"
 else

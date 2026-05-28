@@ -26,7 +26,10 @@ CMD=$(awk '
     print
     exit
   }
-' "$WORKWAY" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
+' "$WORKWAY" | sed -E 's/^[[:space:]`]+//; s/[[:space:]`]+$//')
+# sed strips outer whitespace AND backticks — Bug #14: backticks in
+# WORKWAY's `Test command:` line (natural for markdown-formatted prose)
+# would otherwise reach eval below and trigger command substitution.
 
 if [ -z "$CMD" ] || [ "$CMD" = "none" ] || [ "$CMD" = "{{test_command}}" ]; then
   echo "td-flow: no runnable Test command in $WORKWAY § Local testing — skipping"

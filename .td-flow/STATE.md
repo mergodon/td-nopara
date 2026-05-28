@@ -1,25 +1,22 @@
 # State
 
 Project:  td-flow
-Topic:    contract-tightening
+Topic:    idle
 Phase:    shipping
 Blocker:  none
-Last:     2026-05-28 — applied 5 tightening fixes to CLAUDE.md + 2 to WORKWAY.md + 1 ripple to PROJECT.md; smoke clean.
+Last:     2026-05-28 — fixed Bug #14 (pre-commit backtick handling). Two pieces shipped today; ready to re-run /td-flow-close.
 
 ## Resume note
 
-Post-v7.4 content-review pass on the contract — origin: user noticed `~/.claude/td-rider-contract.md` is 93.8k chars (over the 40k warning), asked to apply the same lean-and-loaded-only-if-needed audit to td-flow's. Contract is at 210 lines / ~22k chars; under threshold, lean by structural standards, so this pass tightens within the existing shape (preserves spirit) rather than splitting content out to skills/rules (a separate, bigger conversation if the size ever matters here).
+Two pieces shipped 2026-05-28 on top of the v7.4 close:
 
-Fixes shipped:
-- "Where things go" — trimmed three oversized entries (lines for "park this to GH", "file an issue for X", "snapshot this") that had grown procedural detail belonging in command files. Detail verified to live in `/td-flow-park` Step 5, `/td-flow-snapshot`, and `## Cross-repo § Filing workflow` — entries now point to those.
-- BACKLOG flush dedupe — line in `## Drift signals` ("BACKLOG > 15 items") and the `## Where things go` "park this" line both trimmed; canonical statement lives once in `## The docs` BACKLOG.md description.
-- `## Framework guidelines` "Never run /init" — compressed from 3 sentences to 1, same content.
-- `## The slash commands` intro — "Ten commands" → "Each command" so the count doesn't drift when an 11th lands. Ripple: PROJECT.md "Ten slash commands" → "Slash commands"; WORKWAY's "CLAUDE.md's 'Ten commands' trigger map" reference updated to "`## The slash commands` trigger map".
-- WORKWAY pre-ship checklist intro — dropped the "11 OK on clean state" magic number.
+**1. Contract tightening (commit 00c9450).** Post-v7.4 content-review pass — origin: user noticed `~/.claude/td-rider-contract.md` is 93.8k chars (over the 40k warning), asked to apply the same lean-and-loaded-only-if-needed audit to td-flow's. Contract was at 210 lines / ~23k chars; under threshold, lean by structural standards, so the pass tightened within the existing shape (preserves spirit) rather than splitting content to skills/rules (a separate, bigger conversation if size ever matters here). Trimmed three oversized "Where things go" router entries (procedural detail verified to live in command files / `## Cross-repo § Filing workflow`), deduped 3 BACKLOG flush mentions to 1, compressed "Never run /init", made "Ten commands" count-free with ripple to PROJECT.md + WORKWAY. Net −1,413 chars (−6%).
 
-Net: CLAUDE.md ~22k → ~21.5k chars (-6%); line count unchanged at 210 (compressions within lines, no whole lines dropped). Smoke 11 OK 0 WARN 0 FAIL. Spirit preserved throughout — three findings tagged [verify] / [extend] / [skip] in the review left for explicit user direction.
+**2. Bug #14 fix (this piece).** tasmanvisa-web filed 2026-05-27: the `eval "$CMD"` in `hooks/pre-commit` triggers command substitution when WORKWAY's `Test command:` line uses markdown-style backticks. Bug body proposed 3 fixes; picked option 1 (strip outer backticks in awk extractor) — option 2 (`bash -c` instead of `eval`) was misdiagnosed in the bug body (same outcome — both re-parse as shell), option 3 (document the constraint) was tasmanvisa-web's local workaround (discipline, not engineering). Fix: extended the sed pipeline in both `hooks/pre-commit` and `scripts/smoke.sh` (they share the extractor verbatim) from `[[:space:]]+` → `[[:space:]\`]+` at the trim boundaries. Eat-own-dog-food: WORKWAY's own Test command now wrapped in backticks, so the framework's own pre-commit hook exercises the fix on every commit — no separate test fixture needed.
 
-If a future session opens here: this is the framework repo itself. Read `CLAUDE.md` for the contract, `.td-flow/PROJECT.md § Shipped` for the version arc, `WORKWAY.md` for how to test/ship.
+Smoke 11 OK 0 WARN 0 FAIL. tasmanvisa-web can revert their local Option-3 workaround (commit eceb154) next pull — informational only, not our action.
+
+If a future session opens here: this is the framework repo itself. Read `CLAUDE.md` for the contract, `.td-flow/PROJECT.md § Shipped` for the version arc, `WORKWAY.md` for how to test/ship. /td-flow-close was invoked then aborted to fix #14 first — re-running it now is the natural next step.
 
 Two transition pieces still live on disk, scheduled for v8.0 cleanup:
 
