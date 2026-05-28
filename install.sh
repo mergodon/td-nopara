@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# td-flow installer — symlinks slash commands, the contract, and the templates dir into ~/.claude/.
+# td-flow installer — symlinks slash commands and the contract into ~/.claude/.
+# (Templates are read directly from the repo by /td-flow-init, not symlinked.)
 # Idempotent: safe to re-run after pulling updates.
 
 set -euo pipefail

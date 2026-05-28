@@ -294,7 +294,7 @@ templates/            files copied into target projects on /td-flow-init
 CLAUDE.md             the canonical td-flow contract (symlinked as ~/.claude/td-flow-contract.md)
 hooks/pre-commit      test-on-commit hook installed by /td-flow-init
 scripts/smoke.sh      pre-ship sanity checks for this repo (wired as Test command)
-install.sh            symlinks commands, templates, contract into ~/.claude/
+install.sh            symlinks commands + contract into ~/.claude/ (templates read from repo)
 FEEDBACK.md           feedback about td-flow itself, captured from any project
 ```
 
