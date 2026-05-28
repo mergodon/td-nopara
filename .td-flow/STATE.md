@@ -4,7 +4,7 @@ Project:  td-flow
 Topic:    idle
 Phase:    closed (2026-05-28)
 Blocker:  none
-Last:     2026-05-28 — dropped the `~/.claude/td-templates` symlink; commands now read templates from the repo clone (`~/projects/td-flow/templates/`). Bundled the stale `templates/td/` → `templates/td-flow/` DEBUG/health pointer fix (broken since the v7.0 dir rename).
+Last:     2026-05-29 — verified stable on Opus 4.8 (1M): smoke 10/10, `@import` chain + all 10 command symlinks resolve, 0 open issues, docs coherent, no drift. Review/stability pass — no changes shipped.
 
 ## Resume note
 
